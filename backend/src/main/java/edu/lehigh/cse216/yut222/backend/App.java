@@ -1,5 +1,7 @@
 package edu.lehigh.cse216.yut222.backend;
 
+import java.util.Map;
+
 // Import the Spark package, so that we can make use of the "get" function to 
 // create an HTTP GET route
 import spark.Spark;
@@ -22,13 +24,15 @@ public class App {
         // https://stackoverflow.com/questions/10380835/is-it-ok-to-use-gson-instance-as-a-static-field-in-a-model-bean-reuse
         final Gson gson = new Gson();
 
-        // dataStore holds all of the data that has been provided via HTTP 
-        // requests
-        //
-        // NB: every time we shut down the server, we will lose all data, and 
-        //     every time we start the server, we'll have an empty dataStore,
-        //     with IDs starting over from 0.
-        final DataStore dataStore = new DataStore();
+        // Get the Postgres conf from the environment
+        Map<String, String> env = System.getenv();
+        String ip = env.get("POSTGRES_IP");
+        String port = env.get("POSTGRES_PORT");
+        String user = env.get("POSTGRES_USER");
+        String pass = env.get("POSTGRES_PASS");
+        
+        // Connect to the database
+        Database db = Database.getDatabase(ip, port, user, pass);
 
         // GET route that returns all message titles and Ids.  All we do is get 
         // the data, embed it in a StructuredResponse, turn it into JSON, and 
@@ -38,7 +42,7 @@ public class App {
             // ensure status 200 OK, with a MIME type of JSON
             response.status(200);
             response.type("application/json");
-            return gson.toJson(new StructuredResponse("ok", null, dataStore.readAll()));
+            return gson.toJson(new StructuredResponse("ok", null, db.readAll()));
         });
 
         // GET route that returns everything for a single row in the DataStore.
@@ -52,7 +56,7 @@ public class App {
             // ensure status 200 OK, with a MIME type of JSON
             response.status(200);
             response.type("application/json");
-            DataRow data = dataStore.readOne(idx);
+            DataRow data = db.readOne(idx);
             if (data == null) {
                 return gson.toJson(new StructuredResponse("error", idx + " not found", null));
             } else {
@@ -74,7 +78,7 @@ public class App {
             response.status(200);
             response.type("application/json");
             // NB: createEntry checks for null title and message
-            int newId = dataStore.createEntry(req.mTitle, req.mMessage);
+            int newId = db.createEntry(req.mTitle, req.mMessage);
             if (newId == -1) {
                 return gson.toJson(new StructuredResponse("error", "error performing insertion", null));
             } else {
@@ -92,7 +96,7 @@ public class App {
             // ensure status 200 OK, with a MIME of JSON
             response.status(200);
             response.type("application/json");
-            DataRow result = dataStore.updateOne(idx, req.mTitle, req.mMessage);
+            DataRow result = db.updateOne(idx, req.mTitle, req.mMessage);
             if (result == null) {
                 return gson.toJson(new StructuredResponse("error", "unable to update row " + idx, null));
             } else {
@@ -109,7 +113,7 @@ public class App {
             response.type("application/json");
             // NB: we won't concern ourselves too much with the quality of the
             //     message sent on a successful delete
-            boolean result = dataStore.deleteOne(idx);
+            boolean result = db.deleteOne(idx);
             if (!result) {
                 return gson.toJson(new StructuredResponse("error", "unable to delete row " + idx, null));
             } else {
