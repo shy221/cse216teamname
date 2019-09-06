@@ -2,12 +2,15 @@ package edu.lehigh.cse216.yut222.phase0;
 
 import android.os.Bundle;
 
+import com.android.volley.*;
+import com.android.volley.toolbox.*;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -20,15 +23,28 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        Log.d("yut222", "Debug Message from onCreate");
 
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
+        // Instantiate the RequestQueue
+        RequestQueue queue = Volley.newRequestQueue(this);
+        String url = "http://www.cse.lehigh.edu/~spear/courses.json";
+
+        // Request a string response from the provided URL
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.d("yut222", "Response is " + response);
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e("yut222", "That didn't work!");
+                    }
         });
+
+        // Add the request to the RequestQueue
+        queue.add(stringRequest);
     }
 
     @Override
