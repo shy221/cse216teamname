@@ -14,6 +14,12 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.*;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -34,7 +40,20 @@ public class MainActivity extends AppCompatActivity {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        Log.d("yut222", "Response is " + response);
+                        final ArrayList<String> myList = new ArrayList<>();
+                        try {
+                            JSONArray jStringArray = new JSONArray(response);
+                            for (int i = 0; i < jStringArray.length(); i++) {
+                                myList.add(jStringArray.getString(i));
+                            }
+                        } catch (final JSONException e) {
+                            Log.d("yut222", "Error parsing JSON file..." + e.getMessage());
+                        }
+                        ListView mListView = (ListView) findViewById(R.id.datum_list_view);
+                        ArrayAdapter adapter = new ArrayAdapter<>(MainActivity.this,
+                                android.R.layout.simple_list_item_1,
+                                myList);
+                        mListView.setAdapter(adapter);
                     }
                 }, new Response.ErrorListener() {
                     @Override
