@@ -15,16 +15,26 @@ describe("Tests of basic math functions", function() {
         foo -= 1;
         expect(foo).toEqual(-1);
     });
+});
 
+describe("Tests of logic of app.ts", function() {
     it("UI Test: Add Button Hides Listing", function(){
         // click the button for showing the add button
         $('#showFormButton').click();
         // expect that the add form is not hidden
-        // create some errors on purpose to make sure apptest works
-        expect($("#addElement").attr("style").indexOf("display: none;")).toEqual(0);
-        // expect tha tthe element listing is hidden
+        expect($("#addElement").attr("style").indexOf("display: none;")).toEqual(-1);
+        // expect tha the element listing is hidden
         expect($("#showElements").attr("style").indexOf("display: none;")).toEqual(0);
         // reset the UI, so we don't mess up the next test
-        $('#addCancel').click();        
+        $('#addCancel').click();
     });
-});
+
+    it("UI Test: init", function(){
+        // expect that the add form is hidden by default
+        expect($('#addElement').attr("style").indexOf("display: none;")).toEqual(0);
+        // expect that the edit form is hidden by default
+        expect($('#editElement').attr("style").indexOf("display: none;")).toEqual(0);
+        // expect that the element listing is not hidden
+        expect($('#showElements').attr("style").indexOf("display: none;")).toEqual(-1);
+    });
+})
