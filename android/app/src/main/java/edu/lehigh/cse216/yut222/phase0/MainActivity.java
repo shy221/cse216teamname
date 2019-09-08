@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
         Log.d("yut222", "Debug Message from onCreate");
 
         // Instantiate the RequestQueue
-        RequestQueue queue = Volley.newRequestQueue(this);
+        RequestQueue queue = MySingleton.getInstance(this.getApplicationContext()).getRequestQueue();
         String url = "http://www.cse.lehigh.edu/~spear/5k.json";
 
         // Request a string response from the provided URL
@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // Add the request to the RequestQueue
-        queue.add(stringRequest);
+        MySingleton.getInstance(this).addToRequestQueue(stringRequest);
     }
 
     private void populateListFromVolley(String response){
