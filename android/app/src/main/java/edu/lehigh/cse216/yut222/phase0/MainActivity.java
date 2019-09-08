@@ -103,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             Intent i = new Intent(getApplicationContext(), SecondActivity.class);
-            i.putExtra("label_contents", "CSE216 is the best");
+            i.putExtra("label_contents", "Lehigh CSE Courses");
             startActivityForResult(i, 789); // 789 is the number that will come back to us
             return true;
         }

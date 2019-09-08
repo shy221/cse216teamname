@@ -19,6 +19,12 @@
             tools:layout_editor_absoluteY="8dp"
             tools:layout_editor_absoluteX="0dp" />
 
+        <ListView
+            android:id="@+id/datum_list_view"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent">
+        </ListView>
+
         <EditText
             android:id="@+id/editText"
             android:layout_width="384dp"
