@@ -1,4 +1,4 @@
-package edu.lehigh.cse216.yut222.backend;
+package edu.lehigh.cse216.teamname.backend;
 
 /**
  * SimpleRequest provides a format for clients to present title and message 

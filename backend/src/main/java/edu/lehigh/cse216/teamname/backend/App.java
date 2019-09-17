@@ -1,4 +1,4 @@
-package edu.lehigh.cse216.yut222.backend;
+package edu.lehigh.cse216.teamname.backend;
 
 // Import the Spark package, so that we can make use of the "get" function to 
 // create an HTTP GET route
@@ -29,6 +29,9 @@ public class App {
         //     every time we start the server, we'll have an empty dataStore,
         //     with IDs starting over from 0.
         final DataStore dataStore = new DataStore();
+
+        // Get the port on which to listen for requests
+        Spark.port(getIntFromEnv("PORT", 4567));
 
         // Set up the location for serving static files. If the STATIC_LOCATION
         // environment variable is set, we will serve from it. Otherwise, serve
@@ -132,5 +135,21 @@ public class App {
                 return gson.toJson(new StructuredResponse("ok", null, null));
             }
         });
+    }
+    /**
+    * Get an integer environment varible if it exists, and otherwise return the
+    * default value.
+    * 
+    * @envar      The name of the environment variable to get.
+    * @defaultVal The integer value to use as the default if envar isn't found
+    * 
+    * @returns The best answer we could come up with for a value for envar
+    */
+    static int getIntFromEnv(String envar, int defaultVal) {
+        ProcessBuilder processBuilder = new ProcessBuilder();
+        if (processBuilder.environment().get(envar) != null) {
+            return Integer.parseInt(processBuilder.environment().get(envar));
+        }
+        return defaultVal;
     }
 }

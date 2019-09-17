@@ -1,4 +1,4 @@
-package edu.lehigh.cse216.yut222.admin;
+package edu.lehigh.cse216.teamname.admin;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

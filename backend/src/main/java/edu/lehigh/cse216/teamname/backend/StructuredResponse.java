@@ -1,4 +1,4 @@
-package edu.lehigh.cse216.yut222.backend;
+package edu.lehigh.cse216.teamname.backend;
 
 /**
  * StructuredResponse provides a common format for success and failure messages,
