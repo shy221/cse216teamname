@@ -1,4 +1,4 @@
-package edu.lehigh.teamname.yut222.admin;
+package edu.lehigh.cse216.teamname.admin;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
