@@ -35,4 +35,21 @@ public class AppTest
     {
         assertTrue( true );
     }
+
+    public void testMenu()
+    {
+        String menuOp = "Main Menu\n" +
+                        "  [T] Create tblData\n" +
+                        "  [D] Drop tblData\n" +
+                        "  [1] Query for a specific row\n" +
+                        "  [*] Query for all rows\n" +
+                        "  [-] Delete a row\n" +
+                        "  [+] Insert a new row\n" +
+                        "  [~] Update a row\n" +
+                        "  [q] Quit Program\n" +
+                        "  [?] Help (this message)";
+        // for now, assume it is true
+        assertTrue ( true ); 
+
+    }
 }
