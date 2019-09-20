@@ -53,6 +53,11 @@ public class Database {
     private PreparedStatement mDropTable;
 
     /**
+     * A prepared statement for increase likes
+     */
+    private PreparedStatement mIncrementLikes;
+
+    /**
      * RowData is like a struct in C: we use it to hold data, and we allow 
      * direct access to its fields.  In the context of this Database, RowData 
      * represents the data we'd see in a row.
@@ -75,14 +80,19 @@ public class Database {
          * The message stored in this row
          */
         String mMessage;
+        /**
+         * The count of likes
+         */
+        int mlikes;
 
         /**
          * Construct a RowData object by providing values for its fields
          */
-        public RowData(int id, String subject, String message) {
+        public RowData(int id, String subject, String message, int likes) {
             mId = id;
             mSubject = subject;
             mMessage = message;
+            mlikes = likes;
         }
     }
 
@@ -141,15 +151,16 @@ public class Database {
             // creation/deletion, so multiple executions will cause an exception
             db.mCreateTable = db.mConnection.prepareStatement(
                     "CREATE TABLE tblData (id SERIAL PRIMARY KEY, subject VARCHAR(50) "
-                    + "NOT NULL, message VARCHAR(500) NOT NULL)");
+                    + "NOT NULL, message VARCHAR(500) NOT NULL, likes NUMERIC(8,0))");
             db.mDropTable = db.mConnection.prepareStatement("DROP TABLE tblData");
 
             // Standard CRUD operations
             db.mDeleteOne = db.mConnection.prepareStatement("DELETE FROM tblData WHERE id = ?");
-            db.mInsertOne = db.mConnection.prepareStatement("INSERT INTO tblData VALUES (default, ?, ?)");
+            db.mInsertOne = db.mConnection.prepareStatement("INSERT INTO tblData VALUES (default, ?, ?, ?)");
             db.mSelectAll = db.mConnection.prepareStatement("SELECT id, subject FROM tblData");
             db.mSelectOne = db.mConnection.prepareStatement("SELECT * from tblData WHERE id=?");
             db.mUpdateOne = db.mConnection.prepareStatement("UPDATE tblData SET message = ? WHERE id = ?");
+            db.mIncrementLikes = db.mConnection.prepareStatement("UPDATE tblData SET likes = likes + 1 WHERE id = ?");
         } catch (SQLException e) {
             System.err.println("Error creating prepared statement");
             e.printStackTrace();
@@ -197,6 +208,7 @@ public class Database {
         try {
             mInsertOne.setString(1, subject);
             mInsertOne.setString(2, message);
+            mInsertOne.setInt(3, 0);
             count += mInsertOne.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -214,7 +226,7 @@ public class Database {
         try {
             ResultSet rs = mSelectAll.executeQuery();
             while (rs.next()) {
-                res.add(new RowData(rs.getInt("id"), rs.getString("subject"), null));
+                res.add(new RowData(rs.getInt("id"), rs.getString("subject"), rs.getString("message"), rs.getInt("likes")));
             }
             rs.close();
             return res;
@@ -237,7 +249,7 @@ public class Database {
             mSelectOne.setInt(1, id);
             ResultSet rs = mSelectOne.executeQuery();
             if (rs.next()) {
-                res = new RowData(rs.getInt("id"), rs.getString("subject"), rs.getString("message"));
+                res = new RowData(rs.getInt("id"), rs.getString("subject"), rs.getString("message"), rs.getInt("likes"));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -281,6 +293,16 @@ public class Database {
             e.printStackTrace();
         }
         return res;
+    }
+
+    public RowData incrementLikes(int id) {
+        try {
+            mIncrementLikes.setInt(1, id);
+            return selectOne(id);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     /**
