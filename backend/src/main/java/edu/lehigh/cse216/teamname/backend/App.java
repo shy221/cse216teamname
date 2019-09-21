@@ -113,7 +113,25 @@ public class App {
             // ensure status 200 OK, with a MIME of JSON
             response.status(200);
             response.type("application/json");
-            DataRow result = db.updateOne(idx, req.mTitle, req.mMessage);
+            //used to be updateOne(idx, req.mTitle, req.mMessage)
+            DataRow result = db.updateOne(idx, req.mMessage);
+            if (result == null) {
+                return gson.toJson(new StructuredResponse("error", "unable to update row " + idx, null));
+            } else {
+                return gson.toJson(new StructuredResponse("ok", null, result));
+            }
+        });
+
+        //PUT route for updating the value of likes in a row in teh Database
+        Spark.put("/messages/:id/likes", (request, response) -> {
+            // If we can't get an ID or can't parse the JSON, Spark will sned
+            // a status 500
+            int idx = Integer.parseInt(request.params("id"));
+            SimpleRequest req = gson.fromJson(request.body(), SimpleRequest.class);
+            // ensure status 200 OK, with a MIME of JSON
+            response.status(200);
+            response.type("application/json");
+            DataRow result = db.incrementLikes(idx);
             if (result == null) {
                 return gson.toJson(new StructuredResponse("error", "unable to update row " + idx, null));
             } else {

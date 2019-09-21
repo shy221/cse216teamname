@@ -27,6 +27,7 @@ public class Database {
      */
     private PreparedStatement mDeleteOne;
     private PreparedStatement mInsertOne;
+    private PreparedStatement mIncrementLikes;
     private PreparedStatement mSelectAll;
     private PreparedStatement mSelectOne;
     private PreparedStatement mUpdateOne;
@@ -85,9 +86,10 @@ public class Database {
 
             // Standard CRUD operations
             db.mDeleteOne = db.mConnection.prepareStatement("DELETE FROM tblData WHERE id = ?");
-            db.mInsertOne = db.mConnection.prepareStatement("INSERT INTO tblData VALUES (?, ?, ?)");
+            db.mInsertOne = db.mConnection.prepareStatement("INSERT INTO tblData VALUES (default, ?, ?, ?)");
+            db.mIncrementLikes = db.mConnection.prepareStatement("UPDATE tblData SET likes = likes + 1 WHERE id = ?");
             db.mSelectAll = db.mConnection.prepareStatement("SELECT id, subject FROM tblData");
-            db.mSelectOne = db.mConnection.prepareStatement("SELECT * from tblData WHERE id=?");
+            db.mSelectOne = db.mConnection.prepareStatement("SELECT * from tblData WHERE id = ?");
             db.mUpdateOne = db.mConnection.prepareStatement("UPDATE tblData SET message = ? WHERE id = ?");
         } catch (SQLException e) {
             System.err.println("Error creating prepared statement");
@@ -132,9 +134,9 @@ public class Database {
             return -1;
         int id = mCount++;
         try {
-            mInsertOne.setInt(1, id);
-            mInsertOne.setString(2, subject);
-            mInsertOne.setString(3, message);
+            mInsertOne.setString(1, subject);
+            mInsertOne.setString(2, message);
+            mInsertOne.setInt(3, 0);
             mInsertOne.execute();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -154,7 +156,7 @@ public class Database {
             mSelectOne.setInt(1, id);
             ResultSet rs = mSelectOne.executeQuery();
             if (rs.next()) {
-                res = new DataRow(rs.getInt("id"), rs.getString("subject"), rs.getString("message"));
+                res = new DataRow(rs.getInt("id"), rs.getString("subject"), rs.getString("message"), rs.getInt("likes"));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -172,7 +174,7 @@ public class Database {
         try {
             ResultSet rs = mSelectAll.executeQuery();
             while (rs.next()) {
-                res.add(new DataRowLite(new DataRow(rs.getInt("id"), rs.getString("subject"), null)));
+                res.add(new DataRowLite(new DataRow(rs.getInt("id"), rs.getString("subject"), rs.getString("message"), rs.getInt("likes"))));
             }
             rs.close();
             return res;
@@ -183,19 +185,36 @@ public class Database {
     }
 
     /**
-     * Update the subject and message of a row in the database
+     * Update the message of a row in the database
      * 
      * @param id The Id of the row to update
      * @param subject The new subject for the row
      * @param message The new message for the row
      * @return a copy of the data in the row, if exists, or null otherwise
      */
-    public DataRow updateOne(int id, String subject, String message) {
+    // I changed updateOne(int id, String subject, String message) because the prepared statement only needs message and id.
+    public DataRow updateOne(int id, String message) {
         try {
-            mUpdateOne.setString(1, subject);
-            mUpdateOne.setString(2, message);
-            mUpdateOne.setInt(3, id);
+            mUpdateOne.setString(1, message);
+            mUpdateOne.setInt(2, id);
             mUpdateOne.execute();
+            return readOne(id);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * Increment the likes value by 1 
+     * 
+     * @param id the Id of the row to increment likes value
+     * @return a copy of the data in the row, if exists, or null otherwise
+     */
+    public DataRow incrementLikes(int id) {
+        try {
+            mIncrementLikes.setInt(1, id);
+            mIncrementLikes.execute();
             return readOne(id);
         } catch (SQLException e) {
             e.printStackTrace();
