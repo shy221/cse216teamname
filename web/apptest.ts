@@ -21,9 +21,9 @@ describe("Tests of basic math functions", function() {
         $('#showFormButton').click();
         // expect that the add form is not hidden
         // create some errors on purpose to make sure apptest works
-        expect($("#addElement").attr("style").indexOf("display: none;")).toEqual(0);
+        expect($("#addElement").attr("style").indexOf("display: none;")).toEqual(-1);
         // expect tha tthe element listing is hidden
-        expect($("#showElements").attr("style").indexOf("display: none;")).toEqual(0);
+        expect($("#showElements").attr("style").indexOf("display: none;")).toEqual(-1);
         // reset the UI, so we don't mess up the next test
         $('#addCancel').click();        
     });
