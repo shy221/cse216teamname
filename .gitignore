@@ -1,0 +1,5 @@
+*.idea/*
+*android/.gradle/*
+*android/.idea/*
+*android/gitignore*
+*android/local.properties*
