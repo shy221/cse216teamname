@@ -50,7 +50,7 @@ public class DataStore {
         // NB: we can safely assume that id is greater than the largest index in 
         //     mRows, and thus we can use the index-based add() method
         int id = mCounter++;
-        DataRow data = new DataRow(id, title, content);
+        DataRow data = new DataRow(id, title, content, 0);
         mRows.add(id, data);
         return id;
     }
@@ -92,9 +92,9 @@ public class DataStore {
      * @param content The new content for the row
      * @return a copy of the data in the row, if it exists, or null otherwise
      */
-    public synchronized DataRow updateOne(int id, String title, String content) {
+    public synchronized DataRow updateOne(int id, String content) {
         // Do not update if we don't have valid data
-        if (title == null || content == null) {
+        if (content == null) {
             return null;
         }
         // Only update if the current entry is valid (not null)
@@ -106,7 +106,6 @@ public class DataStore {
             return null;
         }
         // Update and then return a copy of the data, as a DataRow
-        data.mTitle = title;
         data.mContent = content;
         return new DataRow(data);
     }
