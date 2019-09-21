@@ -226,7 +226,7 @@ public class Database {
         try {
             ResultSet rs = mSelectAll.executeQuery();
             while (rs.next()) {
-                res.add(new RowData(rs.getInt("id"), rs.getString("subject"), rs.getString("message"), rs.getInt("likes")));
+                res.add(new RowData(rs.getInt("id"), rs.getString("subject"), "", 0));
             }
             rs.close();
             return res;
@@ -298,6 +298,7 @@ public class Database {
     public RowData incrementLikes(int id) {
         try {
             mIncrementLikes.setInt(1, id);
+            mIncrementLikes.executeUpdate();
             return selectOne(id);
         } catch (SQLException e) {
             e.printStackTrace();
