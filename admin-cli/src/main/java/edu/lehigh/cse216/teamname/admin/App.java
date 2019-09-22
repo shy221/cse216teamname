@@ -95,9 +95,12 @@ public class App {
             i = Integer.parseInt(in.readLine());
         } catch (IOException e) {
             e.printStackTrace();
-        } catch (NumberFormatException e) {
+        } 
+        /* NumerFormatException is already handled by parseInt()
+        catch (NumberFormatException e) {
             e.printStackTrace();
         }
+        */
         return i;
     }
 
