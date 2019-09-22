@@ -4,29 +4,50 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 
+//import teamname.cse216.lehigh.edu.phase0.R;
+
 class ItemListAdapter extends RecyclerView.Adapter<ItemListAdapter.ViewHolder> {
+
 
     class ViewHolder extends RecyclerView.ViewHolder {
         TextView mIndex;
         TextView mText;
+        TextView mId;
+        TextView mTitle;
+        TextView mContent;
 
         ViewHolder(View itemView) {
             super(itemView);
-            this.mIndex = (TextView) itemView.findViewById(R.id.listItemIndex);
-            this.mText = (TextView) itemView.findViewById(R.id.listItemText);
+//            this.mIndex = (TextView) itemView.findViewById(R.id.listItemIndex);
+//            this.mText = (TextView) itemView.findViewById(R.id.listItemText);
+            this.mId = (TextView) itemView.findViewById(R.id.listItemId);
+            this.mTitle = (TextView) itemView.findViewById(R.id.listItemTitle);
+            this.mContent = (TextView) itemView.findViewById(R.id.listItemContent);
         }
     }
 
-    private ArrayList<Datum> mData;
+    //    private ArrayList<Datum> mData;
+    private ArrayList<Message> mData;
     private LayoutInflater mLayoutInflater;
 
-    ItemListAdapter(Context context, ArrayList<Datum> data) {
+    interface ClickListener{
+        //        void onClick(Datum d);
+        void onClick(Message m);
+
+    }
+
+    private ClickListener mClickListener;
+    ClickListener getClickListener() {return mClickListener;}
+    void setClickListener(ClickListener c) { mClickListener = c;}
+
+    ItemListAdapter(Context context, ArrayList<Message> data) {
         mData = data;
         mLayoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
@@ -44,25 +65,27 @@ class ItemListAdapter extends RecyclerView.Adapter<ItemListAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        final Datum d = mData.get(position);
-        holder.mIndex.setText(Integer.toString(d.mIndex));
-        holder.mText.setText(d.mText);
+        final Message m = mData.get(position);
+        holder.mId.setText(Integer.toString(m.mId));
+        holder.mTitle.setText(m.mTitle);
+        holder.mContent.setText(m.mContent);
+
+//        holder.mIndex.setText(Integer.toString(d.mIndex));
+//        holder.mText.setText(d.mText);
+
         // Attach a click listener to the view we are configuring
         final View.OnClickListener listener = new View.OnClickListener(){
+
             @Override
             public void onClick(View view) {
-                mClickListener.onClick(d);
+                mClickListener.onClick(m);
             }
         };
-        holder.mIndex.setOnClickListener(listener);
-        holder.mText.setOnClickListener(listener);
-    }
+//        holder.mIndex.setOnClickListener(listener);
+//        holder.mText.setOnClickListener(listener);
+        holder.mId.setOnClickListener(listener);
+        holder.mTitle.setOnClickListener(listener);
+        holder.mContent.setOnClickListener(listener);
 
-    // Pop-up Messages
-    interface ClickListener{
-        void onClick(Datum d);
     }
-    private ClickListener mClickListener;
-    ClickListener getClickListener() {return mClickListener;}
-    void setClickListener(ClickListener c) { mClickListener = c;}
 }

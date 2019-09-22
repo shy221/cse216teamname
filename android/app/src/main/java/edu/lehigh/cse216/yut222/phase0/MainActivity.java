@@ -1,10 +1,16 @@
 package edu.lehigh.cse216.yut222.phase0;
 
+
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.android.volley.*;
-import com.android.volley.toolbox.*;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -17,19 +23,26 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.*;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.ListView;
+import android.widget.Toast;
+import androidx.recyclerview.widget.RecyclerView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity {
+//import shy221.cse216.lehigh.edu.phase0.R;
 
+public class MainActivity extends AppCompatActivity {
     /**
      * mData holds the data we get from Volley
      */
-    ArrayList<Datum> mData = new ArrayList<>();
+//    ArrayList<Datum> mData = new ArrayList<>();
+    ArrayList<Message> mData = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,54 +50,266 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        Log.d("yut222", "Debug Message from onCreate");
+//
+//        FloatingActionButton fab = findViewById(R.id.fab);
+//        fab.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+//                        .setAction("Action", null).show();
+//            }
+//        });
+//        Log.d("shy221", "Debug Message from onCreate");
 
-        // Instantiate the RequestQueue
-        RequestQueue queue = Volley.newRequestQueue(this);
+        // Instantiate the RequestQueue.
+        RequestQueue queue = MySingleton.getInstance(this.getApplicationContext()).getRequestQueue();
+
+        //one to show a single detailed message with likes
+        String urlShow = "https://arcane-refuge-67249.herokuapp.com/messages/2";
+        //one to show all message
+        String urlList = "https://arcane-refuge-67249.herokuapp.com/messages";
+        //only functional, nothing to display,
+        //one link to update message content
+        String urlUpdate = "https://arcane-refuge-67249.herokuapp.com/messages/:id";
+        //one link to update likes
+        String urlLike = "https://arcane-refuge-67249.herokuapp.com/messages/:id/likes";
+        //one link to delete message
+        String urlDelete = "https://arcane-refuge-67249.herokuapp.com/messages/:id";
         String url = "http://www.cse.lehigh.edu/~spear/5k.json";
 
-        // Request a string response from the provided URL
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+
+        //POST request method
+
+        //take the message id to include the buttom information
+        //put the message in the database
+        //method to get input from input box
+
+//        //post msg id, msg title and msg content = urlPost
+//        Button bUpdate = (Button) findViewById(R.id.update);
+//        bUpdate.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+////                Intent i = new Intent();
+////
+////
+////                if (!etTitle.getText().toString().equals("")&& !etContent.getText().toString().equals("") ) {
+////                    i.putExtra("title", etTitle.getText().toString());
+////                    i.putExtra("content", etContent.getText().toString());
+////                    setResult(Activity.RESULT_OK, i);
+////                    String title = etTitle.getText().toString();
+////                    String content = etContent.getText().toString();
+////                    postMessage(title, content);
+////
+////                }
+//
+//            }
+
+//        });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        //post msg id and new msg content = urlUpdate
+        StringRequest updateR = new StringRequest(Request.Method.POST, urlUpdate,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        //TODO: modify to post msg id, and new msg content
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e("shy221", "Updating message content didn't work.");
+
+            }
+        });
+        MySingleton.getInstance(this).addToRequestQueue(updateR);
+
+        //post msg id = urlDelete
+        StringRequest deleteR = new StringRequest(Request.Method.DELETE, urlDelete,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        //TODO: modify to post msg id
+//                        populateListFromVolley(response);
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e("shy221", "Deleting message didn't work.");
+
+            }
+        });
+        MySingleton.getInstance(this).addToRequestQueue(deleteR);
+
+        //post msg id = urlLike
+        //add a button
+        //get json object.likes
+        //post likes
+        StringRequest likeR = new StringRequest(Request.Method.POST, urlLike,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        //TODO: modify to post msg id
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e("shy221", "Liking message didn't work.");
+
+            }
+        });
+        MySingleton.getInstance(this).addToRequestQueue(likeR);
+
+
+        //RESPONSE request method
+
+        //get json file, obj array, show all with all msg id, msg title = urlList
+        //get json file, only one obj with msg id, msg title and msg content and # of likes = urlShow
+        //post msg-id in order to get show all, but don't display msg-id
+
+        //post msg id and get message  = urlShow
+        //show a single detailed message with likes, but don't display msg-id
+
+        StringRequest showR = new StringRequest(Request.Method.GET, urlShow,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        //TODO: modify to get message title and content and likes
+
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e("shy221", "Showing details of the message didn't work!");
+            }
+        });
+        MySingleton.getInstance(this).addToRequestQueue(showR);
+
+
+
+
+        //post msg id and get message  = urlList
+        StringRequest listR = new StringRequest(Request.Method.GET, urlList,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
                         populateListFromVolley(response);
+
                     }
                 }, new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.e("yut222", "That didn't work!\n" + error);
-                    }
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e("shy221", "Listing all messages didn't work!");
+            }
         });
+        MySingleton.getInstance(this).addToRequestQueue(listR);
 
-        // Add the request to the RequestQueue
-        queue.add(stringRequest);
+
+
+//
+//
+//        // Request a string response from the provided URL.
+//        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+//                new Response.Listener<String>() {
+//                    @Override
+//                    public void onResponse(String response) {
+//                        populateListFromVolley(response);
+//
+//                    }
+//                }, new Response.ErrorListener() {
+//            @Override
+//            public void onErrorResponse(VolleyError error) {
+//                Log.e("shy221", "That didn't work!");
+//            }
+//        });
+//
+//// Add the request to the RequestQueue.
+//        MySingleton.getInstance(this).addToRequestQueue(stringRequest);
     }
+
+
+
+
+    //check mStatus first, mStatus == "ok" or "error", then fetch mData
+    //{"mStatus":"ok",
+    // "mData":{"mId":3,"mTitle":"Movie Time","mContent":"","mLikes":0,"mCreated":"Sep 21, 2019 8:26:37 PM"}}
+
+
+
+
+
+
+
+
+
 
     private void populateListFromVolley(String response){
         try {
-            JSONArray json= new JSONArray(response);
-            for (int i = 0; i < json.length(); ++i) {
-                int num = json.getJSONObject(i).getInt("num");
-                String str = json.getJSONObject(i).getString("str");
-                mData.add(new Datum(num, str));
-            }
+            JSONObject obj = new JSONObject(response);
+            String status;
+            status = obj.getString("mStatus");
+//            Log.e("shy221", status);
+                if(status.equals("ok")){
+                    JSONArray data = obj.getJSONArray("mData");
+                    for (int i = 0; i < data.length(); i++){
+                        int id = data.getJSONObject(i).getInt("mId");
+                        String title = data.getJSONObject(i).getString("mTitle");
+//                        String content = data.getJSONObject(i).getString("mContent");
+                        String content = "";
+                        mData.add(new Message(id, title, content));
+                    }
+
+                }else{
+                    Log.d("shy221","mStatus is not ok.");
+                }
         } catch (final JSONException e) {
-            Log.d("yut222", "Error parsing JSON file: " + e.getMessage());
+            Log.d("shy221", "Error parsing JSON file: " + e.getMessage());
             return;
         }
-        Log.d("yut222", "Successfully parsed JSON file.");
-        RecyclerView rv = (RecyclerView) findViewById(R.id.datum_list_view);
+        Log.d("shy221", "Successfully parsed JSON file.");
+
+
+
+//        ListView mListView = (ListView) findViewById(R.id.datum_list_view);
+//        ItemListAdapter adapter = new ItemListAdapter(this, mData);
+//        mListView.setAdapter(adapter);
+        RecyclerView rv = findViewById(R.id.message_list_view);
         rv.setLayoutManager(new LinearLayoutManager(this));
         ItemListAdapter adapter = new ItemListAdapter(this, mData);
         rv.setAdapter(adapter);
+
         adapter.setClickListener(new ItemListAdapter.ClickListener() {
             @Override
-            public void onClick(Datum d) {
-                Toast.makeText(MainActivity.this, d.mIndex + " --> " + d.mText, Toast.LENGTH_LONG).show();
+            public void onClick(Message message) {
+                Toast.makeText(MainActivity.this, message.mTitle , Toast.LENGTH_LONG).show();
             }
         });
     }
+
+
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -100,13 +325,13 @@ public class MainActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             Intent i = new Intent(getApplicationContext(), SecondActivity.class);
-            i.putExtra("label_contents", "CSE216 is the best");
+            i.putExtra("label_contents", "Post your message here.");
             startActivityForResult(i, 789); // 789 is the number that will come back to us
             return true;
         }
+
 
         return super.onOptionsItemSelected(item);
     }
@@ -118,8 +343,12 @@ public class MainActivity extends AppCompatActivity {
             // Make sure the request was successful
             if (resultCode == RESULT_OK) {
                 // Get the "extra" string of data
-                Toast.makeText(MainActivity.this, data.getStringExtra("result"), Toast.LENGTH_LONG).show();
+//                Log.e("shy221 result", data.getStringExtra("result"));
+                Toast.makeText(MainActivity.this, data.getStringExtra("title") + data.getStringExtra("content"), Toast.LENGTH_LONG).show();
+
             }
         }
     }
+
+
 }
