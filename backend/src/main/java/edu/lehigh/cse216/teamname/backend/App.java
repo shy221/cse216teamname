@@ -127,7 +127,6 @@ public class App {
             // If we can't get an ID or can't parse the JSON, Spark will sned
             // a status 500
             int idx = Integer.parseInt(request.params("id"));
-            SimpleRequest req = gson.fromJson(request.body(), SimpleRequest.class);
             // ensure status 200 OK, with a MIME of JSON
             response.status(200);
             response.type("application/json");
