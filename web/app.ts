@@ -2,6 +2,7 @@
 /// <reference path="ts/NewEntryForm.ts"/>
 /// <reference path="ts/ElementList.ts"/>
 /// <reference path="ts/Navbar.ts"/>
+/// <reference path="ts/ShowDetail.ts"/>
 
 // Prevent compiler errors when using jQuery.  "$" will be given a type of 
 // "any", so that we can use it anywhere, and assume it has any fields or
@@ -20,9 +21,9 @@ $(document).ready(function () {
     Navbar.refresh();
     NewEntryForm.refresh();
     ElementList.refresh();
-
+    EditEntryForm.refresh();
+    ShowDetail.refresh();
     // Create the object that controls the "Edit Entry" form
-    editEntryForm = new EditEntryForm();
     // set up initial UI state
     $("#editElement").hide();
 });
