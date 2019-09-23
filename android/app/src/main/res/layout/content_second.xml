@@ -19,19 +19,6 @@
             tools:layout_editor_absoluteY="8dp"
             tools:layout_editor_absoluteX="0dp" />
 
-        <EditText
-            android:id="@+id/editText"
-            android:layout_width="384dp"
-            android:layout_height="52dp"
-            android:ems="10"
-            android:inputType="textPersonName"
-            android:text=""
-            tools:layout_editor_absoluteY="62dp"
-            tools:layout_editor_absoluteX="0dp"
-            android:layout_below="@+id/specialMessage"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
-
         <Button
             android:id="@+id/buttonCancel"
             android:layout_width="191dp"
@@ -56,6 +43,38 @@
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
             android:layout_marginBottom="162dp" />
+
+        <EditText
+            android:id="@+id/editText"
+            android:layout_width="384dp"
+            android:layout_height="52dp"
+            android:layout_below="@+id/specialMessage"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:layout_marginStart="3dp"
+            android:layout_marginLeft="3dp"
+            android:layout_marginTop="2dp"
+            android:ems="10"
+            android:inputType="textPersonName"
+            android:text=""
+            tools:layout_editor_absoluteX="0dp"
+            tools:layout_editor_absoluteY="62dp" />
+
+        <EditText
+            android:id="@+id/editText4"
+            android:layout_width="384dp"
+            android:layout_height="52dp"
+            android:layout_below="@+id/specialMessage"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:layout_marginStart="6dp"
+            android:layout_marginLeft="6dp"
+            android:layout_marginTop="106dp"
+            android:ems="10"
+            android:inputType="textPersonName"
+            android:text=""
+            tools:layout_editor_absoluteX="0dp"
+            tools:layout_editor_absoluteY="62dp" />
     </RelativeLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
