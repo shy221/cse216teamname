@@ -169,14 +169,16 @@ public class Database {
      * 
      * @return All rows, as an ArrayList
      */
-    public ArrayList<DataRowLite> readAll() {
-        ArrayList<DataRowLite> res = new ArrayList<DataRowLite>();
+    //in phase 1 only use DataRow for the convience of Android, probably need to change back to DataRowLite in later phase.
+    //public ArrayList<DataRowLite> readAll() {
+    public ArrayList<DataRow> readAll() {
+        //ArrayList<DataRowLite> res = new ArrayList<DataRowLite>();
+        ArrayList<DataRow> res = new ArrayList<DataRow>();
         try {
             ResultSet rs = mSelectAll.executeQuery();
             while (rs.next()) {
-                DataRow d = new DataRow(rs.getInt("id"), rs.getString("subject"), rs.getString("message"), rs.getInt("likes"));
-                DataRowLite dl = new DataRowLite(d);
-                res.add(dl);
+                //res.add(new DataRowLite(new DataRow(rs.getInt("id"), rs.getString("subject"), rs.getString("message"), rs.getInt("likes"))));
+                res.add(new DataRow(rs.getInt("id"), rs.getString("subject"), rs.getString("message"), rs.getInt("likes")));
             }
             rs.close();
             return res;
