@@ -45,12 +45,7 @@ public class SecondActivity extends AppCompatActivity {
         // The OK button gets the text from the input box and returns it to the calling activity
         final EditText etTitle = (EditText) findViewById(R.id.editText);
         final EditText etContent = (EditText) findViewById(R.id.editText4);
-//        ArrayList<Message> list = new ArrayList<Message>();
-//        Message message = new Message((int)Math.random(), etTitle.getText().toString(), etContent.getText().toString());
-//        list.add(message);
-//        Gson json = new Gson();
-//        Type type = new TypeToken<ArrayList<Message>>(){}.getType();
-//        result = json.toJson(list, type);
+
 
         Button bOk = (Button) findViewById(R.id.buttonOk);
         bOk.setOnClickListener(new View.OnClickListener() {
@@ -87,8 +82,8 @@ public class SecondActivity extends AppCompatActivity {
         //one link to post
         String urlPost = "https://arcane-refuge-67249.herokuapp.com/messages";
         Map<String, String> map = new HashMap<>();
-        map.put("title", t);
-        map.put("content", c);
+        map.put("mTitle", t);
+        map.put("mContent", c);
         JSONObject m = new JSONObject(map);
         JsonObjectRequest postR = new JsonObjectRequest(Request.Method.POST,
                 urlPost, m, new Response.Listener<JSONObject>() {
@@ -99,7 +94,7 @@ public class SecondActivity extends AppCompatActivity {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.e("Something werong", "later to figure out why.");
+                Log.e("Something wrong", "later to figure out why.");
             }
         });
         MySingleton.getInstance(this).addToRequestQueue(postR);

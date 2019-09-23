@@ -1,10 +1,11 @@
 package edu.lehigh.cse216.yut222.phase0;
 
 class Message {
-    /**
-     * An integer index for this piece of data
-     */
+//    /**
+//     * An integer index for this piece of data
+//     */
     int mId;
+//    int mLikes;
 
     /**
      * The string title and contents that comprise this piece of data
@@ -23,5 +24,6 @@ class Message {
         mId = id;
         mTitle = title;
         mContent = content;
+//        mLikes = likes;
     }
 }

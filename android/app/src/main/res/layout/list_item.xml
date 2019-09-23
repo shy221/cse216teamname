@@ -32,22 +32,29 @@
         android:text="" />
 
 
-    <Button
-        android:id="@+id/detail"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Detail" />
+    <!--<Button-->
+        <!--android:id="@+id/detail"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="Detail" />-->
+
+    <!--<Button-->
+        <!--android:id="@+id/update"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="edit" />-->
+
+    <!--<Button-->
+        <!--android:id="@+id/drop"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="delete" />-->
 
     <Button
-        android:id="@+id/update"
+        android:id="@+id/like"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="edit" />
-
-    <Button
-        android:id="@+id/drop"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="delete" />
+        android:src="@drawable/like"
+        />
 
 </LinearLayout>

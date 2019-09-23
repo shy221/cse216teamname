@@ -17,28 +17,22 @@ class ItemListAdapter extends RecyclerView.Adapter<ItemListAdapter.ViewHolder> {
 
 
     class ViewHolder extends RecyclerView.ViewHolder {
-        TextView mIndex;
-        TextView mText;
         TextView mId;
         TextView mTitle;
         TextView mContent;
 
         ViewHolder(View itemView) {
             super(itemView);
-//            this.mIndex = (TextView) itemView.findViewById(R.id.listItemIndex);
-//            this.mText = (TextView) itemView.findViewById(R.id.listItemText);
             this.mId = (TextView) itemView.findViewById(R.id.listItemId);
             this.mTitle = (TextView) itemView.findViewById(R.id.listItemTitle);
             this.mContent = (TextView) itemView.findViewById(R.id.listItemContent);
         }
     }
 
-    //    private ArrayList<Datum> mData;
     private ArrayList<Message> mData;
     private LayoutInflater mLayoutInflater;
 
     interface ClickListener{
-        //        void onClick(Datum d);
         void onClick(Message m);
 
     }
@@ -70,8 +64,6 @@ class ItemListAdapter extends RecyclerView.Adapter<ItemListAdapter.ViewHolder> {
         holder.mTitle.setText(m.mTitle);
         holder.mContent.setText(m.mContent);
 
-//        holder.mIndex.setText(Integer.toString(d.mIndex));
-//        holder.mText.setText(d.mText);
 
         // Attach a click listener to the view we are configuring
         final View.OnClickListener listener = new View.OnClickListener(){
@@ -81,8 +73,7 @@ class ItemListAdapter extends RecyclerView.Adapter<ItemListAdapter.ViewHolder> {
                 mClickListener.onClick(m);
             }
         };
-//        holder.mIndex.setOnClickListener(listener);
-//        holder.mText.setOnClickListener(listener);
+
         holder.mId.setOnClickListener(listener);
         holder.mTitle.setOnClickListener(listener);
         holder.mContent.setOnClickListener(listener);

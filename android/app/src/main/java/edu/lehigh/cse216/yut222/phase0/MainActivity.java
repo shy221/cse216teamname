@@ -9,6 +9,7 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -34,6 +35,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 //import shy221.cse216.lehigh.edu.phase0.R;
 
@@ -41,7 +44,6 @@ public class MainActivity extends AppCompatActivity {
     /**
      * mData holds the data we get from Volley
      */
-//    ArrayList<Datum> mData = new ArrayList<>();
     ArrayList<Message> mData = new ArrayList<>();
 
     @Override
@@ -64,6 +66,8 @@ public class MainActivity extends AppCompatActivity {
         // Instantiate the RequestQueue.
         RequestQueue queue = MySingleton.getInstance(this.getApplicationContext()).getRequestQueue();
 
+        String url = "https://arcane-refuge-67249.herokuapp.com/messages/";
+
         //one to show a single detailed message with likes
         String urlShow = "https://arcane-refuge-67249.herokuapp.com/messages/2";
         //one to show all message
@@ -71,11 +75,8 @@ public class MainActivity extends AppCompatActivity {
         //only functional, nothing to display,
         //one link to update message content
         String urlUpdate = "https://arcane-refuge-67249.herokuapp.com/messages/:id";
-        //one link to update likes
-        String urlLike = "https://arcane-refuge-67249.herokuapp.com/messages/:id/likes";
         //one link to delete message
         String urlDelete = "https://arcane-refuge-67249.herokuapp.com/messages/:id";
-        String url = "http://www.cse.lehigh.edu/~spear/5k.json";
 
 
         //POST request method
@@ -84,9 +85,29 @@ public class MainActivity extends AppCompatActivity {
         //put the message in the database
         //method to get input from input box
 
-//        //post msg id, msg title and msg content = urlPost
-//        Button bUpdate = (Button) findViewById(R.id.update);
-//        bUpdate.setOnClickListener(new View.OnClickListener() {
+
+//        //Button update
+////        Button bUpdate = (Button) findViewById(R.id.update);
+////        bUpdate.setOnClickListener(new View.OnClickListener() {
+////            @Override
+////            public void onClick(View view) {
+//////                Intent i = new Intent();
+//////                    i.putExtra("title", etTitle.getText().toString());
+//////                    i.putExtra("content", etContent.getText().toString());
+//////                    setResult(Activity.RESULT_OK, i);
+//////                    String title = etTitle.getText().toString();
+//////                    String content = etContent.getText().toString();
+//////                    postMessage(title, content);
+////
+////                finish();
+////
+////            }
+////
+////        });
+
+//        //button Drop
+//        Button bDelete = (Button) findViewById(R.id.drop);
+//        bDelete.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View view) {
 ////                Intent i = new Intent();
@@ -103,84 +124,33 @@ public class MainActivity extends AppCompatActivity {
 ////                }
 //
 //            }
-
+//
+//        });
+//
+//        //button like
+//        Button bLike = (Button) findViewById(R.id.like);
+//        bLike.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+////                Intent i = new Intent();
+////
+////
+////                if (!etTitle.getText().toString().equals("")&& !etContent.getText().toString().equals("") ) {
+////                    i.putExtra("title", etTitle.getText().toString());
+////                    i.putExtra("content", etContent.getText().toString());
+////                    setResult(Activity.RESULT_OK, i);
+////                    String title = etTitle.getText().toString();
+////                    String content = etContent.getText().toString();
+////                    postMessage(title, content);
+////
+////                }
+//
+//            }
+//
 //        });
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        //post msg id and new msg content = urlUpdate
-        StringRequest updateR = new StringRequest(Request.Method.POST, urlUpdate,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        //TODO: modify to post msg id, and new msg content
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.e("shy221", "Updating message content didn't work.");
-
-            }
-        });
-        MySingleton.getInstance(this).addToRequestQueue(updateR);
-
-        //post msg id = urlDelete
-        StringRequest deleteR = new StringRequest(Request.Method.DELETE, urlDelete,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        //TODO: modify to post msg id
-//                        populateListFromVolley(response);
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.e("shy221", "Deleting message didn't work.");
-
-            }
-        });
-        MySingleton.getInstance(this).addToRequestQueue(deleteR);
-
-        //post msg id = urlLike
-        //add a button
-        //get json object.likes
-        //post likes
-        StringRequest likeR = new StringRequest(Request.Method.POST, urlLike,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        //TODO: modify to post msg id
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.e("shy221", "Liking message didn't work.");
-
-            }
-        });
-        MySingleton.getInstance(this).addToRequestQueue(likeR);
 
 
         //RESPONSE request method
@@ -227,46 +197,22 @@ public class MainActivity extends AppCompatActivity {
         MySingleton.getInstance(this).addToRequestQueue(listR);
 
 
-
-//
-//
-//        // Request a string response from the provided URL.
-//        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-//                new Response.Listener<String>() {
-//                    @Override
-//                    public void onResponse(String response) {
-//                        populateListFromVolley(response);
-//
-//                    }
-//                }, new Response.ErrorListener() {
-//            @Override
-//            public void onErrorResponse(VolleyError error) {
-//                Log.e("shy221", "That didn't work!");
-//            }
-//        });
-//
-//// Add the request to the RequestQueue.
-//        MySingleton.getInstance(this).addToRequestQueue(stringRequest);
     }
+
 
 
 
 
     //check mStatus first, mStatus == "ok" or "error", then fetch mData
     //{"mStatus":"ok",
-    // "mData":{"mId":3,"mTitle":"Movie Time","mContent":"","mLikes":0,"mCreated":"Sep 21, 2019 8:26:37 PM"}}
-
-
-
-
-
-
-
-
+    // "mData":
+    // {"mId":3,"mTitle":"Movie Time","mContent":"","mLikes":0,"mCreated":"Sep 21, 2019 8:26:37 PM"}
+    // }
 
 
     private void populateListFromVolley(String response){
         try {
+            mData.clear();
             JSONObject obj = new JSONObject(response);
             String status;
             status = obj.getString("mStatus");
@@ -277,8 +223,10 @@ public class MainActivity extends AppCompatActivity {
                         int id = data.getJSONObject(i).getInt("mId");
                         String title = data.getJSONObject(i).getString("mTitle");
 //                        String content = data.getJSONObject(i).getString("mContent");
+//                        int likes = data.getJSONObject(i).getInt("mLikes");
                         String content = "";
                         mData.add(new Message(id, title, content));
+                        Log.d("hi", mData.toString());
                     }
 
                 }else{
@@ -304,10 +252,44 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(Message message) {
                 Toast.makeText(MainActivity.this, message.mTitle , Toast.LENGTH_LONG).show();
+                Intent i = new Intent(getApplicationContext(), DetailActivity.class);
+                i.putExtra("label_contents", "Post your message here.");
+                i.putExtra("message id", message.mId);
+                i.putExtra("message title", message.mTitle);
+                i.putExtra("message content", message.mContent);
+                startActivityForResult(i, 123); // 123 is the number that will come back to us
+
+
             }
         });
     }
 
+    private int getMessageId(int position) {
+        return mData.get(position).mId;
+    }
+
+
+
+    private void postLike(final String likes, final int id){
+        //one link to update likes
+        String urlLike = "https://arcane-refuge-67249.herokuapp.com/messages/" + id +"/likes";
+        Map<String, String> map = new HashMap<>();
+        map.put("mLikes", likes);
+        JSONObject m = new JSONObject(map);
+        JsonObjectRequest likeR = new JsonObjectRequest(Request.Method.POST,
+                urlLike, m, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                Log.e("message", "Like the message here!");
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e("shy221", "post likes went wrong.");
+            }
+        });
+        MySingleton.getInstance(this).addToRequestQueue(likeR);
+    }
 
 
 
@@ -344,7 +326,31 @@ public class MainActivity extends AppCompatActivity {
             if (resultCode == RESULT_OK) {
                 // Get the "extra" string of data
 //                Log.e("shy221 result", data.getStringExtra("result"));
-                Toast.makeText(MainActivity.this, data.getStringExtra("title") + data.getStringExtra("content"), Toast.LENGTH_LONG).show();
+//                Toast.makeText(MainActivity.this, data.getStringExtra("title") + data.getStringExtra("content"), Toast.LENGTH_LONG).show();
+                StringRequest listR = new StringRequest(Request.Method.GET,"https://arcane-refuge-67249.herokuapp.com/messages" ,
+                        new Response.Listener<String>() {
+                            @Override
+                            public void onResponse(String response) {
+                                populateListFromVolley(response);
+
+                            }
+                        }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e("shy221", "Listing all messages didn't work!");
+                    }
+                });
+                MySingleton.getInstance(this).addToRequestQueue(listR);
+
+            }
+        }
+        if (requestCode == 123) {
+            // Make sure the request was successful
+            if (resultCode == RESULT_OK) {
+                // Get the "extra" string of data
+//                Log.e("shy221 result", data.getStringExtra("result"));
+//                Toast.makeText(MainActivity.this, data.getStringExtra("title") + data.getStringExtra("content"), Toast.LENGTH_LONG).show();
+
 
             }
         }
