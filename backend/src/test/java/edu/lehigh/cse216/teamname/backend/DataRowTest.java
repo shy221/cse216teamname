@@ -32,11 +32,13 @@ public class DataRowTest extends TestCase {
         String title = "Test Title";
         String content = "Test Content";
         int id = 17;
-        DataRow d = new DataRow(id, title, content);
+        int likes = 5;
+        DataRow d = new DataRow(id, title, content, likes);
 
         assertTrue(d.mTitle.equals(title));
         assertTrue(d.mContent.equals(content));
         assertTrue(d.mId == id);
+        assertTrue(d.mLikes == likes);
         assertFalse(d.mCreated == null);
     }
 
@@ -47,11 +49,13 @@ public class DataRowTest extends TestCase {
         String title = "Test Title For Copy";
         String content = "Test Content For Copy";
         int id = 177;
-        DataRow d = new DataRow(id, title, content);
+        int likes = 5;
+        DataRow d = new DataRow(id, title, content,likes);
         DataRow d2 = new DataRow(d);
         assertTrue(d2.mTitle.equals(d.mTitle));
         assertTrue(d2.mContent.equals(d.mContent));
         assertTrue(d2.mId == d.mId);
+        assertTrue(d2.mLikes == d.mLikes);
         assertTrue(d2.mCreated.equals(d.mCreated));
     }
 }
