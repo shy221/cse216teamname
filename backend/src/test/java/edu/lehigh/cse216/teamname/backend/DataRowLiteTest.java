@@ -4,6 +4,8 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
+import java.util.Date;
+
 /**
  * Unit test for simple App.
  */
@@ -32,7 +34,8 @@ public class DataRowLiteTest extends TestCase {
         String content = "Test Content";
         int id = 17;
         int likes = 5;
-        DataRow d = new DataRow(id, title, content, likes);
+        Date date= new Date();
+        DataRow d = new DataRow(id, title, content, likes, date);
         DataRowLite d2 = new DataRowLite(d);
 
         assertTrue(d2.mId == id);

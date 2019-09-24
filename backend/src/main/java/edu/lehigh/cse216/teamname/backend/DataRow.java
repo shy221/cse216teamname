@@ -48,12 +48,12 @@ public class DataRow {
      * 
      * @param content The content string for this row of data
      */
-    DataRow(int id, String title, String content, int likes) {
+    DataRow(int id, String title, String content, int likes, Date date) {
         mId = id;
         mTitle = title;
         mContent = content;
         mLikes = likes;
-        mCreated = new Date();
+        mCreated = date;
     }
 
     /**

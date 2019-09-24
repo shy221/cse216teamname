@@ -81,7 +81,7 @@ public class App {
             }
         });
 
-        // POST route for adding a new element to the DataStore.  This will read
+        // POST route for adding a new element to the Database.  This will read
         // JSON from the body of the request, turn it into a SimpleRequest 
         // object, extract the title and message, insert them, and return the 
         // ID of the newly created row.
@@ -103,7 +103,7 @@ public class App {
             }
         });
         
-        // PUT route for updating a row in the DataStore. This is almost
+        // PUT route for updating a row in the Database. This is almost
         // exactly the same as POST
         Spark.put("/messages/:id", (request, response) -> {
             // If we can't get an ID or can't parse the JSON, Spark will sned
@@ -114,7 +114,7 @@ public class App {
             response.status(200);
             response.type("application/json");
             //used to be updateOne(idx, req.mTitle, req.mMessage)
-            DataRow result = db.updateOne(idx, req.mMessage);
+            DataRow result = db.updateOne(idx, req.mTitle, req.mMessage);
             if (result == null) {
                 return gson.toJson(new StructuredResponse("error", "unable to update row " + idx, null));
             } else {
@@ -127,7 +127,6 @@ public class App {
             // If we can't get an ID or can't parse the JSON, Spark will sned
             // a status 500
             int idx = Integer.parseInt(request.params("id"));
-            SimpleRequest req = gson.fromJson(request.body(), SimpleRequest.class);
             // ensure status 200 OK, with a MIME of JSON
             response.status(200);
             response.type("application/json");
@@ -139,9 +138,9 @@ public class App {
             }
         });
 
-        // DELETE route for removing a row from the DataStore
+        // DELETE route for removing a row from the Database
         Spark.delete("/messages/:id", (request, response) -> {
-            // If we can;t get an ID, Spark will sned a status 500
+            // If we can't get an ID, Spark will sned a status 500
             int idx = Integer.parseInt(request.params("id"));
             // ensure status 200 OK, with a MIME type of JSON
             response.status(200);

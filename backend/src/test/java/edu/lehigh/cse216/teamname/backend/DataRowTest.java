@@ -3,6 +3,7 @@ package edu.lehigh.cse216.teamname.backend;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+import java.util.Date;
 
 /**
  * Unit test for simple App.
@@ -33,13 +34,15 @@ public class DataRowTest extends TestCase {
         String content = "Test Content";
         int id = 17;
         int likes = 5;
-        DataRow d = new DataRow(id, title, content, likes);
+        Date date = new Date();
+        long datelong = date.getTime();
+        DataRow d = new DataRow(id, title, content, likes, date);
 
         assertTrue(d.mTitle.equals(title));
         assertTrue(d.mContent.equals(content));
         assertTrue(d.mId == id);
         assertTrue(d.mLikes == likes);
-        assertFalse(d.mCreated == null);
+        assertFalse(d.mCreated.equals(datelong));
     }
 
     /**
@@ -50,7 +53,9 @@ public class DataRowTest extends TestCase {
         String content = "Test Content For Copy";
         int id = 177;
         int likes = 5;
-        DataRow d = new DataRow(id, title, content,likes);
+        Date date= new Date();
+        long datelong = date.getTime();
+        DataRow d = new DataRow(id, title, content, likes, date);
         DataRow d2 = new DataRow(d);
         assertTrue(d2.mTitle.equals(d.mTitle));
         assertTrue(d2.mContent.equals(d.mContent));
