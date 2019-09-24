@@ -2,11 +2,9 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">Edit an Entry</h4>
+                <h4 class="modal-title" id="ShowDetail-title"></h4>
             </div>
             <div class="modal-body">
-                <label for="ShowDetail-title">Event Title</label>
-                <input class="form-control" type="text" id="ShowDetail-title" />
                 <label for="ShowDetail-message">Details</label>
                 <textarea class="form-control" id="ShowDetail-message"></textarea>
                 <label for="ShowDetail-created">Event created</label>

@@ -2,14 +2,14 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">Edit an Entry</h4>
+                <h4 class="modal-title">Edit a Post</h4>
             </div>
             <div class="modal-body">
-                <label for="EditEntryForm-title">Title</label>
+                <label for="EditEntryForm-title">Event Title</label>
                 <input class="form-control" type="text" id="EditEntryForm-title" />
-                <label for="EditEntryForm-message">Message</label>
+                <label for="EditEntryForm-message">Event Detail</label>
                 <textarea class="form-control" id="EditEntryForm-message"></textarea>
-                <label for="EditEntryForm-created">Event created</label>
+                <label for="EditEntryForm-created">Time Created</label>
                 <span id="EditEntryForm-created"></span>
                 <input type="hidden" id="EditEntryForm-editId" />
             </div>

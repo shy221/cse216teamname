@@ -26,7 +26,7 @@ class ShowDetail {
 
     private static reloadLike() {
         let id = "" + $("#" + ShowDetail.NAME + "-detailId").val();
-        console.log(id);
+        
         // Issue a GET, and then pass the result to update()
         $.ajax({
             type: "GET",
@@ -84,7 +84,7 @@ class ShowDetail {
      * with those ways of making the modal disappear.
      */
     public static show(data: any) {
-        $("#" + ShowDetail.NAME + "-title").val(data.mData.mTitle);
+        $("#" + ShowDetail.NAME + "-title").text(data.mData.mTitle);
         $("#" + ShowDetail.NAME + "-message").val(data.mData.mContent);
         $("#" + ShowDetail.NAME + "-detailId").val(data.mData.mId);
         $("#" + ShowDetail.NAME + "-created").text(data.mData.mCreated);
@@ -101,7 +101,7 @@ class ShowDetail {
     private static likePost() {
         // get the values of the id of the current post
         let id = "" + $("#" + ShowDetail.NAME + "-detailId").val();
-        console.log(id);
+        
         // set up an AJAX post.  When the server replies, the result will go to
         // onSubmitResponse
         $.ajax({
@@ -119,7 +119,7 @@ class ShowDetail {
         // for now, just print the ID that goes along with the data in the row
         // whose "delete" button was clicked
         let id = "" + $("#" + ShowDetail.NAME + "-detailId").val();
-        console.log(id);
+        
         ShowDetail.hide();
         $.ajax({
             type: "DELETE",
@@ -137,7 +137,7 @@ class ShowDetail {
     private static clickEdit() {
         // as in clickDelete, we need the ID of the row
         let id = "" + $("#" + ShowDetail.NAME + "-detailId").val();
-        console.log(id);
+        
         ShowDetail.hide();
         $.ajax({
             type: "GET",
