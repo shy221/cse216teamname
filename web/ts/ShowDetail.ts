@@ -84,7 +84,7 @@ class ShowDetail {
      * with those ways of making the modal disappear.
      */
     public static show(data: any) {
-        $("#" + ShowDetail.NAME + "-title").val(data.mData.mTitle);
+        $("#" + ShowDetail.NAME + "-title").text(data.mData.mTitle);
         $("#" + ShowDetail.NAME + "-message").val(data.mData.mContent);
         $("#" + ShowDetail.NAME + "-detailId").val(data.mData.mId);
         $("#" + ShowDetail.NAME + "-created").text(data.mData.mCreated);
