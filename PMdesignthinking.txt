@@ -1,0 +1,11 @@
+Who is your app for?
+    lehigh students and local bethlehem people.
+What will your app help people do?
+    It will help them to find friends to go to nearby concerts and events together.
+How will your app help them?
+    It will allow users to post information about the events and concerts. Other users can comment, 
+        like and indicate that they are going to the certain event.
+Brainstorm App Definition Statement: My app will help local people to find friends to 
+    go to concerts or events they are both interested in by giving them space to post
+    information about the event or concert and comment, like and indicate that they are
+    going to a certain event posted by other users.
