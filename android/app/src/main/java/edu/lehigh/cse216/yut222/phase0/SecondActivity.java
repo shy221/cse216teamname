@@ -83,7 +83,7 @@ public class SecondActivity extends AppCompatActivity {
         String urlPost = "https://arcane-refuge-67249.herokuapp.com/messages";
         Map<String, String> map = new HashMap<>();
         map.put("mTitle", t);
-        map.put("mContent", c);
+        map.put("mMessage", c);
         JSONObject m = new JSONObject(map);
         JsonObjectRequest postR = new JsonObjectRequest(Request.Method.POST,
                 urlPost, m, new Response.Listener<JSONObject>() {

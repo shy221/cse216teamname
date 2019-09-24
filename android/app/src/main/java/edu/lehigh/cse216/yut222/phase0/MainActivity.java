@@ -105,50 +105,6 @@ public class MainActivity extends AppCompatActivity {
 ////
 ////        });
 
-//        //button Drop
-//        Button bDelete = (Button) findViewById(R.id.drop);
-//        bDelete.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-////                Intent i = new Intent();
-////
-////
-////                if (!etTitle.getText().toString().equals("")&& !etContent.getText().toString().equals("") ) {
-////                    i.putExtra("title", etTitle.getText().toString());
-////                    i.putExtra("content", etContent.getText().toString());
-////                    setResult(Activity.RESULT_OK, i);
-////                    String title = etTitle.getText().toString();
-////                    String content = etContent.getText().toString();
-////                    postMessage(title, content);
-////
-////                }
-//
-//            }
-//
-//        });
-//
-//        //button like
-//        Button bLike = (Button) findViewById(R.id.like);
-//        bLike.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-////                Intent i = new Intent();
-////
-////
-////                if (!etTitle.getText().toString().equals("")&& !etContent.getText().toString().equals("") ) {
-////                    i.putExtra("title", etTitle.getText().toString());
-////                    i.putExtra("content", etContent.getText().toString());
-////                    setResult(Activity.RESULT_OK, i);
-////                    String title = etTitle.getText().toString();
-////                    String content = etContent.getText().toString();
-////                    postMessage(title, content);
-////
-////                }
-//
-//            }
-//
-//        });
-
 
 
 
@@ -222,11 +178,12 @@ public class MainActivity extends AppCompatActivity {
                     for (int i = 0; i < data.length(); i++){
                         int id = data.getJSONObject(i).getInt("mId");
                         String title = data.getJSONObject(i).getString("mTitle");
-//                        String content = data.getJSONObject(i).getString("mContent");
-//                        int likes = data.getJSONObject(i).getInt("mLikes");
-                        String content = "";
-                        mData.add(new Message(id, title, content));
-                        Log.d("hi", mData.toString());
+                        String content = data.getJSONObject(i).getString("mContent");
+                        int likes = data.getJSONObject(i).getInt("mLikes");
+//                        String content = "";
+                        mData.add(new Message(id, title, content,likes));
+//                        mData.add(new Message(id, title, content));
+//                        Log.d("hi", mData.toString());
                     }
 
                 }else{
@@ -251,12 +208,13 @@ public class MainActivity extends AppCompatActivity {
         adapter.setClickListener(new ItemListAdapter.ClickListener() {
             @Override
             public void onClick(Message message) {
-                Toast.makeText(MainActivity.this, message.mTitle , Toast.LENGTH_LONG).show();
+//                Toast.makeText(MainActivity.this, message.mTitle , Toast.LENGTH_LONG).show();
                 Intent i = new Intent(getApplicationContext(), DetailActivity.class);
                 i.putExtra("label_contents", "Post your message here.");
                 i.putExtra("message id", message.mId);
                 i.putExtra("message title", message.mTitle);
                 i.putExtra("message content", message.mContent);
+                i.putExtra("message likes", message.mLikes);
                 startActivityForResult(i, 123); // 123 is the number that will come back to us
 
 
@@ -264,32 +222,10 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private int getMessageId(int position) {
-        return mData.get(position).mId;
-    }
 
 
 
-    private void postLike(final String likes, final int id){
-        //one link to update likes
-        String urlLike = "https://arcane-refuge-67249.herokuapp.com/messages/" + id +"/likes";
-        Map<String, String> map = new HashMap<>();
-        map.put("mLikes", likes);
-        JSONObject m = new JSONObject(map);
-        JsonObjectRequest likeR = new JsonObjectRequest(Request.Method.POST,
-                urlLike, m, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                Log.e("message", "Like the message here!");
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.e("shy221", "post likes went wrong.");
-            }
-        });
-        MySingleton.getInstance(this).addToRequestQueue(likeR);
-    }
+
 
 
 
