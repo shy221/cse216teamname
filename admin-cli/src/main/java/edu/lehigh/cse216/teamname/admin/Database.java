@@ -5,10 +5,13 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 public class Database {
     /**
@@ -84,15 +87,20 @@ public class Database {
          * The count of likes
          */
         int mlikes;
+        /**
+         * The date of the post
+         */
+        Timestamp mDate;
 
         /**
          * Construct a RowData object by providing values for its fields
          */
-        public RowData(int id, String subject, String message, int likes) {
+        public RowData(int id, String subject, String message, int likes, Timestamp date) {
             mId = id;
             mSubject = subject;
             mMessage = message;
             mlikes = likes;
+            mDate = date;
         }
     }
 
@@ -151,12 +159,12 @@ public class Database {
             // creation/deletion, so multiple executions will cause an exception
             db.mCreateTable = db.mConnection.prepareStatement(
                     "CREATE TABLE tblData (id SERIAL PRIMARY KEY, subject VARCHAR(50) "
-                    + "NOT NULL, message VARCHAR(500) NOT NULL, likes NUMERIC(8,0))");
+                    + "NOT NULL, message VARCHAR(500) NOT NULL, likes NUMERIC(8,0), date TIMESTAMP(6))");
             db.mDropTable = db.mConnection.prepareStatement("DROP TABLE tblData");
 
             // Standard CRUD operations
             db.mDeleteOne = db.mConnection.prepareStatement("DELETE FROM tblData WHERE id = ?");
-            db.mInsertOne = db.mConnection.prepareStatement("INSERT INTO tblData VALUES (default, ?, ?, ?)");
+            db.mInsertOne = db.mConnection.prepareStatement("INSERT INTO tblData VALUES (default, ?, ?, ?, ?)");
             db.mSelectAll = db.mConnection.prepareStatement("SELECT id, subject FROM tblData");
             db.mSelectOne = db.mConnection.prepareStatement("SELECT * from tblData WHERE id=?");
             db.mUpdateOne = db.mConnection.prepareStatement("UPDATE tblData SET message = ? WHERE id = ?");
@@ -209,6 +217,9 @@ public class Database {
             mInsertOne.setString(1, subject);
             mInsertOne.setString(2, message);
             mInsertOne.setInt(3, 0);
+            Date date= new Date();
+            Timestamp ts = new Timestamp(date.getTime());
+            mInsertOne.setTimestamp(4, ts);
             count += mInsertOne.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -226,7 +237,7 @@ public class Database {
         try {
             ResultSet rs = mSelectAll.executeQuery();
             while (rs.next()) {
-                res.add(new RowData(rs.getInt("id"), rs.getString("subject"), "", 0));
+                res.add(new RowData(rs.getInt("id"), rs.getString("subject"), "", 0, null));
             }
             rs.close();
             return res;
@@ -249,7 +260,7 @@ public class Database {
             mSelectOne.setInt(1, id);
             ResultSet rs = mSelectOne.executeQuery();
             if (rs.next()) {
-                res = new RowData(rs.getInt("id"), rs.getString("subject"), rs.getString("message"), rs.getInt("likes"));
+                res = new RowData(rs.getInt("id"), rs.getString("subject"), rs.getString("message"), rs.getInt("likes"), rs.getTimestamp("date"));
             }
         } catch (SQLException e) {
             e.printStackTrace();

@@ -146,6 +146,7 @@ public class App {
                     System.out.println("  [" + res.mId + "] " + res.mSubject);
                     System.out.println("  --> " + res.mMessage);
                     System.out.println("  --> " + res.mlikes);
+                    System.out.println("  --> " + res.mDate);
                 }
             } else if (action == '*') {
                 ArrayList<Database.RowData> res = db.selectAll();
@@ -189,6 +190,7 @@ public class App {
                     System.out.println("  [" + res.mId + "] " + res.mSubject);
                     System.out.println("  --> " + res.mMessage);
                     System.out.println("  --> " + res.mlikes);
+                    System.out.println("  --> " + res.mDate);
                 }
             }
         }
