@@ -1,9 +1,10 @@
+//Shenyi Yu Phase 1
 package edu.lehigh.cse216.yut222.phase0;
 
 class Message {
-//    /**
-//     * An integer index for this piece of data
-//     */
+    /**
+     * An integer index for this piece of data
+     */
     int mId;
     int mLikes;
 
@@ -21,7 +22,6 @@ class Message {
      * @param content The string contents for this piece of data
      */
     Message(int id, String title, String content, int likes) {
-//    Message(int id, String title, String content) {
         mId = id;
         mTitle = title;
         mContent = content;

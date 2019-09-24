@@ -1,5 +1,5 @@
+//Shenyi Yu Phase 1
 package edu.lehigh.cse216.yut222.phase0;
-
 
 import android.app.Activity;
 import android.content.Intent;
@@ -52,90 +52,37 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-//
-//        FloatingActionButton fab = findViewById(R.id.fab);
-//        fab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-//            }
-//        });
-//        Log.d("shy221", "Debug Message from onCreate");
 
+
+        //SY
         // Instantiate the RequestQueue.
         RequestQueue queue = MySingleton.getInstance(this.getApplicationContext()).getRequestQueue();
-
-        String url = "https://arcane-refuge-67249.herokuapp.com/messages/";
-
-        //one to show a single detailed message with likes
-        String urlShow = "https://arcane-refuge-67249.herokuapp.com/messages/2";
         //one to show all message
         String urlList = "https://arcane-refuge-67249.herokuapp.com/messages";
         //only functional, nothing to display,
+        //SEE DETAIL ACTIVITY
         //one link to update message content
-        String urlUpdate = "https://arcane-refuge-67249.herokuapp.com/messages/:id";
         //one link to delete message
-        String urlDelete = "https://arcane-refuge-67249.herokuapp.com/messages/:id";
+        //one link to like message
 
 
+        //SY
         //POST request method
-
-        //take the message id to include the buttom information
+        //take the message id to include information
         //put the message in the database
         //method to get input from input box
 
-
-//        //Button update
-////        Button bUpdate = (Button) findViewById(R.id.update);
-////        bUpdate.setOnClickListener(new View.OnClickListener() {
-////            @Override
-////            public void onClick(View view) {
-//////                Intent i = new Intent();
-//////                    i.putExtra("title", etTitle.getText().toString());
-//////                    i.putExtra("content", etContent.getText().toString());
-//////                    setResult(Activity.RESULT_OK, i);
-//////                    String title = etTitle.getText().toString();
-//////                    String content = etContent.getText().toString();
-//////                    postMessage(title, content);
-////
-////                finish();
-////
-////            }
-////
-////        });
-
-
-
-
-
         //RESPONSE request method
-
         //get json file, obj array, show all with all msg id, msg title = urlList
         //get json file, only one obj with msg id, msg title and msg content and # of likes = urlShow
         //post msg-id in order to get show all, but don't display msg-id
 
-        //post msg id and get message  = urlShow
-        //show a single detailed message with likes, but don't display msg-id
-
-        StringRequest showR = new StringRequest(Request.Method.GET, urlShow,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        //TODO: modify to get message title and content and likes
-
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.e("shy221", "Showing details of the message didn't work!");
-            }
-        });
-        MySingleton.getInstance(this).addToRequestQueue(showR);
 
 
 
 
+
+        //SY
         //post msg id and get message  = urlList
         StringRequest listR = new StringRequest(Request.Method.GET, urlList,
                 new Response.Listener<String>() {
@@ -152,13 +99,9 @@ public class MainActivity extends AppCompatActivity {
         });
         MySingleton.getInstance(this).addToRequestQueue(listR);
 
-
     }
 
-
-
-
-
+    //SY
     //check mStatus first, mStatus == "ok" or "error", then fetch mData
     //{"mStatus":"ok",
     // "mData":
@@ -166,13 +109,15 @@ public class MainActivity extends AppCompatActivity {
     // }
 
 
+    //modified method to list all messages
     private void populateListFromVolley(String response){
         try {
             mData.clear();
             JSONObject obj = new JSONObject(response);
             String status;
             status = obj.getString("mStatus");
-//            Log.e("shy221", status);
+            //this is to check if status went wrong
+            // Log.e("shy221", status);
                 if(status.equals("ok")){
                     JSONArray data = obj.getJSONArray("mData");
                     for (int i = 0; i < data.length(); i++){
@@ -180,10 +125,7 @@ public class MainActivity extends AppCompatActivity {
                         String title = data.getJSONObject(i).getString("mTitle");
                         String content = data.getJSONObject(i).getString("mContent");
                         int likes = data.getJSONObject(i).getInt("mLikes");
-//                        String content = "";
                         mData.add(new Message(id, title, content,likes));
-//                        mData.add(new Message(id, title, content));
-//                        Log.d("hi", mData.toString());
                     }
 
                 }else{
@@ -195,11 +137,6 @@ public class MainActivity extends AppCompatActivity {
         }
         Log.d("shy221", "Successfully parsed JSON file.");
 
-
-
-//        ListView mListView = (ListView) findViewById(R.id.datum_list_view);
-//        ItemListAdapter adapter = new ItemListAdapter(this, mData);
-//        mListView.setAdapter(adapter);
         RecyclerView rv = findViewById(R.id.message_list_view);
         rv.setLayoutManager(new LinearLayoutManager(this));
         ItemListAdapter adapter = new ItemListAdapter(this, mData);
@@ -208,7 +145,8 @@ public class MainActivity extends AppCompatActivity {
         adapter.setClickListener(new ItemListAdapter.ClickListener() {
             @Override
             public void onClick(Message message) {
-//                Toast.makeText(MainActivity.this, message.mTitle , Toast.LENGTH_LONG).show();
+                //Toast for fun effect SY
+                //Toast.makeText(MainActivity.this, message.mTitle , Toast.LENGTH_LONG).show();
                 Intent i = new Intent(getApplicationContext(), DetailActivity.class);
                 i.putExtra("label_contents", "Post your message here.");
                 i.putExtra("message id", message.mId);
@@ -221,12 +159,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
-
-
-
-
-
 
 
     @Override
@@ -263,6 +195,8 @@ public class MainActivity extends AppCompatActivity {
                 // Get the "extra" string of data
 //                Log.e("shy221 result", data.getStringExtra("result"));
 //                Toast.makeText(MainActivity.this, data.getStringExtra("title") + data.getStringExtra("content"), Toast.LENGTH_LONG).show();
+
+                //refresh
                 StringRequest listR = new StringRequest(Request.Method.GET,"https://arcane-refuge-67249.herokuapp.com/messages" ,
                         new Response.Listener<String>() {
                             @Override
@@ -283,6 +217,7 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == 123) {
             // Make sure the request was successful
             if (resultCode == RESULT_OK) {
+                //refresh when detail activity is working fine
                 StringRequest listR = new StringRequest(Request.Method.GET,"https://arcane-refuge-67249.herokuapp.com/messages" ,
                         new Response.Listener<String>() {
                             @Override

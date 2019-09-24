@@ -1,3 +1,4 @@
+//Shenyi Yu Phase 1
 package edu.lehigh.cse216.yut222.phase0;
 
 import android.app.Activity;
@@ -46,14 +47,11 @@ public class SecondActivity extends AppCompatActivity {
         final EditText etTitle = (EditText) findViewById(R.id.editText);
         final EditText etContent = (EditText) findViewById(R.id.editText4);
 
-
         Button bOk = (Button) findViewById(R.id.buttonOk);
         bOk.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent i = new Intent();
-
-
                 if (!etTitle.getText().toString().equals("")&& !etContent.getText().toString().equals("") ) {
                     i.putExtra("title", etTitle.getText().toString());
                     i.putExtra("content", etContent.getText().toString());
@@ -79,6 +77,7 @@ public class SecondActivity extends AppCompatActivity {
     }
 
     private void postMessage(final String t, final String c){
+        //map is hashMap, m is jsonObject
         //one link to post
         String urlPost = "https://arcane-refuge-67249.herokuapp.com/messages";
         Map<String, String> map = new HashMap<>();
