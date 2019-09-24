@@ -5,7 +5,7 @@ class Message {
 //     * An integer index for this piece of data
 //     */
     int mId;
-//    int mLikes;
+    int mLikes;
 
     /**
      * The string title and contents that comprise this piece of data
@@ -20,10 +20,11 @@ class Message {
      * @param title The string title for this piece of data
      * @param content The string contents for this piece of data
      */
-    Message(int id, String title, String content) {
+    Message(int id, String title, String content, int likes) {
+//    Message(int id, String title, String content) {
         mId = id;
         mTitle = title;
         mContent = content;
-//        mLikes = likes;
+        mLikes = likes;
     }
 }

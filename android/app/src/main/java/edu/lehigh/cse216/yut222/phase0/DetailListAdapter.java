@@ -19,12 +19,14 @@ class DetailListAdapter extends RecyclerView.Adapter<DetailListAdapter.ViewHolde
         TextView mId;
         TextView mTitle;
         TextView mContent;
+        TextView mLikes;
 
         ViewHolder(View itemView) {
             super(itemView);
             this.mId = (TextView) itemView.findViewById(R.id.detailItemId);
             this.mTitle = (TextView) itemView.findViewById(R.id.detailItemTitle);
             this.mContent = (TextView) itemView.findViewById(R.id.detailItemContent);
+            this.mLikes = (TextView) itemView.findViewById(R.id.detailItemLikes);
         }
     }
 
@@ -62,6 +64,7 @@ class DetailListAdapter extends RecyclerView.Adapter<DetailListAdapter.ViewHolde
         holder.mId.setText(Integer.toString(m.mId));
         holder.mTitle.setText(m.mTitle);
         holder.mContent.setText(m.mContent);
+        holder.mLikes.setText(Integer.toString(m.mLikes));
 
 
         // Attach a click listener to the view we are configuring
