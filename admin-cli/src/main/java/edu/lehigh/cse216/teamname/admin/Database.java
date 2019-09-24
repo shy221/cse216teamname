@@ -5,8 +5,13 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 public class Database {
     /**
@@ -51,6 +56,11 @@ public class Database {
     private PreparedStatement mDropTable;
 
     /**
+     * A prepared statement for increase likes
+     */
+    private PreparedStatement mIncrementLikes;
+
+    /**
      * RowData is like a struct in C: we use it to hold data, and we allow 
      * direct access to its fields.  In the context of this Database, RowData 
      * represents the data we'd see in a row.
@@ -73,14 +83,24 @@ public class Database {
          * The message stored in this row
          */
         String mMessage;
+        /**
+         * The count of likes
+         */
+        int mlikes;
+        /**
+         * The date of the post
+         */
+        Timestamp mDate;
 
         /**
          * Construct a RowData object by providing values for its fields
          */
-        public RowData(int id, String subject, String message) {
+        public RowData(int id, String subject, String message, int likes, Timestamp date) {
             mId = id;
             mSubject = subject;
             mMessage = message;
+            mlikes = likes;
+            mDate = date;
         }
     }
 
@@ -94,21 +114,22 @@ public class Database {
     /**
      * Get a fully-configured connection to the database
      * 
-     * @param ip   The IP address of the database server
-     * @param port The port on the database server to which connection requests
-     *             should be sent
-     * @param user The user ID to use when connecting
-     * @param pass The password to use when connecting
+     * @param db_url   The login info to heroku database
      * 
      * @return A Database object, or null if we cannot connect properly
      */
-    static Database getDatabase(String ip, String port, String user, String pass) {
+    static Database getDatabase(String db_url) {
         // Create an un-configured Database object
         Database db = new Database();
 
         // Give the Database object a connection, fail if we cannot get one
         try {
-            Connection conn = DriverManager.getConnection("jdbc:postgresql://" + ip + ":" + port + "/", user, pass);
+            Class.forName("org.postgresql.Driver");
+            URI dbUri = new URI(db_url);
+            String username = dbUri.getUserInfo().split(":")[0];
+            String password = dbUri.getUserInfo().split(":")[1];
+            String dbUrl = "jdbc:postgresql://" + dbUri.getHost() + ":" + dbUri.getPort() + dbUri.getPath() + "?sslmode=require";
+            Connection conn = DriverManager.getConnection(dbUrl, username, password);
             if (conn == null) {
                 System.err.println("Error: DriverManager.getConnection() returned a null object");
                 return null;
@@ -117,6 +138,12 @@ public class Database {
         } catch (SQLException e) {
             System.err.println("Error: DriverManager.getConnection() threw a SQLException");
             e.printStackTrace();
+            return null;
+        } catch (ClassNotFoundException cnfe) {
+            System.out.println("Unable to find postgresql driver");
+            return null;
+        } catch (URISyntaxException s) {
+            System.out.println("URI Syntax Error");
             return null;
         }
 
@@ -132,15 +159,16 @@ public class Database {
             // creation/deletion, so multiple executions will cause an exception
             db.mCreateTable = db.mConnection.prepareStatement(
                     "CREATE TABLE tblData (id SERIAL PRIMARY KEY, subject VARCHAR(50) "
-                    + "NOT NULL, message VARCHAR(500) NOT NULL)");
+                    + "NOT NULL, message VARCHAR(500) NOT NULL, likes NUMERIC(8,0), date TIMESTAMP(6))");
             db.mDropTable = db.mConnection.prepareStatement("DROP TABLE tblData");
 
             // Standard CRUD operations
             db.mDeleteOne = db.mConnection.prepareStatement("DELETE FROM tblData WHERE id = ?");
-            db.mInsertOne = db.mConnection.prepareStatement("INSERT INTO tblData VALUES (default, ?, ?)");
+            db.mInsertOne = db.mConnection.prepareStatement("INSERT INTO tblData VALUES (default, ?, ?, ?, ?)");
             db.mSelectAll = db.mConnection.prepareStatement("SELECT id, subject FROM tblData");
             db.mSelectOne = db.mConnection.prepareStatement("SELECT * from tblData WHERE id=?");
             db.mUpdateOne = db.mConnection.prepareStatement("UPDATE tblData SET message = ? WHERE id = ?");
+            db.mIncrementLikes = db.mConnection.prepareStatement("UPDATE tblData SET likes = likes + 1 WHERE id = ?");
         } catch (SQLException e) {
             System.err.println("Error creating prepared statement");
             e.printStackTrace();
@@ -188,6 +216,10 @@ public class Database {
         try {
             mInsertOne.setString(1, subject);
             mInsertOne.setString(2, message);
+            mInsertOne.setInt(3, 0);
+            Date date= new Date();
+            Timestamp ts = new Timestamp(date.getTime());
+            mInsertOne.setTimestamp(4, ts);
             count += mInsertOne.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -205,7 +237,7 @@ public class Database {
         try {
             ResultSet rs = mSelectAll.executeQuery();
             while (rs.next()) {
-                res.add(new RowData(rs.getInt("id"), rs.getString("subject"), null));
+                res.add(new RowData(rs.getInt("id"), rs.getString("subject"), "", 0, null));
             }
             rs.close();
             return res;
@@ -228,7 +260,7 @@ public class Database {
             mSelectOne.setInt(1, id);
             ResultSet rs = mSelectOne.executeQuery();
             if (rs.next()) {
-                res = new RowData(rs.getInt("id"), rs.getString("subject"), rs.getString("message"));
+                res = new RowData(rs.getInt("id"), rs.getString("subject"), rs.getString("message"), rs.getInt("likes"), rs.getTimestamp("date"));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -272,6 +304,17 @@ public class Database {
             e.printStackTrace();
         }
         return res;
+    }
+
+    public RowData incrementLikes(int id) {
+        try {
+            mIncrementLikes.setInt(1, id);
+            mIncrementLikes.executeUpdate();
+            return selectOne(id);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     /**
