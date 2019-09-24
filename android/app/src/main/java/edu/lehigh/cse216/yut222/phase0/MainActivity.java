@@ -283,11 +283,20 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == 123) {
             // Make sure the request was successful
             if (resultCode == RESULT_OK) {
-                // Get the "extra" string of data
-//                Log.e("shy221 result", data.getStringExtra("result"));
-//                Toast.makeText(MainActivity.this, data.getStringExtra("title") + data.getStringExtra("content"), Toast.LENGTH_LONG).show();
+                StringRequest listR = new StringRequest(Request.Method.GET,"https://arcane-refuge-67249.herokuapp.com/messages" ,
+                        new Response.Listener<String>() {
+                            @Override
+                            public void onResponse(String response) {
+                                populateListFromVolley(response);
 
-
+                            }
+                        }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e("shy221", "Listing all messages didn't work!");
+                    }
+                });
+                MySingleton.getInstance(this).addToRequestQueue(listR);
             }
         }
     }

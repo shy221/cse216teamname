@@ -83,7 +83,7 @@ public class DetailActivity extends AppCompatActivity {
             public void onClick(View view) {
                 //call delete request function
                 deleteMessage(urlDetail);
-                finish();
+                showDetail();
             }
         });
 

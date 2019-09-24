@@ -1,4 +1,4 @@
-package edu.lehigh.cse216.teamname.phase0;
+package edu.lehigh.cse216.yut222.phase0;
 
 
 import android.view.View;
@@ -24,18 +24,17 @@ import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withContentDescription;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
-import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.allOf;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
-public class MainActivityTest {
+public class UISecondAcTest {
 
     @Rule
     public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<>(MainActivity.class);
 
     @Test
-    public void mainActivityTest() {
+    public void uISecondAcTest() {
         // Added a sleep statement to match the app's execution delay.
         // The recommended way to handle such scenarios is to use Espresso idling resources:
         // https://google.github.io/android-testing-support-library/docs/espresso/idling-resource/index.html
@@ -55,34 +54,15 @@ public class MainActivityTest {
                         isDisplayed()));
         overflowMenuButton.perform(click());
 
-        // Added a sleep statement to match the app's execution delay.
-        // The recommended way to handle such scenarios is to use Espresso idling resources:
-        // https://google.github.io/android-testing-support-library/docs/espresso/idling-resource/index.html
-        try {
-            Thread.sleep(250);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        ViewInteraction appCompatTextView = onView(
-                allOf(withId(R.id.title), withText("Settings"),
+        ViewInteraction linearLayout = onView(
+                allOf(withId(R.id.content),
                         childAtPosition(
                                 childAtPosition(
-                                        withId(R.id.content),
+                                        IsInstanceOf.<View>instanceOf(android.widget.ListView.class),
                                         0),
                                 0),
                         isDisplayed()));
-        appCompatTextView.perform(click());
-
-        ViewInteraction textView = onView(
-                allOf(withId(R.id.specialMessage), withText("CSE216 is the best"),
-                        childAtPosition(
-                                childAtPosition(
-                                        IsInstanceOf.<View>instanceOf(android.view.ViewGroup.class),
-                                        0),
-                                0),
-                        isDisplayed()));
-        textView.check(matches(withText("CSE216 is the best")));
+        linearLayout.check(matches(isDisplayed()));
     }
 
     private static Matcher<View> childAtPosition(

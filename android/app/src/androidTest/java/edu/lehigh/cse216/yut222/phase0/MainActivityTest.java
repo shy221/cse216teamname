@@ -20,17 +20,11 @@ import org.junit.runner.RunWith;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
-import static androidx.test.espresso.action.ViewActions.closeSoftKeyboard;
-import static androidx.test.espresso.action.ViewActions.pressImeActionButton;
-import static androidx.test.espresso.action.ViewActions.replaceText;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
-import static androidx.test.espresso.matcher.ViewMatchers.withClassName;
-import static androidx.test.espresso.matcher.ViewMatchers.withContentDescription;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.is;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
@@ -41,113 +35,25 @@ public class MainActivityTest {
 
     @Test
     public void mainActivityTest() {
-        // Added a sleep statement to match the app's execution delay.
-        // The recommended way to handle such scenarios is to use Espresso idling resources:
-        // https://google.github.io/android-testing-support-library/docs/espresso/idling-resource/index.html
-        try {
-            Thread.sleep(300);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        ViewInteraction overflowMenuButton = onView(
-                allOf(withContentDescription("More options"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.toolbar),
-                                        1),
-                                0),
-                        isDisplayed()));
-        overflowMenuButton.perform(click());
-
-        // Added a sleep statement to match the app's execution delay.
-        // The recommended way to handle such scenarios is to use Espresso idling resources:
-        // https://google.github.io/android-testing-support-library/docs/espresso/idling-resource/index.html
-        try {
-            Thread.sleep(250);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
         ViewInteraction appCompatTextView = onView(
-                allOf(withId(R.id.title), withText("Post your message"),
+                allOf(withId(R.id.listItemTitle), withText("ATC"),
                         childAtPosition(
                                 childAtPosition(
-                                        withId(R.id.content),
-                                        0),
-                                0),
+                                        withId(R.id.message_list_view),
+                                        4),
+                                1),
                         isDisplayed()));
         appCompatTextView.perform(click());
 
-        ViewInteraction appCompatEditText = onView(
-                allOf(withId(R.id.editText),
-                        childAtPosition(
-                                childAtPosition(
-                                        withClassName(is("androidx.constraintlayout.widget.ConstraintLayout")),
-                                        0),
-                                3),
-                        isDisplayed()));
-        appCompatEditText.perform(replaceText("123"), closeSoftKeyboard());
-
-        ViewInteraction appCompatEditText2 = onView(
-                allOf(withId(R.id.editText4),
-                        childAtPosition(
-                                childAtPosition(
-                                        withClassName(is("androidx.constraintlayout.widget.ConstraintLayout")),
-                                        0),
-                                4),
-                        isDisplayed()));
-        appCompatEditText2.perform(replaceText("1"), closeSoftKeyboard());
-
-        ViewInteraction appCompatEditText3 = onView(
-                allOf(withId(R.id.editText4), withText("1"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withClassName(is("androidx.constraintlayout.widget.ConstraintLayout")),
-                                        0),
-                                4),
-                        isDisplayed()));
-        appCompatEditText3.perform(pressImeActionButton());
-
-        ViewInteraction editText = onView(
-                allOf(withId(R.id.editText), withText("123"),
+        ViewInteraction button = onView(
+                allOf(withId(R.id.like),
                         childAtPosition(
                                 childAtPosition(
                                         IsInstanceOf.<View>instanceOf(android.view.ViewGroup.class),
                                         0),
                                 1),
                         isDisplayed()));
-        editText.check(matches(withText("123")));
-
-        ViewInteraction editText2 = onView(
-                allOf(withId(R.id.editText4), withText("1"),
-                        childAtPosition(
-                                childAtPosition(
-                                        IsInstanceOf.<View>instanceOf(android.view.ViewGroup.class),
-                                        0),
-                                2),
-                        isDisplayed()));
-        editText2.check(matches(withText("1")));
-
-        ViewInteraction button = onView(
-                allOf(withId(R.id.buttonOk),
-                        childAtPosition(
-                                childAtPosition(
-                                        IsInstanceOf.<View>instanceOf(android.view.ViewGroup.class),
-                                        0),
-                                4),
-                        isDisplayed()));
         button.check(matches(isDisplayed()));
-
-        ViewInteraction button2 = onView(
-                allOf(withId(R.id.buttonOk),
-                        childAtPosition(
-                                childAtPosition(
-                                        IsInstanceOf.<View>instanceOf(android.view.ViewGroup.class),
-                                        0),
-                                4),
-                        isDisplayed()));
-        button2.check(matches(isDisplayed()));
     }
 
     private static Matcher<View> childAtPosition(
