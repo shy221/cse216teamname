@@ -2,12 +2,12 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">Add a New Entry</h4>
+                <h4 class="modal-title">Post a New Event</h4>
             </div>
             <div class="modal-body">
-                <label for="NewEntryForm-title">Title</label>
+                <label for="NewEntryForm-title">Event Title</label>
                 <input class="form-control" type="text" id="NewEntryForm-title" />
-                <label for="NewEntryForm-message">Message</label>
+                <label for="NewEntryForm-message">Event Detail</label>
                 <textarea class="form-control" id="NewEntryForm-message"></textarea>
             </div>
             <div class="modal-footer">

@@ -1,6 +1,6 @@
 <div class="panel panel-default" id="ElementList">
     <div class="panel-heading">
-        <h3 class="panel-title">All Data</h3>
+        <h3 class="panel-title">All Events</h3>
     </div>
     <table class="table">
         <tbody>
