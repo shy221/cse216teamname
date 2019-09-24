@@ -5,8 +5,10 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -86,11 +88,11 @@ public class Database {
 
             // Standard CRUD operations
             db.mDeleteOne = db.mConnection.prepareStatement("DELETE FROM tblData WHERE id = ?");
-            db.mInsertOne = db.mConnection.prepareStatement("INSERT INTO tblData VALUES (default, ?, ?, ?)");
+            db.mInsertOne = db.mConnection.prepareStatement("INSERT INTO tblData VALUES (default, ?, ?, ?, ?)");
             db.mIncrementLikes = db.mConnection.prepareStatement("UPDATE tblData SET likes = likes + 1 WHERE id = ?");
             db.mSelectAll = db.mConnection.prepareStatement("SELECT * FROM tblData");
             db.mSelectOne = db.mConnection.prepareStatement("SELECT * from tblData WHERE id = ?");
-            db.mUpdateOne = db.mConnection.prepareStatement("UPDATE tblData SET message = ? WHERE id = ?");
+            db.mUpdateOne = db.mConnection.prepareStatement("UPDATE tblData SET subject = ?, message = ? WHERE id = ?");
         } catch (SQLException e) {
             System.err.println("Error creating prepared statement");
             e.printStackTrace();
@@ -137,6 +139,9 @@ public class Database {
             mInsertOne.setString(1, subject);
             mInsertOne.setString(2, message);
             mInsertOne.setInt(3, 0);
+            Date date= new Date();
+            Timestamp ts = new Timestamp(date.getTime());
+            mInsertOne.setTimestamp(4, ts);
             mInsertOne.execute();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -156,7 +161,7 @@ public class Database {
             mSelectOne.setInt(1, id);
             ResultSet rs = mSelectOne.executeQuery();
             if (rs.next()) {
-                res = new DataRow(rs.getInt("id"), rs.getString("subject"), rs.getString("message"), rs.getInt("likes"));
+                res = new DataRow(rs.getInt("id"), rs.getString("subject"), rs.getString("message"), rs.getInt("likes"), rs.getDate("date"));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -178,7 +183,7 @@ public class Database {
             ResultSet rs = mSelectAll.executeQuery();
             while (rs.next()) {
                 //res.add(new DataRowLite(new DataRow(rs.getInt("id"), rs.getString("subject"), rs.getString("message"), rs.getInt("likes"))));
-                res.add(new DataRow(rs.getInt("id"), rs.getString("subject"), rs.getString("message"), rs.getInt("likes")));
+                res.add(new DataRow(rs.getInt("id"), rs.getString("subject"), rs.getString("message"), rs.getInt("likes"), rs.getDate("date")));
             }
             rs.close();
             return res;
@@ -197,10 +202,11 @@ public class Database {
      * @return a copy of the data in the row, if exists, or null otherwise
      */
     // I changed updateOne(int id, String subject, String message) because the prepared statement only needs message and id.
-    public DataRow updateOne(int id, String message) {
+    public DataRow updateOne(int id, String title, String message) {
         try {
-            mUpdateOne.setString(1, message);
-            mUpdateOne.setInt(2, id);
+            mUpdateOne.setString(1, title);
+            mUpdateOne.setString(2, message);
+            mUpdateOne.setInt(3, id);
             mUpdateOne.execute();
             return readOne(id);
         } catch (SQLException e) {

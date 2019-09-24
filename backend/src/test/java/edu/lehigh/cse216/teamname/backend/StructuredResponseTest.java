@@ -4,6 +4,8 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
+import java.util.Date;
+
 /**
  * Unit test for simple App.
  */
@@ -33,7 +35,8 @@ public class StructuredResponseTest extends TestCase {
         String content = "Test Content";
         int id = 17;
         int likes = 5;
-        DataRow d = new DataRow(id, title, content, likes);
+        Date date= new Date();
+        DataRow d = new DataRow(id, title, content, likes, date);
 
         String status = "ok";
         String message = "";
