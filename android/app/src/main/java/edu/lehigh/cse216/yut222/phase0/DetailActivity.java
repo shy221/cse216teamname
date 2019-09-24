@@ -1,3 +1,4 @@
+//Shenyi Yu Phase 1
 package edu.lehigh.cse216.yut222.phase0;
 
 import android.app.Activity;
@@ -34,6 +35,7 @@ import java.util.Map;
 
 public class DetailActivity extends AppCompatActivity {
     ArrayList<Message> mData = new ArrayList<>();
+    //clickCount is for later use in like button on click. SY
     int clickCount = 0;
 
     @Override
@@ -45,50 +47,39 @@ public class DetailActivity extends AppCompatActivity {
         String mTitle = intent.getStringExtra("message title");
         String mContent = intent.getStringExtra("message content");
         String url = "https://arcane-refuge-67249.herokuapp.com/messages/";
+        //urlDetail leads to route of a specific message
         final String urlDetail = url + mId;
         final int mLikes = intent.getIntExtra("message likes", 0000);
         final Message m = new Message(mId, mTitle, mContent,mLikes );
-//        Message m = new Message(mId, mTitle, mContent);
         mData.add(new Message(mId, mTitle, mContent, mLikes));
-//        mData.add(new Message(mId, mTitle, mContent));
+        //show detail message SY
         showDetail();
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
 
+        //Edit function not yet finished, can refer to like function, second activity
+        //using jsonObjectRequest and put method
+        //getting user's inout from editText and put into Intent
+        // SY
 
 
-
-//        //post msg id and new msg content = urlUpdate
-//        StringRequest updateR = new StringRequest(Request.Method.PUT, urlDetail,
-//                new Response.Listener<String>() {
-//                    @Override
-//                    public void onResponse(String response) {
-//                        //TODO: modify to post msg id, and new msg content
-//                    }
-//                }, new Response.ErrorListener() {
-//            @Override
-//            public void onErrorResponse(VolleyError error) {
-//                Log.e("shy221", "Updating message content didn't work.");
-//
-//            }
-//        });
-//        MySingleton.getInstance(this).addToRequestQueue(updateR);
-
-
-        // The Delete button returns to the caller without sending any data
+        // The Delete button returns to the caller without sending any data SY
         Button bDelete = (Button) findViewById(R.id.drop);
         bDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 //call delete request function
                 deleteMessage(urlDetail);
+                //refresh
                 showDetail();
             }
         });
 
 
-        // The Like button returns to the caller
+        // The Like button returns updated number of likes to the caller
+        //can be developed into image button with "liked" effect
+        // using the two pngs I provide in res/drawable SY
         Button bLike = findViewById(R.id.like);
         bLike.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -163,24 +154,7 @@ public class DetailActivity extends AppCompatActivity {
         MySingleton.getInstance(this).addToRequestQueue(likeR);
     }
 
-//    private void refreshMessage(String urlD){
-//        //post msg id = urlDelete
-//        StringRequest deleteR = new StringRequest(Request.Method.DELETE, urlD,
-//                new Response.Listener<String>() {
-//                    @Override
-//                    public void onResponse(String response) {
-//
-//                    }
-//                }, new Response.ErrorListener() {
-//            @Override
-//            public void onErrorResponse(VolleyError error) {
-//                Log.e("shy221", "Deleting message didn't work.");
-//
-//            }
-//        });
-//        MySingleton.getInstance(this).addToRequestQueue(deleteR);
-//
-//    }
+//might need refresh function depending on your design EY
 
 
 
