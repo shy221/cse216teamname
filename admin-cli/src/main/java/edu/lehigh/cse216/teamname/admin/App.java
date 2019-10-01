@@ -7,8 +7,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
 
+import com.sendgrid.*;
+
 /**
- * App is our basic admin app.  For now, it is a demonstration of the six key 
+ * App is our basic admin app. For now, it is a demonstration of the six key
  * operations on a database: connect, insert, update, query, delete, disconnect
  */
 public class App {
@@ -41,7 +43,7 @@ public class App {
         // The valid actions:
         String actions = "TD1*-+~q?L";
 
-        // We repeat until a valid single-character option is selected        
+        // We repeat until a valid single-character option is selected
         while (true) {
             System.out.print("[" + actions + "] :> ");
             String action;
@@ -63,10 +65,10 @@ public class App {
     /**
      * Ask the user to enter a String message
      * 
-     * @param in A BufferedReader, for reading from the keyboard
+     * @param in      A BufferedReader, for reading from the keyboard
      * @param message A message to display when asking for input
      * 
-     * @return The string that the user provided.  May be "".
+     * @return The string that the user provided. May be "".
      */
     static String getString(BufferedReader in, String message) {
         String s;
@@ -83,10 +85,10 @@ public class App {
     /**
      * Ask the user to enter an integer
      * 
-     * @param in A BufferedReader, for reading from the keyboard
+     * @param in      A BufferedReader, for reading from the keyboard
      * @param message A message to display when asking for input
      * 
-     * @return The integer that the user provided.  On error, it will be -1
+     * @return The integer that the user provided. On error, it will be -1
      */
     static int getInt(BufferedReader in, String message) {
         int i = -1;
@@ -95,27 +97,50 @@ public class App {
             i = Integer.parseInt(in.readLine());
         } catch (IOException e) {
             e.printStackTrace();
-        } 
-        /* NumerFormatException is already handled by parseInt()
-        catch (NumberFormatException e) {
-            e.printStackTrace();
         }
-        */
+        /*
+         * NumerFormatException is already handled by parseInt() catch
+         * (NumberFormatException e) { e.printStackTrace(); }
+         */
         return i;
     }
 
+    static boolean sendEmail(String from_email, String to_email) {
+        Email from = new Email(from_email);
+        String subject = "Sending with SendGrid is Fun";
+        Email to = new Email(to_email);
+        Content content = new Content("text/plain", "and easy to do anywhere, even with Java");
+        Mail mail = new Mail(from, subject, to, content);
+
+        SendGrid sg = new SendGrid(System.getenv("SENDGRID_API_KEY"));
+        Request request = new Request();
+        try {
+            request.setMethod(Method.POST);
+            request.setEndpoint("mail/send");
+            request.setBody(mail.build());
+            Response response = sg.api(request);
+            System.out.println(response.getStatusCode());
+            System.out.println(response.getBody());
+            System.out.println(response.getHeaders());
+        } catch (IOException ex) {
+            throw ex;
+            return false;
+        }
+        return true;
+    }
+
     /**
-     * The main routine runs a loop that gets a request from the user and
-     * processes it
+     * The main routine runs a loop that gets a request from the user and processes
+     * it
      * 
-     * @param argv Command-line options.  Ignored by this program.
+     * @param argv Command-line options. Ignored by this program.
      */
     public static void main(String[] argv) {
         // get the Postgres configuration from the environment
         Map<String, String> env = System.getenv();
         String db_url = env.get("DATABASE_URL");
 
-        // Get a fully-configured connection to the database, or exit 
+        // Get a fully-configured connection to the database, or exit
         // immediately
         Database db = Database.getDatabase(db_url);
         if (db == null)
@@ -127,7 +152,7 @@ public class App {
             // Get the user's request, and do it
             //
             // NB: for better testability, each action should be a separate
-            //     function call
+            // function call
             char action = prompt(in);
             if (action == '?') {
                 menu();
@@ -194,7 +219,7 @@ public class App {
                 }
             }
         }
-        // Always remember to disconnect from the database when the program 
+        // Always remember to disconnect from the database when the program
         // exits
         db.disconnect();
     }
