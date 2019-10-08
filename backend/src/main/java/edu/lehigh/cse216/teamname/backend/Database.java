@@ -30,6 +30,31 @@ public class Database {
     private PreparedStatement mDeleteOne;
     private PreparedStatement mInsertOne;
     private PreparedStatement mIncrementLikes;
+    //when deleting a message also clear below parameters
+    //added related sql
+    private PreparedStatement mClearLikes;
+    private PreparedStatement mClearDislikes;
+    private PreparedStatement mClearComments;
+    //added decrement likes, increment dislikes and decrement dislikes
+    private PreparedStatement mDecrementLikes;
+    private PreparedStatement mIncrementDislikes;
+    private PreparedStatement mDecrementDislikes;
+    private PreparedStatement mCheckLikes;
+    private PreparedStatement mCheckDislikes;
+
+    //added select user profile,
+    //possibly all user profile ? No need.
+    //added update user profile
+    private PreparedStatement uSelectOne;
+    private PreparedStatement uUpdateOne;
+    //added update password
+    private PreparedStatement uUpdatePwd;
+    //check if password matches
+    private PreparedStatement uAuth;
+    //added select comments
+    private PreparedStatement cSelectAll;
+    //added insert comment
+    private PreparedStatement cInsertOne;
     private PreparedStatement mSelectAll;
     private PreparedStatement mSelectOne;
     private PreparedStatement mUpdateOne;
@@ -45,11 +70,7 @@ public class Database {
     /**
      * Connect to the Database
      * 
-     * @param ip   The IP address of the database server
-     * @param port The port on the database server to which connection requests
-     *             should be sent
-     * @param user The user ID to use when connecting
-     * @param pass The password to use when connecting
+     * @param db_url
      * @return A Database object, or null if we cannot connect properly
      */
     static Database getDatabase(String db_url) {
@@ -87,12 +108,35 @@ public class Database {
             // creation/deletion, so multiple executions will cause an exception
 
             // Standard CRUD operations
-            db.mDeleteOne = db.mConnection.prepareStatement("DELETE FROM tblData WHERE id = ?");
+            //tblData
+            db.mDeleteOne = db.mConnection.prepareStatement("DELETE FROM tblData WHERE mid = ?");
             db.mInsertOne = db.mConnection.prepareStatement("INSERT INTO tblData VALUES (default, ?, ?, ?, ?)");
-            db.mIncrementLikes = db.mConnection.prepareStatement("UPDATE tblData SET likes = likes + 1 WHERE id = ?");
-            db.mSelectAll = db.mConnection.prepareStatement("SELECT * FROM tblData");
-            db.mSelectOne = db.mConnection.prepareStatement("SELECT * from tblData WHERE id = ?");
-            db.mUpdateOne = db.mConnection.prepareStatement("UPDATE tblData SET subject = ?, message = ? WHERE id = ?");
+            db.mSelectAll = db.mConnection.prepareStatement("SELECT mid, subject FROM tblData");
+            db.mSelectOne = db.mConnection.prepareStatement("SELECT * from tblData NATURAL JOIN tblUser NATURAL JOIN numOfLikes NATURAL JOIN numOfDislikes WHERE mid = ?");
+            db.mUpdateOne = db.mConnection.prepareStatement("UPDATE tblData SET title = ?, message = ? WHERE mid = ?");
+            db.mClearLikes = db.mConnection.prepareStatement("DELETE FROM tblLike WHERE mid = ?");
+            db.mClearDislikes = db.mConnection.prepareStatement("DELETE FROM tblDislike WHERE mid = ?");
+            db.mClearComments = db.mConnection.prepareStatement("DELETE FROM tblComment WHERE mid = ?");
+
+            db.mIncrementLikes = db.mConnection.prepareStatement("INSERT INTO tblLike VALUES (?, ?)");
+            db.mDecrementLikes = db.mConnection.prepareStatement("DELETE FROM tblLike WHERE uid = ? AND mid = ?");
+            db.mIncrementDislikes = db.mConnection.prepareStatement("INSERT INTO tblDislike VALUES (?, ?)");
+            db.mDecrementDislikes = db.mConnection.prepareStatement("DELETE FROM tblDislike WHERE uid = ? AND mid = ?");
+            db.mCheckLikes = db.mConnection.prepareStatement("SELECT * from tblLike where uid = ? AND mid = ?");
+            db.mCheckDislikes = db.mConnection.prepareStatement("SELECT * from tblDislike where uid = ? AND mid = ?");
+
+            //add get user profile for spefic user
+            db.uSelectOne = db.mConnection.prepareStatement("SELECT * from tblUser WHERE uid = ?");
+            //tblUser
+            //add update user profile for specific user
+            db.uUpdateOne = db.mConnection.prepareStatement("UPDATE tblUser SET username = ?, intro = ? WHERE uid = ?");
+            db.uAuth = db.mConnection.prepareStatement("SELECT * from tblUser WHERE email = ?");
+            //add update password for specific user
+            db.uUpdatePwd = db.mConnection.prepareStatement("UPDATE tblUser SET salt = ?, password = ? WHERE uid = ?");
+            //tblComments
+            //add get all comments for specific message
+            db.cSelectAll = db.mConnection.prepareStatement("SELECT cid, uid, username, text FROM tblComment NATURAL JOIN tblUser where mid = ?");
+            db.cInsertOne = db.mConnection.prepareStatement("INSERT INTO tblComment VALUES (default, ?, ?, ?)");
         } catch (SQLException e) {
             System.err.println("Error creating prepared statement");
             e.printStackTrace();
@@ -131,14 +175,15 @@ public class Database {
      * @param message The message for this new row
      * @return The Id of the new row, or -1 if no row was created
      */
-    public int createEntry(String subject, String message) {
+    //detail: title, content, likes, dislikes, comment.userid, comments.text
+    public int createEntry(int uid, String subject, String message) {
         if (subject == null || message == null)
             return -1;
         int id = mCount++;
         try {
-            mInsertOne.setString(1, subject);
-            mInsertOne.setString(2, message);
-            mInsertOne.setInt(3, 0);
+            mInsertOne.setInt(1, uid);
+            mInsertOne.setString(2, subject);
+            mInsertOne.setString(3, message);
             Date date= new Date();
             Timestamp ts = new Timestamp(date.getTime());
             mInsertOne.setTimestamp(4, ts);
@@ -150,6 +195,30 @@ public class Database {
     }
 
     /**
+     * Insert a row into the database
+     *
+     * @param uid The subject for this new row
+     * @param mid The message for this new row
+     * @param text
+     * @return The Id of the new row, or -1 if no row was created
+     */
+    //detail: title, content, likes, dislikes, comment.userid, comments.text
+    public int createComment(int uid, int mid, String text) {
+        if (uid <= 0 || mid <= 0 ||text == null)
+            return -1;
+        try {
+            cInsertOne.setInt(1, uid);
+            cInsertOne.setInt(2, mid);
+            cInsertOne.setString(3, text);
+            cInsertOne.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return mid;
+    }
+
+    /**
+     * phase 2
      * Get all data for a specific row, by Id
      * 
      * @param id The Id of the row being requested
@@ -161,12 +230,40 @@ public class Database {
             mSelectOne.setInt(1, id);
             ResultSet rs = mSelectOne.executeQuery();
             if (rs.next()) {
-                res = new DataRow(rs.getInt("id"), rs.getString("subject"), rs.getString("message"), rs.getInt("likes"), rs.getDate("date"));
+//                ArrayList<Comment> comments = new ArrayList<Comment>();
+//                comments = ;
+                //detail: title, content, likes, dislikes, comment.userid, comments.text
+                //res = new DataRow(rs.getInt("id"), rs.getString("subject"), rs.getString("message"), rs.getInt("likes"), rs.getDate("date"));
+//                res = new DataRow(rs.getInt("id"), rs.getString("subject"), rs.getString("message"), rs.getInt("likes"), rs.getInt("dislikes"), rs.getDate("date"), comments);
+                res = new DataRow(rs.getInt("mid"), rs.getInt("uid"), rs.getString("username"), rs.getString("subject"), rs.getString("message"), rs.getInt("likes"), rs.getInt("dislikes"), rs.getDate("date"));
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return res;
+    }
+
+    /**
+     * phase 2
+     * Query the database for a list of all comments and their related Ids
+     *
+     * @return All rows, as an ArrayList
+     */
+    public ArrayList<Comment> readAllComments(int mId) {
+        ArrayList<Comment> res = new ArrayList<Comment>();
+        try {
+            // SQL that gets all comments.executeQuery()
+            cSelectAll.setInt(1, mId);
+            ResultSet rs = cSelectAll.executeQuery();
+            while (rs.next()) {
+                res.add(new Comment(rs.getInt("cid"), rs.getInt("mid"), rs.getInt("uid"), rs.getString("username"), rs.getString("text")));
+            }
+            rs.close();
+            return res;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     /**
@@ -183,7 +280,10 @@ public class Database {
             ResultSet rs = mSelectAll.executeQuery();
             while (rs.next()) {
                 //res.add(new DataRowLite(new DataRow(rs.getInt("id"), rs.getString("subject"), rs.getString("message"), rs.getInt("likes"))));
-                res.add(new DataRow(rs.getInt("id"), rs.getString("subject"), rs.getString("message"), rs.getInt("likes"), rs.getDate("date")));
+                //phase 1 used
+                //res.add(new DataRow(rs.getInt("id"), rs.getString("subject"), rs.getString("message"), rs.getInt("likes"), rs.getDate("date")));
+                //phase 2 with more parameters
+                res.add(new DataRow(rs.getInt("mid"), rs.getInt("uid"), rs.getString("username"), rs.getString("subject"), rs.getString("message"), rs.getInt("likes"), rs.getInt("dislikes"), rs.getDate("date")));
             }
             rs.close();
             return res;
@@ -196,19 +296,19 @@ public class Database {
     /**
      * Update the message of a row in the database
      * 
-     * @param id The Id of the row to update
-     * @param subject The new subject for the row
+     * @param mid The Id of the row to update
+     * @param title The new subject for the row
      * @param message The new message for the row
      * @return a copy of the data in the row, if exists, or null otherwise
      */
     // I changed updateOne(int id, String subject, String message) because the prepared statement only needs message and id.
-    public DataRow updateOne(int id, String title, String message) {
+    public DataRow updateOne(int mid, String title, String message) {
         try {
             mUpdateOne.setString(1, title);
             mUpdateOne.setString(2, message);
-            mUpdateOne.setInt(3, id);
+            mUpdateOne.setInt(3, mid);
             mUpdateOne.execute();
-            return readOne(id);
+            return readOne(mid);
         } catch (SQLException e) {
             e.printStackTrace();
             return null;
@@ -216,21 +316,124 @@ public class Database {
     }
 
     /**
-     * Increment the likes value by 1 
-     * 
-     * @param id the Id of the row to increment likes value
+     * Increment the likes value by 1
+     *
+     * @param mid the Id of the row to increment likes value
      * @return a copy of the data in the row, if exists, or null otherwise
      */
-    public DataRow incrementLikes(int id) {
+    public DataRow incrementLikes(int uid, int mid) {
         try {
-            mIncrementLikes.setInt(1, id);
+            mIncrementLikes.setInt(1, uid);
+            mIncrementLikes.setInt(2, mid);
             mIncrementLikes.execute();
-            return readOne(id);
+            return readOne(mid);
         } catch (SQLException e) {
             e.printStackTrace();
             return null;
         }
     }
+
+    /**
+     * phase 2
+     * Decrement the likes value by 1
+     *
+     * @param uid the Id of the row to increment likes value
+     * @param mid
+     * @return a copy of the data in the row, if exists, or null otherwise
+     */
+    public DataRow decrementLikes(int uid, int mid) {
+        try {
+            mDecrementLikes.setInt(1, uid);
+            mDecrementLikes.setInt(2, mid);
+            mDecrementLikes.execute();
+            return readOne(mid);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    //TODO: check if table next is null then chall related function
+    public DataRow doLikes(int uid, int mid){
+        try {
+            mCheckLikes.setInt(1,uid);
+            mCheckLikes.setInt(2,mid);
+            mCheckLikes.execute();
+            ResultSet rs = mCheckLikes.executeQuery();
+            if (rs.next()){
+                decrementLikes(uid, mid);
+            }
+            else{
+                incrementLikes(uid, mid);
+            }
+            return readOne(mid);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+    }
+
+    /**
+     * Increment the likes value by 1
+     *
+     * @param uid the Id of the row to increment likes value
+     * @param mid
+     * @return a copy of the data in the row, if exists, or null otherwise
+     */
+    public DataRow incrementDislikes(int uid, int mid) {
+        try {
+            mIncrementDislikes.setInt(1, uid);
+            mIncrementDislikes.setInt(2, mid);
+            mIncrementDislikes.execute();
+            return readOne(mid);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * phase 2
+     * Decrement the likes value by 1
+     *
+     * @param uid the Id of the row to increment likes value
+     * @param mid
+     * @return a copy of the data in the row, if exists, or null otherwise
+     */
+    public DataRow decrementDislikes(int uid, int mid) {
+        try {
+            mDecrementDislikes.setInt(1, uid);
+            mDecrementDislikes.setInt(2, mid);
+            mDecrementDislikes.execute();
+            return readOne(mid);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public DataRow doDislikes(int uid, int mid){
+        try {
+            mCheckDislikes.setInt(1,uid);
+            mCheckDislikes.setInt(2,mid);
+            mCheckDislikes.execute();
+            ResultSet rs = mCheckDislikes.executeQuery();
+            if (rs.next()){
+                decrementDislikes(uid, mid);
+            }
+            else{
+                incrementDislikes(uid, mid);
+            }
+            return readOne(mid);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+    }
+
+
 
     /**
      * Delete a row from the database
@@ -242,10 +445,111 @@ public class Database {
         try {
             mDeleteOne.setInt(1, id);
             mDeleteOne.execute();
+            mClearLikes.setInt(1, id);
+            mClearDislikes.setInt(1, id);
+            mClearComments.setInt(1, id);
+            mClearLikes.execute();
+            mClearDislikes.execute();
+            mClearComments.execute();
             return true;
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
+        }
+    }
+    /**
+     * phase 2
+     *
+     */
+
+    /**
+     * Check if the password for this specific user exists
+     *
+     * @param email login authorization
+     */
+    public DataRowUserProfile matchPwd(String email) {
+        DataRowUserProfile res = null;
+        try {
+            uAuth.setString(1, email);
+            uAuth.executeQuery();
+            ResultSet rs = uSelectOne.executeQuery();
+            if (rs.next()) {
+                res = new DataRowUserProfile(rs.getInt("uid"), rs.getString("username"), rs.getString("email"), rs.getString("salt"), rs.getString("password"),rs.getString("intro") );
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return res;
+    }
+
+    /**
+     * phase 2
+     * Get all data for a specific row, by Id
+     *
+     * @param id The user Id of the row being requested
+     * @return The data for the requested row, or null if the Id was invalid
+     */
+    public DataRowUserProfile uReadOne(int id) {
+        DataRowUserProfile res = null;
+        try {
+            uSelectOne.setInt(1, id);
+            ResultSet rs = uSelectOne.executeQuery();
+            if (rs.next()) {
+                //modify here
+                //detail: uid, username, email, salt, password, intro
+                //DataRowUserProfile for user profile!
+                res = new DataRowUserProfile(rs.getInt("uid"), rs.getString("username"), rs.getString("email"), rs.getString("salt"), rs.getString("password"),rs.getString("intro") );
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return res;
+    }
+
+    /**
+     * phase 2
+     * Update the profile of a row in the database
+     *
+     * can it be updated? uid cannot be updated!
+     * uEmail is not necessary to be updated.
+     * @param username The new username for the row
+     * @param intro The new intro for the row
+     * No other param to be updated.
+     * @return a copy of the data in the row, if exists, or null otherwise
+     */
+    //DONE: need modify the index or add more params.
+    public DataRowUserProfile uUpdateOne(int id, String username, String intro) {
+        try {
+            uUpdateOne.setString(1, username);
+            uUpdateOne.setString(2, intro);
+            uUpdateOne.setInt(3, id);
+            uUpdateOne.execute();
+            return uReadOne(id);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * phase 2
+     * Update the password of a row in the database
+     *
+     * @param password The new password for the row
+     * No other param to be updated.
+     * @return a copy of the data in the row, if exists, or null otherwise
+     */
+    //DONE: need modify the index or add more params.
+    public int uUpdatePwd(int id, String salt, String password) {
+        try {
+            uUpdatePwd.setString(1, salt);
+            uUpdatePwd.setString(2, password);
+            uUpdatePwd.setInt(3, id);
+            uUpdatePwd.execute();
+            return id;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return -1;
         }
     }
 }

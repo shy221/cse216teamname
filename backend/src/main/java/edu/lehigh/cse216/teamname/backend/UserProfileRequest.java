@@ -1,28 +1,26 @@
 package edu.lehigh.cse216.teamname.backend;
 
 /**
- * SimpleRequest provides a format for clients to present title and message 
+ * UserProfileRequest provides a format for clients to present title and message 
  * strings to the server.
  * 
  * NB: since this will be created from JSON, all fields must be public, and we
  *     do not need a constructor.
  */
-public class SimpleRequest {
-    public int mid;
-    public int uid;
+public class UserProfileRequest {
     /**
-     * The title being provided by the client.
+     * The username being provided by the client.
      */
-    public String mTitle;
+    public String uUsername;
 
     /**
-     * The message being provided by the client.
+     * The introduction being provided by the client.
      */
-    public String mMessage;
+    public String uIntro;
     /**
      * The email being provided by the client.
      */
-    public String email;
+    public String uEmail;
     /**
      * The sessoinKey being provided by the client.
      */

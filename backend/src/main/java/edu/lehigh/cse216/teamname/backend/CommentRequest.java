@@ -7,18 +7,24 @@ package edu.lehigh.cse216.teamname.backend;
  * NB: since this will be created from JSON, all fields must be public, and we
  *     do not need a constructor.
  */
-public class SimpleRequest {
-    public int mid;
+public class CommentRequest {
+    //user id
+    //message id
+    //text
+    /**
+     * The user id being provided by the client.
+     */
     public int uid;
     /**
-     * The title being provided by the client.
+     * The message id being provided by the cient.
      */
-    public String mTitle;
+
+    public int mid;
 
     /**
-     * The message being provided by the client.
+     * The comment text being provided by the client.
      */
-    public String mMessage;
+    public String text;
     /**
      * The email being provided by the client.
      */

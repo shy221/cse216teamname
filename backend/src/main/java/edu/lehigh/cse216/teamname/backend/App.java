@@ -2,16 +2,28 @@ package edu.lehigh.cse216.teamname.backend;
 
 // Import the Spark package, so that we can make use of the "get" function to 
 // create an HTTP GET route
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import spark.Spark;
 
 // Import Google's JSON library
 import com.google.gson.*;
 
+import java.security.SecureRandom;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
+
+//import org.springframework.security.crypto.bcrypt;
+//import sun.plugin.util.UserProfile;
+
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+
 /**
  * For now, our app creates an HTTP server that can only get and add data.
  */
 public class App {
+
     public static void main(String[] args) {
 
         // gson provides us with a way to turn JSON into objects, and objects
@@ -22,6 +34,7 @@ public class App {
         // NB: Gson is thread-safe.  See 
         // https://stackoverflow.com/questions/10380835/is-it-ok-to-use-gson-instance-as-a-static-field-in-a-model-bean-reuse
         final Gson gson = new Gson();
+        HashMap<String, String> session = new HashMap<String, String>();
 
         // Get the port on which to listen for requests
         Spark.port(getIntFromEnv("PORT", 4567));
@@ -51,16 +64,26 @@ public class App {
             return "";
         });
 
-        // GET route that returns all message titles and Ids.  All we do is get 
-        // the data, embed it in a StructuredResponse, turn it into JSON, and 
-        // return it.  If there's no data, we return "[]", so there's no need 
+        /**
+         * phase 1 routes
+         */
+
+        // GET route that returns all params of message.
+        //see db.readAll() for more
+        // Get the data, embed it in a StructuredResponse, turn it into JSON,
+        // and return it.  If there's no data, we return "[]", so there's no need
         // for error handling.
         Spark.get("/messages", (request, response) -> {
             // ensure status 200 OK, with a MIME type of JSON
             response.status(200);
             response.type("application/json");
+
             return gson.toJson(new StructuredResponse("ok", null, db.readAll()));
         });
+
+        // modify for phase 2
+        // url/messages/:mid -->
+        // detail: title, content, likes, dislikes, comment.userid, comments.text, = get, put
 
         // GET route that returns everything for a single row in the Database.
         // The ":id" suffix in the first parameter to get() becomes 
@@ -73,14 +96,23 @@ public class App {
             // ensure status 200 OK, with a MIME type of JSON
             response.status(200);
             response.type("application/json");
+            SimpleRequest req = gson.fromJson(request.body(), SimpleRequest.class);
             DataRow data = db.readOne(idx);
-            if (data == null) {
-                return gson.toJson(new StructuredResponse("error", idx + " not found", null));
-            } else {
-                return gson.toJson(new StructuredResponse("ok", null, data));
+            String sk = req.sessionKey;
+            String em = req.email;
+            if (sk.equals(session.get(em))){
+                if (data == null) {
+                    return gson.toJson(new StructuredResponse("error", idx + " not found", null));
+                } else {
+                    return gson.toJson(new StructuredResponse("ok", null, data));
+                }
             }
+            return gson.toJson(new StructuredResponse("error", "session key not correct..", null));
+
+
         });
 
+        //phase 2
         // POST route for adding a new element to the Database.  This will read
         // JSON from the body of the request, turn it into a SimpleRequest 
         // object, extract the title and message, insert them, and return the 
@@ -89,20 +121,31 @@ public class App {
             // NB: if gson.Json fails, Spark will reply with status 500 Internal 
             // Server Error
             SimpleRequest req = gson.fromJson(request.body(), SimpleRequest.class);
-            // ensure status 200 OK, with a MIME type of JSON
-            // NB: even on error, we return 200, but with a JSON object that
-            //     describes the error.
-            response.status(200);
-            response.type("application/json");
-            // NB: createEntry checks for null title and message
-            int newId = db.createEntry(req.mTitle, req.mMessage);
-            if (newId == -1) {
-                return gson.toJson(new StructuredResponse("error", "error performing insertion", null));
-            } else {
-                return gson.toJson(new StructuredResponse("ok", "" + newId, null));
+            String sk = req.sessionKey;
+            String em = req.email;
+            if (sk.equals(session.get(em))){
+                // ensure status 200 OK, with a MIME type of JSON
+                // NB: even on error, we return 200, but with a JSON object that
+                //     describes the error.
+                response.status(200);
+                response.type("application/json");
+                // NB: createEntry checks for null title and message
+                int newId = db.createEntry(req.uid, req.mTitle, req.mMessage);
+                if (newId == -1) {
+                    return gson.toJson(new StructuredResponse("error", "error performing insertion", null));
+                } else {
+                    return gson.toJson(new StructuredResponse("ok", "" + newId, null));
+                }
+
             }
+            return gson.toJson(new StructuredResponse("error", "session key not correct..", null));
+
         });
-        
+
+        //phase 2
+        //What else can be updated? no need to update here, comments will be processed in other functions
+        // url/messages/:mid --> detail: title, content, comment.userid, comments.text, = get, put
+
         // PUT route for updating a row in the Database. This is almost
         // exactly the same as POST
         Spark.put("/messages/:id", (request, response) -> {
@@ -110,50 +153,363 @@ public class App {
             // a status 500
             int idx = Integer.parseInt(request.params("id"));
             SimpleRequest req = gson.fromJson(request.body(), SimpleRequest.class);
+            String sk = req.sessionKey;
+            String em = req.email;
+            if (sk.equals(session.get(em))){
+                // ensure status 200 OK, with a MIME of JSON
+                response.status(200);
+                response.type("application/json");
+                //used to be updateOne(idx, req.mTitle, req.mMessage)
+                DataRow result = db.updateOne(idx, req.mTitle, req.mMessage);
+                if (result == null) {
+                    return gson.toJson(new StructuredResponse("error", "unable to update message " + idx, null));
+                } else {
+                    return gson.toJson(new StructuredResponse("ok", null, result));
+                }
+            }
+            return gson.toJson(new StructuredResponse("error", "session key not correct.." + idx, null));
+
+        });
+
+        //TODO: modify it
+        //PUT route for updating the value of likes in a row in the Database
+        Spark.put("/messages/:id/likes", (request, response) -> {
+            // If we can't get an ID or can't parse the JSON, Spark will sned
+            // a status 500
+            int mid = Integer.parseInt(request.params("mid"));
+            int uid = Integer.parseInt(request.params("uid"));
+            SimpleRequest req = gson.fromJson(request.body(), SimpleRequest.class);
+            String sk = req.sessionKey;
+            String em = req.email;
+            if (sk.equals(session.get(em))){
+                // ensure status 200 OK, with a MIME of JSON
+                response.status(200);
+                response.type("application/json");
+                DataRow result = db.incrementLikes(uid, mid);
+                if (result == null) {
+                    return gson.toJson(new StructuredResponse("error", "unable to update likes of" + mid, null));
+                } else {
+                    return gson.toJson(new StructuredResponse("ok", null, result));
+                }
+            }
+            return gson.toJson(new StructuredResponse("error", "session key not correct..", null));
+
+
+        });
+
+        /**
+         * phase 2 routes
+         * for updating dislikes and canceling likes, canceling dislikes
+         */
+        //TODO: modify it
+        //phase 2 update dislike
+        //PUT route for updating the value of dislikes in a row in teh Database
+        Spark.put("/messages/:id/dislikes", (request, response) -> {
+            // If we can't get an ID or can't parse the JSON, Spark will sned
+            // a status 500
+            int mid = Integer.parseInt(request.params("mid"));
+            int uid = Integer.parseInt(request.params("uid"));
             // ensure status 200 OK, with a MIME of JSON
             response.status(200);
             response.type("application/json");
-            //used to be updateOne(idx, req.mTitle, req.mMessage)
-            DataRow result = db.updateOne(idx, req.mTitle, req.mMessage);
+            DataRow result = db.incrementDislikes(uid, mid);
             if (result == null) {
-                return gson.toJson(new StructuredResponse("error", "unable to update row " + idx, null));
+                return gson.toJson(new StructuredResponse("error", "unable to update dislikes of" + mid, null));
             } else {
                 return gson.toJson(new StructuredResponse("ok", null, result));
             }
         });
 
-        //PUT route for updating the value of likes in a row in teh Database
-        Spark.put("/messages/:id/likes", (request, response) -> {
+        //TODO: check if like exists
+        //phase 2 delete like
+        //when a user already liked the message, the next click user has will reflect as canceling the like
+        //DELETE route for updating the value of likes in a row in teh Database
+        Spark.delete("/messages/:id/likes", (request, response) -> {
             // If we can't get an ID or can't parse the JSON, Spark will sned
             // a status 500
-            int idx = Integer.parseInt(request.params("id"));
-            // ensure status 200 OK, with a MIME of JSON
-            response.status(200);
-            response.type("application/json");
-            DataRow result = db.incrementLikes(idx);
-            if (result == null) {
-                return gson.toJson(new StructuredResponse("error", "unable to update row " + idx, null));
-            } else {
-                return gson.toJson(new StructuredResponse("ok", null, result));
+            int uid = Integer.parseInt(request.params("uid"));
+            int mid = Integer.parseInt(request.params("mid"));
+            SimpleRequest req = gson.fromJson(request.body(), SimpleRequest.class);
+            String sk = req.sessionKey;
+            String em = req.email;
+            if (sk.equals(session.get(em))){
+                // ensure status 200 OK, with a MIME of JSON
+                response.status(200);
+                response.type("application/json");
+                DataRow result = db.decrementLikes(uid, mid);
+                if (result == null) {
+                    return gson.toJson(new StructuredResponse("error", "unable to cancel like of" + mid, null));
+                } else {
+                    return gson.toJson(new StructuredResponse("ok", null, result));
+                }
             }
+            return gson.toJson(new StructuredResponse("error", "session key not correct..", null));
+
+
+        });
+
+        //phase 2 delete dislike
+        //when a user already disliked the message, the next click user has will reflect as canceling the dislike
+        //DELETE route for updating the value of likes in a row in teh Database
+        Spark.delete("/messages/:id/dislikes", (request, response) -> {
+            // If we can't get an ID or can't parse the JSON, Spark will sned
+            // a status 500
+            int uid = Integer.parseInt(request.params("uid"));
+            int mid = Integer.parseInt(request.params("mid"));
+            SimpleRequest req = gson.fromJson(request.body(), SimpleRequest.class);
+            String sk = req.sessionKey;
+            String em = req.email;
+            if (sk.equals(session.get(em))){
+                // ensure status 200 OK, with a MIME of JSON
+                response.status(200);
+                response.type("application/json");
+                DataRow result = db.decrementDislikes(uid, mid);
+                if (result == null) {
+                    return gson.toJson(new StructuredResponse("error", "unable to cancel dislike " + mid, null));
+                } else {
+                    return gson.toJson(new StructuredResponse("ok", null, result));
+                }
+            }
+            return gson.toJson(new StructuredResponse("error", "session key not correct..", null));
         });
 
         // DELETE route for removing a row from the Database
         Spark.delete("/messages/:id", (request, response) -> {
             // If we can't get an ID, Spark will sned a status 500
             int idx = Integer.parseInt(request.params("id"));
-            // ensure status 200 OK, with a MIME type of JSON
+            SimpleRequest req = gson.fromJson(request.body(), SimpleRequest.class);
+            String sk = req.sessionKey;
+            String em = req.email;
+            if (sk.equals(session.get(em))){
+                // ensure status 200 OK, with a MIME type of JSON
+                response.status(200);
+                response.type("application/json");
+                // NB: we won't concern ourselves too much with the quality of the
+                //     message sent on a successful delete
+                boolean result = db.deleteOne(idx);
+                if (!result) {
+                    return gson.toJson(new StructuredResponse("error", "unable to delete row " + idx, null));
+                } else {
+                    return gson.toJson(new StructuredResponse("ok", null, null));
+                }
+            }
+            return gson.toJson(new StructuredResponse("error", "session key not correct..", null));
+
+        });
+
+        /**
+         * phase 2 routes
+         */
+
+        //for frontend to enter user email and password
+        //LOGIN
+
+        // POST route for adding a new element to the Database.  This will read
+        // JSON from the body of the request, turn it into a LoginRequest
+        // object, extract the user email and password, insert them, and return the
+        // if the password is correct.
+        Spark.post("/login", (request, response) -> {
+            // NB: if gson.Json fails, Spark will reply with status 500 Internal
+            // Server Error
+            KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
+            SecureRandom secureRandom = new SecureRandom();
+            int keyBitSize = 256;
+            keyGenerator.init(keyBitSize, secureRandom);
+            SecretKey secretKey = keyGenerator.generateKey();
+            LoginRequest req = gson.fromJson(request.body(), LoginRequest.class);
             response.status(200);
             response.type("application/json");
-            // NB: we won't concern ourselves too much with the quality of the
-            //     message sent on a successful delete
-            boolean result = db.deleteOne(idx);
-            if (!result) {
-                return gson.toJson(new StructuredResponse("error", "unable to delete row " + idx, null));
-            } else {
-                return gson.toJson(new StructuredResponse("ok", null, null));
+            // modify functions here
+            String email = req.uEmail;
+            String password = req.uPassword;
+            String salt = BCrypt.gensalt(12);
+            String hash = BCrypt.hashpw(password, salt);
+            String sessionKey = secretKey.toString();
+            session.put(email, sessionKey);
+//            boolean matched = BCrypt.checkpw(password + salt, hash);
+////            System.out.println(matched);
+            if (db.matchPwd(email).uPassword.equals(hash)){
+                    return gson.toJson(new StructuredResponse("ok", "Login success!", null));
+            }
+            else{
+                return gson.toJson(new StructuredResponse("error", email + " not found", null));
             }
         });
+
+
+
+        // PUT route for updating password to the Database.  This will read
+        // JSON from the body of the request, turn it into a LoginRequest
+        // object, extract the user email and password, insert them, and return the
+        // if the password is correct.
+        Spark.put("/uid", (request, response) -> {
+            // NB: if gson.Json fails, Spark will reply with status 500 Internal
+            // Server Error
+            int idx = Integer.parseInt(request.params("uid"));
+            LoginRequest req = gson.fromJson(request.body(), LoginRequest.class);
+            String sk = req.sessionKey;
+            String em = req.uEmail;
+            if (sk.equals(session.get(em))){
+                response.status(200);
+                response.type("application/json");
+                int result = db.uUpdatePwd(idx, req.uSalt, req.uPassword);
+                if (result == -1) {
+                    return gson.toJson(new StructuredResponse("error", "unable to update password " + idx, null));
+                } else {
+                    return gson.toJson(new StructuredResponse("ok", null, result));
+                }
+            }
+            return gson.toJson(new StructuredResponse("error", "session key not correct..", null));
+
+
+        });
+
+        // url/:uid --> user profile: username, email, intro = get, put
+        // ? GET route that returns everything for a single row in the Database.
+        // The ":uid" suffix in the first parameter to get() becomes
+        // ? request.params("id"), so that we can get the requested row ID.  If
+        // ":uid" isn't a number, Spark will reply with a status 500 Internal
+        // Server Error.  Otherwise, we have an integer, and the only possible
+        // error is that it doesn't correspond to a row with data.
+        Spark.get("/:uid", (request, response) -> {
+            int idx = Integer.parseInt(request.params("id"));
+            UserProfileRequest req = gson.fromJson(request.body(), UserProfileRequest.class);
+            String sk = req.sessionKey;
+            String em = req.uEmail;
+            if (sk.equals(session.get(em))){
+                // ensure status 200 OK, with a MIME type of JSON
+                response.status(200);
+                response.type("application/json");
+                //add new functoin based on this
+                DataRowUserProfile data = db.uReadOne(idx);
+                if (data == null) {
+                    return gson.toJson(new StructuredResponse("error", idx + " not found", null));
+                } else {
+                    return gson.toJson(new StructuredResponse("ok", null, data));
+                }
+            }
+            return gson.toJson(new StructuredResponse("error", "session key not correct..", null));
+
+        });
+
+        // PUT route for updating a row in the DataStore. This is almost
+        // exactly the same as POST
+        Spark.put("/:uid", (request, response) -> {
+            // If we can't get an ID or can't parse the JSON, Spark will sned
+            // a status 500
+            int idx = Integer.parseInt(request.params("id"));
+            UserProfileRequest req = gson.fromJson(request.body(), UserProfileRequest.class);
+            String sk = req.sessionKey;
+            String em = req.uEmail;
+            if (sk.equals(session.get(em))){
+                // ensure status 200 OK, with a MIME of JSON
+                response.status(200);
+                response.type("application/json");
+                DataRowUserProfile result = db.uUpdateOne(idx, req.uUsername, req.uIntro);
+                if (result == null) {
+                    return gson.toJson(new StructuredResponse("error", "unable to update user profile " + idx, null));
+                } else {
+                    return gson.toJson(new StructuredResponse("ok", null, result));
+                }
+            }
+            return gson.toJson(new StructuredResponse("error", "session key not correct..", null));
+
+
+
+        });
+
+        //url:uid/comments --> show all comments by this user = get
+        // ? GET route that returns everything for a single row in the Database.
+        // The ":uid" suffix in the first parameter to get() becomes
+        // ? request.params("id"), so that we can get the requested row ID.  If
+        // ":uid" isn't a number, Spark will reply with a status 500 Internal
+        // Server Error.  Otherwise, we have an integer, and the only possible
+        // error is that it doesn't correspond to a row with data.
+        Spark.get("/:uid/comments", (request, response) -> {
+            //?? params =
+            int idx = Integer.parseInt(request.params("mId"));
+            CommentRequest req = gson.fromJson(request.body(), CommentRequest.class);
+            String sk = req.sessionKey;
+            String em = req.email;
+            if (sk.equals(session.get(em))){
+                // ensure status 200 OK, with a MIME type of JSON
+                response.status(200);
+                response.type("application/json");
+                ArrayList<Comment> data = db.readAllComments(idx);
+                if (data == null) {
+                    return gson.toJson(new StructuredResponse("error", idx + " not found", null));
+                } else {
+                    return gson.toJson(new StructuredResponse("ok", null, data));
+                }
+            }
+            return gson.toJson(new StructuredResponse("error", "session key not correct..", null));
+
+        });
+
+        //post comments
+        // POST route for adding a new element to the Database.  This will read
+        // JSON from the body of the request, turn it into a SimpleRequest
+        // object, extract the title and message, insert them, and return the
+        // ID of the newly created row.
+        Spark.post("/:mid/comments", (request, response) -> {
+            // NB: if gson.Json fails, Spark will reply with status 500 Internal
+            // Server Error
+            CommentRequest req = gson.fromJson(request.body(), CommentRequest.class);
+            String sk = req.sessionKey;
+            String em = req.email;
+            if (sk.equals(session.get(em))){
+                // ensure status 200 OK, with a MIME type of JSON
+                // NB: even on error, we return 200, but with a JSON object that
+                //     describes the error.
+                response.status(200);
+                response.type("application/json");
+                // NB: createEntry checks for null title and message
+                int newId = db.createComment(req.uid, req.mid, req.text);
+                if (newId == -1) {
+                    return gson.toJson(new StructuredResponse("error", "error performing insertion", null));
+                } else {
+                    return gson.toJson(new StructuredResponse("ok", "comments of " + newId, null));
+                }
+
+            }
+            return gson.toJson(new StructuredResponse("error", "session key not correct..", null));
+
+        });
+
+
+//        //do we need this?
+//        //url:uid/likes --> show all messages liked by this user : message title and content = get
+//        Spark.get("/:uid/likes", (request, response) -> {
+//            //?? params =
+//            int idx = Integer.parseInt(request.params("id"));
+//            // ensure status 200 OK, with a MIME type of JSON
+//            response.status(200);
+//            response.type("application/json");
+//            DataRow data = db.readOne(idx);
+//            if (data == null) {
+//                return gson.toJson(new StructuredResponse("error", idx + " not found", null));
+//            } else {
+//                return gson.toJson(new StructuredResponse("ok", null, data));
+//            }
+//        });
+
+//        //do we need this?
+//        //url:uid/dislikes --> show all messages liked by this user : message title and content = get
+//        Spark.get("/:uid/dislikes", (request, response) -> {
+//            //?? params =
+//            int idx = Integer.parseInt(request.params("id"));
+//            // ensure status 200 OK, with a MIME type of JSON
+//            response.status(200);
+//            response.type("application/json");
+//            //TODO: add new function
+//            DataRow data = db.readOne(idx);
+//            if (data == null) {
+//                return gson.toJson(new StructuredResponse("error", idx + " not found", null));
+//            } else {
+//                return gson.toJson(new StructuredResponse("ok", null, data));
+//            }
+//        });
+
     }
     /**
     * Get an integer environment varible if it exists, and otherwise return the
