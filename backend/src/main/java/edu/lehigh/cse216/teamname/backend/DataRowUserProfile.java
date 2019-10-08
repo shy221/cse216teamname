@@ -58,7 +58,7 @@ public class DataRowUserProfile {
      * @param intro The introduction for this row of data
      */
     DataRowUserProfile(int uid, String username, String email, String salt, String password, String intro) {
-        uid = uid;
+        uId = uid;
         uSername = username;
         uEmail = email;
         uSalt = salt;

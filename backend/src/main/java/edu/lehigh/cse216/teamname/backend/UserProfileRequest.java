@@ -8,6 +8,7 @@ package edu.lehigh.cse216.teamname.backend;
  *     do not need a constructor.
  */
 public class UserProfileRequest {
+    public int uId;
     /**
      * The username being provided by the client.
      */

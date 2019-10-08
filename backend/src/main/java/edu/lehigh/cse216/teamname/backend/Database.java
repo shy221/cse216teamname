@@ -353,7 +353,7 @@ public class Database {
         }
     }
 
-    //TODO: check if table next is null then chall related function
+    //ucheck if table next is null then chall related function
     public DataRow doLikes(int uid, int mid){
         try {
             mCheckLikes.setInt(1,uid);

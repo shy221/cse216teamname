@@ -65,6 +65,13 @@ public class App {
         });
 
         /**
+         * phase 2 NOTICE:
+         * In every route an email address and a session key will be extracted from the request,
+         * and backend will test if the current session key is the same session key
+         * originally stored for this email address.
+         */
+
+        /**
          * phase 1 routes
          */
 
@@ -81,10 +88,12 @@ public class App {
             return gson.toJson(new StructuredResponse("ok", null, db.readAll()));
         });
 
-        // modify for phase 2
-        // url/messages/:mid -->
-        // detail: title, content, likes, dislikes, comment.userid, comments.text, = get, put
-
+        /**
+         * Modified for phase 2
+         * url/messages/:mid -->
+         * detail: title, content, likes, dislikes, comments
+         * GET route
+         */
         // GET route that returns everything for a single row in the Database.
         // The ":id" suffix in the first parameter to get() becomes 
         // request.params("id"), so that we can get the requested row ID.  If 
@@ -112,10 +121,15 @@ public class App {
 
         });
 
-        //phase 2
+        /**
+         * Modified for phase 2
+         * adding a new message with user id, message title and message content.
+         * url/messages/:mid --> detail: title, content, comment.userid, comments.text, = get, put
+         * POST route
+         */
         // POST route for adding a new element to the Database.  This will read
         // JSON from the body of the request, turn it into a SimpleRequest 
-        // object, extract the title and message, insert them, and return the 
+        // object, extract the user id, title and message, insert them, and return the
         // ID of the newly created row.
         Spark.post("/messages", (request, response) -> {
             // NB: if gson.Json fails, Spark will reply with status 500 Internal 
@@ -142,10 +156,14 @@ public class App {
 
         });
 
-        //phase 2
+        /**
+         * Modified for phase 2
+         * updating message with message title and message content.
+         * comments will be processed in other functions
+         * url/messages/:mid --> detail: title, content, comment.userid, comments.text, = get, put
+         * PUT route
+         */
         //What else can be updated? no need to update here, comments will be processed in other functions
-        // url/messages/:mid --> detail: title, content, comment.userid, comments.text, = get, put
-
         // PUT route for updating a row in the Database. This is almost
         // exactly the same as POST
         Spark.put("/messages/:id", (request, response) -> {
@@ -171,7 +189,12 @@ public class App {
 
         });
 
-        //TODO: modify it
+        /**
+         * Modified for phase 2
+         * updating likes after noticing user hasn't clicked like yet.
+         * PUT route
+         */
+        //modify it
         //PUT route for updating the value of likes in a row in the Database
         Spark.put("/messages/:id/likes", (request, response) -> {
             // If we can't get an ID or can't parse the JSON, Spark will sned
@@ -185,7 +208,7 @@ public class App {
                 // ensure status 200 OK, with a MIME of JSON
                 response.status(200);
                 response.type("application/json");
-                DataRow result = db.incrementLikes(uid, mid);
+                DataRow result = db.doLikes(uid, mid);
                 if (result == null) {
                     return gson.toJson(new StructuredResponse("error", "unable to update likes of" + mid, null));
                 } else {
@@ -198,12 +221,11 @@ public class App {
         });
 
         /**
-         * phase 2 routes
-         * for updating dislikes and canceling likes, canceling dislikes
+         * Modified for phase 2
+         * updating dislikes after noticing user hasn't clicked dislike yet.
+         * PUT route
          */
-        //TODO: modify it
-        //phase 2 update dislike
-        //PUT route for updating the value of dislikes in a row in teh Database
+        //PUT route for updating the value of dislikes in a row in the Database
         Spark.put("/messages/:id/dislikes", (request, response) -> {
             // If we can't get an ID or can't parse the JSON, Spark will sned
             // a status 500
@@ -212,7 +234,7 @@ public class App {
             // ensure status 200 OK, with a MIME of JSON
             response.status(200);
             response.type("application/json");
-            DataRow result = db.incrementDislikes(uid, mid);
+            DataRow result = db.doDislikes(uid, mid);
             if (result == null) {
                 return gson.toJson(new StructuredResponse("error", "unable to update dislikes of" + mid, null));
             } else {
@@ -220,7 +242,11 @@ public class App {
             }
         });
 
-        //TODO: check if like exists
+        /**
+         * Modified for phase 2
+         * deleting likes after noticing user has clicked like already.
+         * DELETE route
+         */
         //phase 2 delete like
         //when a user already liked the message, the next click user has will reflect as canceling the like
         //DELETE route for updating the value of likes in a row in teh Database
@@ -236,7 +262,7 @@ public class App {
                 // ensure status 200 OK, with a MIME of JSON
                 response.status(200);
                 response.type("application/json");
-                DataRow result = db.decrementLikes(uid, mid);
+                DataRow result = db.doLikes(uid, mid);
                 if (result == null) {
                     return gson.toJson(new StructuredResponse("error", "unable to cancel like of" + mid, null));
                 } else {
@@ -248,7 +274,11 @@ public class App {
 
         });
 
-        //phase 2 delete dislike
+        /**
+         * Modified for phase 2
+         * deleting dislikes after noticing user has clicked dislike already.
+         * DELETE route
+         */
         //when a user already disliked the message, the next click user has will reflect as canceling the dislike
         //DELETE route for updating the value of likes in a row in teh Database
         Spark.delete("/messages/:id/dislikes", (request, response) -> {
@@ -263,7 +293,7 @@ public class App {
                 // ensure status 200 OK, with a MIME of JSON
                 response.status(200);
                 response.type("application/json");
-                DataRow result = db.decrementDislikes(uid, mid);
+                DataRow result = db.doDislikes(uid, mid);
                 if (result == null) {
                     return gson.toJson(new StructuredResponse("error", "unable to cancel dislike " + mid, null));
                 } else {
@@ -301,13 +331,16 @@ public class App {
          * phase 2 routes
          */
 
-        //for frontend to enter user email and password
-        //LOGIN
+        /**
+         * phase 2
+         * login with email and password
+         * POST route
+         */
 
-        // POST route for adding a new element to the Database.  This will read
-        // JSON from the body of the request, turn it into a LoginRequest
-        // object, extract the user email and password, insert them, and return the
-        // if the password is correct.
+        // POST route for adding a new element to the Database.
+        // This will read JSON from the body of the request,
+        // turn it into a LoginRequest object, extract the user email and password,
+        // insert them, and return if the password is correct.
         Spark.post("/login", (request, response) -> {
             // NB: if gson.Json fails, Spark will reply with status 500 Internal
             // Server Error
@@ -336,8 +369,11 @@ public class App {
             }
         });
 
-
-
+        /**
+         * phase 2
+         * update password
+         * PUT route
+         */
         // PUT route for updating password to the Database.  This will read
         // JSON from the body of the request, turn it into a LoginRequest
         // object, extract the user email and password, insert them, and return the
@@ -364,13 +400,12 @@ public class App {
 
         });
 
-        // url/:uid --> user profile: username, email, intro = get, put
-        // ? GET route that returns everything for a single row in the Database.
-        // The ":uid" suffix in the first parameter to get() becomes
-        // ? request.params("id"), so that we can get the requested row ID.  If
-        // ":uid" isn't a number, Spark will reply with a status 500 Internal
-        // Server Error.  Otherwise, we have an integer, and the only possible
-        // error is that it doesn't correspond to a row with data.
+        /**
+         * phase 2
+         * display user profile
+         * url/:uid --> user profile: username, email, intro = get, put
+         * GET route
+         */
         Spark.get("/:uid", (request, response) -> {
             int idx = Integer.parseInt(request.params("id"));
             UserProfileRequest req = gson.fromJson(request.body(), UserProfileRequest.class);
@@ -392,12 +427,18 @@ public class App {
 
         });
 
+        /**
+         * phase 2
+         * update user profile
+         * url/:uid --> user profile: username, email, intro = get, put
+         * PUT route
+         */
         // PUT route for updating a row in the DataStore. This is almost
         // exactly the same as POST
         Spark.put("/:uid", (request, response) -> {
             // If we can't get an ID or can't parse the JSON, Spark will sned
             // a status 500
-            int idx = Integer.parseInt(request.params("id"));
+            int idx = Integer.parseInt(request.params("uid"));
             UserProfileRequest req = gson.fromJson(request.body(), UserProfileRequest.class);
             String sk = req.sessionKey;
             String em = req.uEmail;
@@ -418,6 +459,11 @@ public class App {
 
         });
 
+        /**
+         * phase 2
+         * get comments
+         * GET route
+         */
         //url:uid/comments --> show all comments by this user = get
         // ? GET route that returns everything for a single row in the Database.
         // The ":uid" suffix in the first parameter to get() becomes
@@ -425,9 +471,9 @@ public class App {
         // ":uid" isn't a number, Spark will reply with a status 500 Internal
         // Server Error.  Otherwise, we have an integer, and the only possible
         // error is that it doesn't correspond to a row with data.
-        Spark.get("/:uid/comments", (request, response) -> {
+        Spark.get("/:mid/comments", (request, response) -> {
             //?? params =
-            int idx = Integer.parseInt(request.params("mId"));
+            int idx = Integer.parseInt(request.params("mid"));
             CommentRequest req = gson.fromJson(request.body(), CommentRequest.class);
             String sk = req.sessionKey;
             String em = req.email;
@@ -446,6 +492,11 @@ public class App {
 
         });
 
+        /**
+         * phase 2
+         * add comment
+         * POST route
+         */
         //post comments
         // POST route for adding a new element to the Database.  This will read
         // JSON from the body of the request, turn it into a SimpleRequest
