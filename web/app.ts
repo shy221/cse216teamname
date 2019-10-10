@@ -3,6 +3,7 @@
 /// <reference path="ts/ElementList.ts"/>
 /// <reference path="ts/Navbar.ts"/>
 /// <reference path="ts/ShowDetail.ts"/>
+/// <reference path="ts/Login.ts"/>
 
 // Prevent compiler errors when using jQuery.  "$" will be given a type of 
 // "any", so that we can use it anywhere, and assume it has any fields or
@@ -15,6 +16,8 @@ let Handlebars: any;
 // a global for the EditEntryForm of the program.  See newEntryForm for 
 // explanation
 let editEntryForm: EditEntryForm;
+let id: number;
+let email: String;
 
 // Run some configuration code when the web page loads
 $(document).ready(function () {
@@ -23,6 +26,7 @@ $(document).ready(function () {
     ElementList.refresh();
     EditEntryForm.refresh();
     ShowDetail.refresh();
+    Login.refresh();
     // Create the object that controls the "Edit Entry" form
     // set up initial UI state
     $("#editElement").hide();

@@ -1,6 +1,4 @@
-// a global for the main ElementList of the program.  See newEntryForm for 
-// explanation
-var mainList: ElementList;
+
 
 /**
  * The ElementList Singleton provides a way of displaying all of the data 
@@ -34,12 +32,30 @@ class ElementList {
         // Make sure the singleton is initialized
         ElementList.init();
         // Issue a GET, and then pass the result to update()
+        /*
         $.ajax({
             type: "GET",
             url: "/messages",
             dataType: "json",
             success: ElementList.update
         });
+        */
+       var x = [
+        {
+            mData: {
+                mTitle: "Hello!",
+                mId: "0"
+            }
+        },
+        {
+            mData: {
+                mTitle: "Hello 2!",
+                mId: "1"
+            }
+        }
+       ];
+       console.log(x.toString());
+       ElementList.update(x);
     }
 
     /**

@@ -4,7 +4,7 @@
     "description": "Web Front-End",
     "dependencies": {
         "bootstrap": "^3.4.1",
-        "handlebars": "^4.2.1",
+        "handlebars": "^4.4.2",
         "jasmine-core": "^3.4.0",
         "jquery": "^3.4.1",
         "typescript": "^3.6.2"

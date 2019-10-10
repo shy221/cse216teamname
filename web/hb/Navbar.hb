@@ -23,6 +23,19 @@
                     </a>
                 </li>
             </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a class="btn btn-link" id="Navbar-Account">
+                        <span class="glyphicon glyphicon-user"></span> Account
+                    </a>
+                </li>
+                <li>
+                    <a class="btn btn-link" id="Navbar-login">
+                        Login
+                        <span class="glyphicon glyphicon-log-in"></span><span class="sr-only">Show</span>
+                    </a>
+                </li>
+            </ul>
         </div>
     </div>
 </nav>
