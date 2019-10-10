@@ -41,7 +41,67 @@ public class App {
      */
     static char prompt(BufferedReader in) {
         // The valid actions:
-        String actions = "TD1*-+~q?L";
+        String actions = "VTD1*-+~q?L";
+
+        // We repeat until a valid single-character option is selected
+        while (true) {
+            System.out.print("[" + actions + "] :> ");
+            String action;
+            try {
+                action = in.readLine();
+            } catch (IOException e) {
+                e.printStackTrace();
+                continue;
+            }
+            if (action.length() != 1)
+                continue;
+            if (actions.contains(action)) {
+                return action.charAt(0);
+            }
+            System.out.println("Invalid Command");
+        }
+    }
+
+    /**
+     * Ask the user to enter a menu option; repeat until we get a valid option
+     * 
+     * @param in A BufferedReader, for reading from the keyboard
+     * 
+     * @return The character corresponding to the chosen menu option
+     */
+    static char promptTables(BufferedReader in) {
+        // The valid actions:
+        String actions = "MUCLDq";
+
+        // We repeat until a valid single-character option is selected
+        while (true) {
+            System.out.print("[" + actions + "] :> ");
+            String action;
+            try {
+                action = in.readLine();
+            } catch (IOException e) {
+                e.printStackTrace();
+                continue;
+            }
+            if (action.length() != 1)
+                continue;
+            if (actions.contains(action)) {
+                return action.charAt(0);
+            }
+            System.out.println("Invalid Command");
+        }
+    }
+
+    /**
+     * Ask the user to enter a menu option; repeat until we get a valid option
+     * 
+     * @param in A BufferedReader, for reading from the keyboard
+     * 
+     * @return The character corresponding to the chosen menu option
+     */
+    static char promptViews(BufferedReader in) {
+        // The valid actions:
+        String actions = "LDldq";
 
         // We repeat until a valid single-character option is selected
         while (true) {
@@ -105,11 +165,16 @@ public class App {
         return i;
     }
 
-    static boolean sendEmail(String from_email, String to_email) {
+    /**
+     * Method to send a email with email address
+     */
+    static boolean sendEmail(String from_email, String to_email, String password) {
         Email from = new Email(from_email);
-        String subject = "Sending with SendGrid is Fun";
+        String subject = "[Buzz] Welcome to Buzz!";
         Email to = new Email(to_email);
-        Content content = new Content("text/plain", "and easy to do anywhere, even with Java");
+        Content content = new Content("text/plain", "Your Buzz password is: " + password
+                + "\n\nTo reset your password, please login with your email address at: "
+                + "https://arcane-refuge-67249.herokuapp.com" + " and reset your password in the profile page.");
         Mail mail = new Mail(from, subject, to, content);
 
         SendGrid sg = new SendGrid(System.getenv("SENDGRID_API_KEY"));
@@ -123,10 +188,34 @@ public class App {
             System.out.println(response.getBody());
             System.out.println(response.getHeaders());
         } catch (IOException ex) {
-            throw ex;
+            ex.printStackTrace();
             return false;
         }
         return true;
+    }
+
+    /**
+     * function to generate a random string of length n
+     */
+    static String randomPassword(int n) {
+        // chose a Character random from this String
+        String AlphaNumericString = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" + "0123456789" + "abcdefghijklmnopqrstuvxyz"
+                + ",./;-=+!@#$%^&*";
+
+        // create StringBuffer size of AlphaNumericString
+        StringBuilder sb = new StringBuilder(n);
+
+        for (int i = 0; i < n; i++) {
+
+            // generate a random number between
+            // 0 to AlphaNumericString variable length
+            int index = (int) (AlphaNumericString.length() * Math.random());
+
+            // add Character one by one in end of sb
+            sb.append(AlphaNumericString.charAt(index));
+        }
+
+        return sb.toString();
     }
 
     /**
@@ -158,15 +247,54 @@ public class App {
                 menu();
             } else if (action == 'q') {
                 break;
+            } else if (action == 'V') {
+                action = promptViews(in);
+                if (action == 'L') {
+                    db.createViewForLike();
+                } else if (action == 'D') {
+                    db.createViewForDislike();
+                } else if (action == 'l') {
+                    db.dropViewForLike();
+                } else if (action == 'd') {
+                    db.dropViewForDislike();
+                } else if (action == 'q') {
+                    break;
+                }
             } else if (action == 'T') {
-                db.createTable();
+                action = promptTables(in);
+                if (action == 'M') {
+                    db.createData();
+                } else if (action == 'U') {
+                    db.createUser();
+                } else if (action == 'C') {
+                    db.createComment();
+                } else if (action == 'L') {
+                    db.createLike();
+                } else if (action == 'D') {
+                    db.createDislike();
+                } else if (action == 'q') {
+                    break;
+                }
             } else if (action == 'D') {
-                db.dropTable();
+                action = promptTables(in);
+                if (action == 'M') {
+                    db.dropData();
+                } else if (action == 'U') {
+                    db.dropUser();
+                } else if (action == 'C') {
+                    db.dropComment();
+                } else if (action == 'L') {
+                    db.dropLike();
+                } else if (action == 'D') {
+                    db.dropDislike();
+                } else if (action == 'q') {
+                    break;
+                }
             } else if (action == '1') {
                 int id = getInt(in, "Enter the row ID");
                 if (id == -1)
                     continue;
-                Database.RowData res = db.selectOne(id);
+                Database.RowData res = db.selectOneFromData(id);
                 if (res != null) {
                     System.out.println("  [" + res.mId + "] " + res.mSubject);
                     System.out.println("  --> " + res.mMessage);
@@ -174,7 +302,7 @@ public class App {
                     System.out.println("  --> " + res.mDate);
                 }
             } else if (action == '*') {
-                ArrayList<Database.RowData> res = db.selectAll();
+                ArrayList<Database.RowData> res = db.selectAllFromData();
                 if (res == null)
                     continue;
                 System.out.println("  Current Database Contents");
@@ -183,26 +311,67 @@ public class App {
                     System.out.println("  [" + rd.mId + "] " + rd.mSubject);
                 }
             } else if (action == '-') {
-                int id = getInt(in, "Enter the row ID");
-                if (id == -1)
-                    continue;
-                int res = db.deleteRow(id);
-                if (res == -1)
-                    continue;
-                System.out.println("  " + res + " rows deleted");
+                action = promptTables(in);
+                if (action == 'M') {
+                    int id = getInt(in, "Enter the row ID");
+                    if (id == -1)
+                        continue;
+                    int res = db.deleteRowFromData(id);
+                    if (res == -1)
+                        continue;
+                    System.out.println("  " + res + " rows deleted");
+                } else if (action == 'U') {
+                    int id = getInt(in, "Enter the user ID");
+                    if (id == -1)
+                        continue;
+                    int res = db.deleteRowFromUser(id);
+                    if (res == -1)
+                        continue;
+                    System.out.println("  " + res + " rows deleted");
+                } else if (action == 'C') {
+                    db.dropComment();
+                } else if (action == 'L') {
+                    db.dropLike();
+                } else if (action == 'D') {
+                    db.dropDislike();
+                } else if (action == 'q') {
+                    break;
+                }
             } else if (action == '+') {
-                String subject = getString(in, "Enter the subject");
-                String message = getString(in, "Enter the message");
-                if (subject.equals("") || message.equals(""))
-                    continue;
-                int res = db.insertRow(subject, message);
-                System.out.println(res + " rows added");
+                action = promptTables(in);
+                if (action == 'M') {
+                    String subject = getString(in, "Enter the subject");
+                    String message = getString(in, "Enter the message");
+                    int uid = getInt(in, "Enter the uid");
+                    if (subject.equals("") || message.equals("") || uid <= 0)
+                        continue;
+                    int res = db.insertRowToData(uid, subject, message);
+                    System.out.println(res + " rows added");
+                } else if (action == 'U') {
+                    String email = getString(in, "Enter the email");
+                    if (email.equals("")) {
+                        continue;
+                    }
+                    String password = randomPassword(8);
+
+                    int res = db.insertRowToUser(email, password);
+                    System.out.println(sendEmail("admin@buzz.com", email, password));
+                    System.out.println(res + " rows added");
+                } else if (action == 'C') {
+                    db.dropComment();
+                } else if (action == 'L') {
+                    db.dropLike();
+                } else if (action == 'D') {
+                    db.dropDislike();
+                } else if (action == 'q') {
+                    break;
+                }
             } else if (action == '~') {
                 int id = getInt(in, "Enter the row ID");
                 if (id == -1)
                     continue;
                 String newMessage = getString(in, "Enter the new message");
-                int res = db.updateOne(id, newMessage);
+                int res = db.updateOneInData(id, newMessage);
                 if (res == -1)
                     continue;
                 System.out.println("  " + res + " rows updated");
@@ -210,7 +379,7 @@ public class App {
                 int id = getInt(in, "Enter the row ID");
                 if (id == -1)
                     continue;
-                Database.RowData res = db.incrementLikes(id);
+                Database.RowData res = db.incrementLikes(id, id);
                 if (res != null) {
                     System.out.println("  [" + res.mId + "] " + res.mSubject);
                     System.out.println("  --> " + res.mMessage);
