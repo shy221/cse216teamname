@@ -59,6 +59,9 @@ class Login {
         // If we get an "ok" pwd, clear the form and refresh the main 
         // listing of pwds
         if (data.mStatus === "ok") {
+            ukey = data.mData.uSessionKey;
+            uid = data.mData.uId;
+            uemail = data.mData.uEmail;
             ElementList.refresh();
         }
         // Handle explicit errors with a detailed popup pwd

@@ -16,8 +16,10 @@ let Handlebars: any;
 // a global for the EditEntryForm of the program.  See newEntryForm for 
 // explanation
 let editEntryForm: EditEntryForm;
-let id: number;
-let email: String;
+let uid: number;
+let uemail: String;
+let ukey: String;
+
 
 // Run some configuration code when the web page loads
 $(document).ready(function () {
