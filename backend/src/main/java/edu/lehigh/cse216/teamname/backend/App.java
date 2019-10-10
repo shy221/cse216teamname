@@ -84,7 +84,6 @@ public class App {
             // ensure status 200 OK, with a MIME type of JSON
             response.status(200);
             response.type("application/json");
-
             return gson.toJson(new StructuredResponse("ok", null, db.readAll()));
         });
 
@@ -355,14 +354,16 @@ public class App {
             // modify functions here
             String email = req.uEmail;
             String password = req.uPassword;
-            String salt = BCrypt.gensalt(12);
+            //get salt from db
+            String salt = db.matchPwd(email).uSalt;
             String hash = BCrypt.hashpw(password, salt);
             String sessionKey = secretKey.toString();
+            Object sessKey = sessionKey;
             session.put(email, sessionKey);
 //            boolean matched = BCrypt.checkpw(password + salt, hash);
 ////            System.out.println(matched);
             if (db.matchPwd(email).uPassword.equals(hash)){
-                    return gson.toJson(new StructuredResponse("ok", "Login success!", null));
+                    return gson.toJson(new StructuredResponse("ok", "Login success!", sessKey));
             }
             else{
                 return gson.toJson(new StructuredResponse("error", email + " not found", null));

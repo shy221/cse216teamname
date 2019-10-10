@@ -46,7 +46,7 @@ public class DataRow {
      * The creation date for this row of data.  Once it is set, it cannot be 
      * changed
      */
-    public final Date mCreated;
+    public  Date mCreated;
 
 
     /**
@@ -54,7 +54,7 @@ public class DataRow {
      * creation date based on the system clock at the time the constructor was
      * called
      *
-     * @param id The id to associate with this row.  Assumed to be unique 
+     * @param mid The id to associate with this row.  Assumed to be unique
      *           throughout the whole program.
      *
      * @param title The title string for this row of data
@@ -72,8 +72,15 @@ public class DataRow {
         mCreated = new Date();
     }
 
+    DataRow(int mid, String title) {
+        mId = mid;
+        mTitle = title;
+    }
+
+
+
     /**
-     * Copy constructor to create one datarow from another
+     * Copy constructor to create one data row from another
      */
     DataRow(DataRow data) {
         mId = data.mId;
