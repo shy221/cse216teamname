@@ -472,8 +472,7 @@ public class Database {
         DataRowUserProfile res = null;
         try {
             uAuth.setString(1, email);
-            uAuth.executeQuery();
-            ResultSet rs = uSelectOne.executeQuery();
+            ResultSet rs = uAuth.executeQuery();
             if (rs.next()) {
                 res = new DataRowUserProfile(rs.getInt("uid"), rs.getString("username"), rs.getString("email"), rs.getString("salt"), rs.getString("password"),rs.getString("intro") );
             }

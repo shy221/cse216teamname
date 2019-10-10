@@ -41,6 +41,7 @@ public class DataRowUserProfile {
      */
     public String uIntro;
 
+    public String uSessionKey;
     /**
      * Create a new DataRowUserProfile with the provided user id and parameters,
      *
@@ -66,6 +67,16 @@ public class DataRowUserProfile {
         uIntro = intro;
     }
 
+    DataRowUserProfile(int uid, String username, String email, String salt, String password, String intro, String sessionKey) {
+        uId = uid;
+        uSername = username;
+        uEmail = email;
+        uSalt = salt;
+        uPassword = password;
+        uIntro = intro;
+        uSessionKey = sessionKey;
+    }
+
     /**
      * Copy constructor to create one DataRowUserProfile from another
      */
@@ -77,5 +88,6 @@ public class DataRowUserProfile {
         uSalt = data.uSalt;
         uPassword = data.uPassword;
         uIntro = data.uIntro;
+        uSessionKey = data.uSessionKey;
     }
 }

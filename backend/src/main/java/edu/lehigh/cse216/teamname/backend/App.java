@@ -10,6 +10,7 @@ import com.google.gson.*;
 
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -357,13 +358,15 @@ public class App {
             //get salt from db
             String salt = db.matchPwd(email).uSalt;
             String hash = BCrypt.hashpw(password, salt);
-            String sessionKey = secretKey.toString();
-            Object sessKey = sessionKey;
+            // get base64 encoded version of the key
+            String sessionKey = Base64.getEncoder().encodeToString(secretKey.getEncoded());
+//            String sessionKey = secretKey.toString();
+            DataRowUserProfile userInfo = new DataRowUserProfile(db.matchPwd(email).uId,db.matchPwd(email).uSername, db.matchPwd(email).uEmail, db.matchPwd(email).uSalt, db.matchPwd(email).uPassword, db.matchPwd(email).uIntro, sessionKey);
             session.put(email, sessionKey);
 //            boolean matched = BCrypt.checkpw(password + salt, hash);
 ////            System.out.println(matched);
             if (db.matchPwd(email).uPassword.equals(hash)){
-                    return gson.toJson(new StructuredResponse("ok", "Login success!", sessKey));
+                    return gson.toJson(new StructuredResponse("ok", "Login success!", userInfo));
             }
             else{
                 return gson.toJson(new StructuredResponse("error", email + " not found", null));
@@ -379,7 +382,7 @@ public class App {
         // JSON from the body of the request, turn it into a LoginRequest
         // object, extract the user email and password, insert them, and return the
         // if the password is correct.
-        Spark.put("/uid", (request, response) -> {
+        Spark.put("/:uid", (request, response) -> {
             // NB: if gson.Json fails, Spark will reply with status 500 Internal
             // Server Error
             int idx = Integer.parseInt(request.params("uid"));
@@ -408,7 +411,7 @@ public class App {
          * GET route
          */
         Spark.get("/:uid", (request, response) -> {
-            int idx = Integer.parseInt(request.params("id"));
+            int idx = Integer.parseInt(request.params("uid"));
             UserProfileRequest req = gson.fromJson(request.body(), UserProfileRequest.class);
             String sk = req.sessionKey;
             String em = req.uEmail;
