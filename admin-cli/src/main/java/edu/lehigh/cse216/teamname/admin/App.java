@@ -20,8 +20,10 @@ public class App {
      */
     static void menu() {
         System.out.println("Main Menu");
-        System.out.println("  [T] Create tblData");
-        System.out.println("  [D] Drop tblData");
+        System.out.println("  [T] Create a table");
+        System.out.println("  [D] Drop a table");
+        System.out.println("  [V] Create views");
+        System.out.println("  [v] Drop views");
         System.out.println("  [1] Query for a specific row");
         System.out.println("  [*] Query for all rows");
         System.out.println("  [-] Delete a row");
@@ -29,7 +31,7 @@ public class App {
         System.out.println("  [~] Update a row");
         System.out.println("  [q] Quit Program");
         System.out.println("  [?] Help (this message)");
-        System.out.println("  [L] Increment likes for a specific row");
+        System.out.println("  [L] Clear likes and dislikes");
     }
 
     /**
@@ -41,7 +43,7 @@ public class App {
      */
     static char prompt(BufferedReader in) {
         // The valid actions:
-        String actions = "VTD1*-+~q?L";
+        String actions = "TDVv1*-+~q?L";
 
         // We repeat until a valid single-character option is selected
         while (true) {
@@ -60,6 +62,20 @@ public class App {
             }
             System.out.println("Invalid Command");
         }
+    }
+
+    /**
+     * Print the table menu for our program
+     */
+    static void tblMenu() {
+        System.out.println("Choose a table");
+        System.out.println("  [M] tblData");
+        System.out.println("  [U] tblUser");
+        System.out.println("  [C] tblComment");
+        System.out.println("  [L] tblLike");
+        System.out.println("  [D] tblDislike");
+        System.out.println("  [q] Quit to main menu");
+        System.out.println("  [?] Help (this message)");
     }
 
     /**
@@ -93,6 +109,17 @@ public class App {
     }
 
     /**
+     * Print the views menu for our program
+     */
+    static void viewsMenu() {
+        System.out.println("Choose a view");
+        System.out.println("  [L] numOfLikes");
+        System.out.println("  [D] numOfDislikes");
+        System.out.println("  [q] Quit to main menu");
+        System.out.println("  [?] Help (this message)");
+    }
+
+    /**
      * Ask the user to enter a menu option; repeat until we get a valid option
      * 
      * @param in A BufferedReader, for reading from the keyboard
@@ -101,7 +128,48 @@ public class App {
      */
     static char promptViews(BufferedReader in) {
         // The valid actions:
-        String actions = "LDldq";
+        String actions = "LDq";
+
+        // We repeat until a valid single-character option is selected
+        while (true) {
+            System.out.print("[" + actions + "] :> ");
+            String action;
+            try {
+                action = in.readLine();
+            } catch (IOException e) {
+                e.printStackTrace();
+                continue;
+            }
+            if (action.length() != 1)
+                continue;
+            if (actions.contains(action)) {
+                return action.charAt(0);
+            }
+            System.out.println("Invalid Command");
+        }
+    }
+
+    /**
+     * Print the views menu for our program
+     */
+    static void likesMenu() {
+        System.out.println("Choose an attribute to clear");
+        System.out.println("  [L] Like");
+        System.out.println("  [D] Dislike");
+        System.out.println("  [q] Quit to main menu");
+        System.out.println("  [?] Help (this message)");
+    }
+
+    /**
+     * Ask the user to enter a menu option; repeat until we get a valid option
+     * 
+     * @param in A BufferedReader, for reading from the keyboard
+     * 
+     * @return The character corresponding to the chosen menu option
+     */
+    static char promptLikes(BufferedReader in) {
+        // The valid actions:
+        String actions = "LDq";
 
         // We repeat until a valid single-character option is selected
         while (true) {
@@ -247,50 +315,75 @@ public class App {
                 menu();
             } else if (action == 'q') {
                 break;
-            } else if (action == 'V') {
-                action = promptViews(in);
-                if (action == 'L') {
-                    db.createViewForLike();
-                } else if (action == 'D') {
-                    db.createViewForDislike();
-                } else if (action == 'l') {
-                    db.dropViewForLike();
-                } else if (action == 'd') {
-                    db.dropViewForDislike();
-                } else if (action == 'q') {
-                    break;
-                }
             } else if (action == 'T') {
-                action = promptTables(in);
-                if (action == 'M') {
-                    db.createData();
-                } else if (action == 'U') {
-                    db.createUser();
-                } else if (action == 'C') {
-                    db.createComment();
-                } else if (action == 'L') {
-                    db.createLike();
-                } else if (action == 'D') {
-                    db.createDislike();
-                } else if (action == 'q') {
-                    break;
+                while (true) {
+                    action = promptTables(in);
+                    if (action == '?') {
+                        tblMenu();
+                    } else if (action == 'M') {
+                        db.createData();
+                    } else if (action == 'U') {
+                        db.createUser();
+                    } else if (action == 'C') {
+                        db.createComment();
+                    } else if (action == 'L') {
+                        db.createLike();
+                    } else if (action == 'D') {
+                        db.createDislike();
+                    } else if (action == 'q') {
+                        break;
+                    }
                 }
+
             } else if (action == 'D') {
-                action = promptTables(in);
-                if (action == 'M') {
-                    db.dropData();
-                } else if (action == 'U') {
-                    db.dropUser();
-                } else if (action == 'C') {
-                    db.dropComment();
-                } else if (action == 'L') {
-                    db.dropLike();
-                } else if (action == 'D') {
-                    db.dropDislike();
-                } else if (action == 'q') {
-                    break;
+                while (true) {
+                    action = promptTables(in);
+                    if (action == '?') {
+                        tblMenu();
+                    } else if (action == 'M') {
+                        db.dropData();
+                    } else if (action == 'U') {
+                        db.dropUser();
+                    } else if (action == 'C') {
+                        db.dropComment();
+                    } else if (action == 'L') {
+                        db.dropLike();
+                    } else if (action == 'D') {
+                        db.dropDislike();
+                    } else if (action == 'q') {
+                        break;
+                    }
                 }
-            } else if (action == '1') {
+
+            } else if (action == 'V') {
+                while (true) {
+                    action = promptViews(in);
+                    if (action == '?') {
+                        viewsMenu();
+                    } else if (action == 'L') {
+                        db.createViewForLike();
+                    } else if (action == 'D') {
+                        db.createViewForDislike();
+                    } else if (action == 'q') {
+                        break;
+                    }
+                }
+
+            } else if (action == 'v') {
+                while (true) {
+                    action = promptViews(in);
+                    if (action == '?') {
+                        viewsMenu();
+                    } else if (action == 'L') {
+                        db.dropViewForLike();
+                    } else if (action == 'D') {
+                        db.dropViewForDislike();
+                    } else if (action == 'q') {
+                        break;
+                    }
+                }
+
+            } else if (action == '1') { // TODOOOOOOOOOOOOOOOOOOOOO
                 int id = getInt(in, "Enter the row ID");
                 if (id == -1)
                     continue;
@@ -301,8 +394,9 @@ public class App {
                     System.out.println("  --> " + res.mlikes);
                     System.out.println("  --> " + res.mDate);
                 }
-            } else if (action == '*') {
-                ArrayList<Database.RowData> res = db.selectAllFromData();
+
+            } else if (action == '*') { // TODOOOOOOOOOOOOOOOOOOOOOOOO
+                ArrayList<Database.RowData> res = db.selectAllFromComment(1);
                 if (res == null)
                     continue;
                 System.out.println("  Current Database Contents");
@@ -310,63 +404,85 @@ public class App {
                 for (Database.RowData rd : res) {
                     System.out.println("  [" + rd.mId + "] " + rd.mSubject);
                 }
-            } else if (action == '-') {
-                action = promptTables(in);
-                if (action == 'M') {
-                    int id = getInt(in, "Enter the row ID");
-                    if (id == -1)
-                        continue;
-                    int res = db.deleteRowFromData(id);
-                    if (res == -1)
-                        continue;
-                    System.out.println("  " + res + " rows deleted");
-                } else if (action == 'U') {
-                    int id = getInt(in, "Enter the user ID");
-                    if (id == -1)
-                        continue;
-                    int res = db.deleteRowFromUser(id);
-                    if (res == -1)
-                        continue;
-                    System.out.println("  " + res + " rows deleted");
-                } else if (action == 'C') {
-                    db.dropComment();
-                } else if (action == 'L') {
-                    db.dropLike();
-                } else if (action == 'D') {
-                    db.dropDislike();
-                } else if (action == 'q') {
-                    break;
-                }
-            } else if (action == '+') {
-                action = promptTables(in);
-                if (action == 'M') {
-                    String subject = getString(in, "Enter the subject");
-                    String message = getString(in, "Enter the message");
-                    int uid = getInt(in, "Enter the uid");
-                    if (subject.equals("") || message.equals("") || uid <= 0)
-                        continue;
-                    int res = db.insertRowToData(uid, subject, message);
-                    System.out.println(res + " rows added");
-                } else if (action == 'U') {
-                    String email = getString(in, "Enter the email");
-                    if (email.equals("")) {
-                        continue;
-                    }
-                    String password = randomPassword(8);
 
-                    int res = db.insertRowToUser(email, password);
-                    System.out.println(sendEmail("admin@buzz.com", email, password));
-                    System.out.println(res + " rows added");
-                } else if (action == 'C') {
-                    db.dropComment();
-                } else if (action == 'L') {
-                    db.dropLike();
-                } else if (action == 'D') {
-                    db.dropDislike();
-                } else if (action == 'q') {
-                    break;
+            } else if (action == '-') {
+                while (true) {
+                    action = promptTables(in);
+                    if (action == '?') {
+                        tblMenu();
+                    } else if (action == 'M') {
+                        int id = getInt(in, "Enter the row ID");
+                        if (id == -1)
+                            continue;
+                        int res = db.deleteRowFromData(id);
+                        if (res == -1)
+                            continue;
+                        System.out.println("  " + res + " rows deleted");
+                    } else if (action == 'U') {
+                        int id = getInt(in, "Enter the user ID");
+                        if (id == -1)
+                            continue;
+                        int res = db.deleteRowFromUser(id);
+                        if (res == -1)
+                            continue;
+                        System.out.println("  " + res + " rows deleted");
+                    } else if (action == 'C') {
+                        db.dropComment();
+                    } else if (action == 'L') {
+                        db.dropLike();
+                    } else if (action == 'D') {
+                        db.dropDislike();
+                    } else if (action == 'q') {
+                        break;
+                    }
                 }
-            } else if (action == '~') {
+
+            } else if (action == '+') {
+                while (true) {
+                    action = promptTables(in);
+                    if (action == '?') {
+                        tblMenu();
+
+                    } else if (action == 'M') {
+                        String subject = getString(in, "Enter the subject");
+                        String message = getString(in, "Enter the message");
+                        int uid = getInt(in, "Enter the uid");
+                        if (subject.equals("") || message.equals("") || uid <= 0)
+                            continue;
+                        int res = db.insertRowToData(uid, subject, message);
+                        System.out.println(res + " rows added");
+
+                    } else if (action == 'U') {
+                        String email = getString(in, "Enter the email");
+                        if (email.equals("")) {
+                            continue;
+                        }
+                        String password = randomPassword(8);
+
+                        int res = db.insertRowToUser(email, password);
+                        System.out.println(sendEmail("admin@buzz.com", email, password));
+                        System.out.println(res + " rows added");
+
+                    } else if (action == 'C') {
+                        String msg = getString(in, "Enter the comment");
+                        int mid = getInt(in, "Enter the id of message");
+                        int uid = getInt(in, "Enter the your user id");
+                        if (msg.equals("") || mid <= 0 || uid <= 0) {
+                            continue;
+                        }
+                        int res = db.insertRowToComment(uid, mid, msg);
+                        System.out.println(res + " rows added");
+
+                    } else if (action == 'L') {
+                        db.dropLike();
+                    } else if (action == 'D') {
+                        db.dropDislike();
+                    } else if (action == 'q') {
+                        break;
+                    }
+                }
+
+            } else if (action == '~') { // TODOOOOOOOOOOOOO
                 int id = getInt(in, "Enter the row ID");
                 if (id == -1)
                     continue;
@@ -375,16 +491,31 @@ public class App {
                 if (res == -1)
                     continue;
                 System.out.println("  " + res + " rows updated");
+
             } else if (action == 'L') {
-                int id = getInt(in, "Enter the row ID");
-                if (id == -1)
-                    continue;
-                Database.RowData res = db.incrementLikes(id, id);
-                if (res != null) {
-                    System.out.println("  [" + res.mId + "] " + res.mSubject);
-                    System.out.println("  --> " + res.mMessage);
-                    System.out.println("  --> " + res.mlikes);
-                    System.out.println("  --> " + res.mDate);
+                while (true) {
+                    action = promptLikes(in);
+                    if (action == '?') {
+                        likesMenu();
+                    } else if (action == 'L') {
+                        int id = getInt(in, "Enter the mID");
+                        if (id == -1)
+                            continue;
+                        /*int res = db.clearLikes(id);
+                        if (res == -1)
+                            continue;
+                        System.out.println("  " + res + " rows deleted");*/
+                    } else if (action == 'D') {
+                        int id = getInt(in, "Enter the mID");
+                        if (id == -1)
+                            continue;
+                        /*int res = db.clearDislikes(id);
+                        if (res == -1)
+                            continue;
+                        System.out.println("  " + res + " rows deleted");*/
+                    } else if (action == 'q') {
+                        break;
+                    }
                 }
             }
         }

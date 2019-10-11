@@ -453,7 +453,7 @@ public class Database {
             db.mInsertOne = db.mConnection.prepareStatement("INSERT INTO tblData VALUES (default, ?, ?, ?, ?)");
             db.mSelectAll = db.mConnection.prepareStatement("SELECT mid, subject FROM tblData");
             db.mSelectOne = db.mConnection.prepareStatement(
-                    "SELECT * from tblData NATURAL JOIN tblUser NATURAL JOIN numOfLikes NATURAL JOIN numOfDislikes WHERE mid = ?");
+                    "SELECT row.*, (SELECT COUNT(*) FROM tblLike WHERE tblLike.mid = row.mid) AS likes, (SELECT COUNT(*) FROM tblDislike WHERE tblDislike.mid = row.mid) AS dislikes FROM (SELECT * from tblData NATURAL JOIN tblUser) AS row WHERE row.mid = ?");
             db.mUpdateOne = db.mConnection.prepareStatement("UPDATE tblData SET title = ?, message = ? WHERE mid = ?");
             db.mIncrementLikes = db.mConnection.prepareStatement("INSERT INTO tblLike VALUES (?, ?)");
             db.mDecrementLikes = db.mConnection.prepareStatement("DELETE FROM tblLike WHERE uid = ? AND mid = ?");
@@ -591,7 +591,7 @@ public class Database {
         try {
             cInsertOne.setInt(1, uid);
             cInsertOne.setInt(2, mid);
-            cInsertOne.setString(3, null);
+            cInsertOne.setString(3, text);
             count += cInsertOne.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -611,6 +611,28 @@ public class Database {
             while (rs.next()) {
                 res.add(new RowData(rs.getInt("id"), rs.getString("subject"), "", 0, null));
             }
+            rs.close();
+            return res;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * Query the database for a list of all subjects and their IDs
+     * 
+     * @return All rows, as an ArrayList
+     */
+    ArrayList<RowData> selectAllFromComment(int mid) {
+        ArrayList<RowData> res = new ArrayList<RowData>();
+        try {
+            cSelectAll.setInt(1, mid);
+            ResultSet rs = cSelectAll.executeQuery();
+            /*while (rs.next()) {
+                res.add(new RowData(rs.getInt("id"), rs.getString("subject"), "", 0, null));
+            }
+            */
             rs.close();
             return res;
         } catch (SQLException e) {
