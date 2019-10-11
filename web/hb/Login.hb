@@ -5,10 +5,10 @@
                 <h4 class="modal-title">User Login</h4>
             </div>
             <div class="modal-body">
-                <label for="User-ID">User ID</label>
-                <input class="form-control" type="text" id="User-ID" />
-                <label for="User-pwd">Password</label>
-                <input class="form-control" type="password" id="User-pwd"></textarea>
+                <label for="Login-ID">User ID</label>
+                <input class="form-control" type="text" id="Login-ID" />
+                <label for="Login-pwd">Password</label>
+                <input class="form-control" type="password" id="Login-pwd"></textarea>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" id="Login-Login">Login</button>

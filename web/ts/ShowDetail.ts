@@ -38,6 +38,7 @@ class ShowDetail {
             type: "GET",
             url: "/messages/" + id,
             dataType: "json",
+            data: JSON.stringify({ uEmail: uemail, sessionKey: ukey }),
             success: ShowDetail.likeResponse
         });
     }
@@ -91,10 +92,12 @@ class ShowDetail {
      * with those ways of making the modal disappear.
      */
     public static show(data: any) {
+        let id = "" + $("#" + ShowDetail.NAME + "-detailId").val();
         $.ajax({
             type: "GET",
             url: "/messages/" + id + "/comments",
             dataType: "json",
+            data: JSON.stringify({ uEmail: uemail, sessionKey: ukey }),
             // 用ShowComments里的show
             success: ShowDetail.update
             //如果refresh 不行就改回listAllComments
@@ -125,6 +128,7 @@ class ShowDetail {
             type: "PUT",
             url: "/messages/" + id + "/likes",
             dataType: "json",
+            data: JSON.stringify({ uEmail: uemail, sessionKey: ukey }),
             success: ShowDetail.reloadLike
         });
     }
@@ -139,6 +143,7 @@ class ShowDetail {
             type: "GET",
             url: "/messages/" + id + "/comments",
             dataType: "json",
+            data: JSON.stringify({ uEmail: uemail, sessionKey: ukey }),
             // 用ShowComments里的show
             success: ShowDetail.listAllComments
             //如果refresh 不行就改回listAllComments
@@ -167,6 +172,7 @@ class ShowDetail {
             type: "DELETE",
             url: "/messages/" + id,
             dataType: "json",
+            data: JSON.stringify({ uEmail: uemail, sessionKey: ukey }),
             // TODO: we should really have a function that looks at the return
             //       value and possibly prints an error message.
             success: ElementList.refresh
@@ -185,6 +191,7 @@ class ShowDetail {
             type: "GET",
             url: "/messages/" + id,
             dataType: "json",
+            data: JSON.stringify({ uEmail: uemail, sessionKey: ukey }),
             success: EditEntryForm.show
         });
     }

@@ -42,6 +42,7 @@ node_modules/handlebars/bin/handlebars hb/NewEntryForm.hb >> $TARGETFOLDER/$WEBF
 node_modules/handlebars/bin/handlebars hb/Navbar.hb >> $TARGETFOLDER/$WEBFOLDERNAME/templates.js
 node_modules/handlebars/bin/handlebars hb/ShowDetail.hb >> $TARGETFOLDER/$WEBFOLDERNAME/templates.js
 node_modules/handlebars/bin/handlebars hb/Login.hb >> $TARGETFOLDER/$WEBFOLDERNAME/templates.js
+node_modules/handlebars/bin/handlebars hb/UserProfile.hb >> $TARGETFOLDER/$WEBFOLDERNAME/templates.js
 
 
 # set up Jasmine
