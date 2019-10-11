@@ -109,6 +109,8 @@ public class App {
             DataRow data = db.readOne(mid);
             String sk = req.sessionKey;
             String em = req.uEmail;
+            System.out.println(em);
+            System.out.println(sk);
             if (sk.equals(session.get(em))){
                 if (data == null) {
                     return gson.toJson(new StructuredResponse("error", mid + " not found", null));
@@ -477,17 +479,17 @@ public class App {
         // error is that it doesn't correspond to a row with data.
         Spark.get("/:mid/comments", (request, response) -> {
             //?? params =
-            int idx = Integer.parseInt(request.params("mid"));
+            int mid = Integer.parseInt(request.params("mid"));
             CommentRequest req = gson.fromJson(request.body(), CommentRequest.class);
             String sk = req.sessionKey;
-            String em = req.email;
+            String em = req.uEmail;
             if (sk.equals(session.get(em))){
                 // ensure status 200 OK, with a MIME type of JSON
                 response.status(200);
                 response.type("application/json");
-                ArrayList<Comment> data = db.readAllComments(idx);
+                ArrayList<Comment> data = db.readAllComments(mid);
                 if (data == null) {
-                    return gson.toJson(new StructuredResponse("error", idx + " not found", null));
+                    return gson.toJson(new StructuredResponse("error", mid + " not found", null));
                 } else {
                     return gson.toJson(new StructuredResponse("ok", null, data));
                 }
@@ -511,7 +513,7 @@ public class App {
             // Server Error
             CommentRequest req = gson.fromJson(request.body(), CommentRequest.class);
             String sk = req.sessionKey;
-            String em = req.email;
+            String em = req.uEmail;
             if (sk.equals(session.get(em))){
                 // ensure status 200 OK, with a MIME type of JSON
                 // NB: even on error, we return 200, but with a JSON object that
