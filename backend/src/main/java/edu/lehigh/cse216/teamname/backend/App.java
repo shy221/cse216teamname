@@ -109,6 +109,8 @@ public class App {
             DataRow data = db.readOne(mid);
             String sk = req.sessionKey;
             String em = req.uEmail;
+            System.out.println(em);
+            System.out.println(sk);
             if (sk.equals(session.get(em))){
                 if (data == null) {
                     return gson.toJson(new StructuredResponse("error", mid + " not found", null));
