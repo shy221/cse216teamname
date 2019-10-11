@@ -100,18 +100,18 @@ public class App {
         // ":id" isn't a number, Spark will reply with a status 500 Internal
         // Server Error.  Otherwise, we have an integer, and the only possible 
         // error is that it doesn't correspond to a row with data.
-        Spark.get("/messages/:id", (request, response) -> {
-            int idx = Integer.parseInt(request.params("id"));
+        Spark.get("/messages/:mid", (request, response) -> {
+            int mid = Integer.parseInt(request.params("mid"));
             // ensure status 200 OK, with a MIME type of JSON
             response.status(200);
             response.type("application/json");
             SimpleRequest req = gson.fromJson(request.body(), SimpleRequest.class);
-            DataRow data = db.readOne(idx);
+            DataRow data = db.readOne(mid);
             String sk = req.sessionKey;
-            String em = req.email;
+            String em = req.uEmail;
             if (sk.equals(session.get(em))){
                 if (data == null) {
-                    return gson.toJson(new StructuredResponse("error", idx + " not found", null));
+                    return gson.toJson(new StructuredResponse("error", mid + " not found", null));
                 } else {
                     return gson.toJson(new StructuredResponse("ok", null, data));
                 }
@@ -136,7 +136,7 @@ public class App {
             // Server Error
             SimpleRequest req = gson.fromJson(request.body(), SimpleRequest.class);
             String sk = req.sessionKey;
-            String em = req.email;
+            String em = req.uEmail;
             if (sk.equals(session.get(em))){
                 // ensure status 200 OK, with a MIME type of JSON
                 // NB: even on error, we return 200, but with a JSON object that
@@ -172,7 +172,7 @@ public class App {
             int idx = Integer.parseInt(request.params("id"));
             SimpleRequest req = gson.fromJson(request.body(), SimpleRequest.class);
             String sk = req.sessionKey;
-            String em = req.email;
+            String em = req.uEmail;
             if (sk.equals(session.get(em))){
                 // ensure status 200 OK, with a MIME of JSON
                 response.status(200);
@@ -203,7 +203,7 @@ public class App {
             int uid = Integer.parseInt(request.params("uid"));
             SimpleRequest req = gson.fromJson(request.body(), SimpleRequest.class);
             String sk = req.sessionKey;
-            String em = req.email;
+            String em = req.uEmail;
             if (sk.equals(session.get(em))){
                 // ensure status 200 OK, with a MIME of JSON
                 response.status(200);
@@ -257,7 +257,7 @@ public class App {
             int mid = Integer.parseInt(request.params("mid"));
             SimpleRequest req = gson.fromJson(request.body(), SimpleRequest.class);
             String sk = req.sessionKey;
-            String em = req.email;
+            String em = req.uEmail;
             if (sk.equals(session.get(em))){
                 // ensure status 200 OK, with a MIME of JSON
                 response.status(200);
@@ -288,7 +288,7 @@ public class App {
             int mid = Integer.parseInt(request.params("mid"));
             SimpleRequest req = gson.fromJson(request.body(), SimpleRequest.class);
             String sk = req.sessionKey;
-            String em = req.email;
+            String em = req.uEmail;
             if (sk.equals(session.get(em))){
                 // ensure status 200 OK, with a MIME of JSON
                 response.status(200);
@@ -309,7 +309,7 @@ public class App {
             int idx = Integer.parseInt(request.params("id"));
             SimpleRequest req = gson.fromJson(request.body(), SimpleRequest.class);
             String sk = req.sessionKey;
-            String em = req.email;
+            String em = req.uEmail;
             if (sk.equals(session.get(em))){
                 // ensure status 200 OK, with a MIME type of JSON
                 response.status(200);

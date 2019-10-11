@@ -22,7 +22,7 @@ public class SimpleRequest {
     /**
      * The email being provided by the client.
      */
-    public String email;
+    public String uEmail;
     /**
      * The sessoinKey being provided by the client.
      */

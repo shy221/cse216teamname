@@ -34,6 +34,7 @@ public class Comment {
 
 
 
+
     /**
      * Create a new Comment with the provided id and title/content, and a 
      * creation date based on the system clock at the time the constructor was
@@ -54,6 +55,7 @@ public class Comment {
         mId = mid;
         cUsername = username;
         cText = text;
+//        sessionKey = SessionKey;
     }
 
     /**
@@ -66,5 +68,6 @@ public class Comment {
         // NB: Strings and Dates are immutable, so copy-by-reference is safe
         cUsername = data.cUsername;
         cText = data.cText;
+//        sessionKey = data.sessionKey;
     }
 }

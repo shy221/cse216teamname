@@ -41,7 +41,7 @@ public class DataRowUserProfile {
      */
     public String uIntro;
 
-    public String uSessionKey;
+    public String sessionKey;
     /**
      * Create a new DataRowUserProfile with the provided user id and parameters,
      *
@@ -67,14 +67,14 @@ public class DataRowUserProfile {
         uIntro = intro;
     }
 
-    DataRowUserProfile(int uid, String username, String email, String salt, String password, String intro, String sessionKey) {
+    DataRowUserProfile(int uid, String username, String email, String salt, String password, String intro, String SessionKey) {
         uId = uid;
         uSername = username;
         uEmail = email;
         uSalt = salt;
         uPassword = password;
         uIntro = intro;
-        uSessionKey = sessionKey;
+        sessionKey = SessionKey;
     }
 
     /**
@@ -88,6 +88,6 @@ public class DataRowUserProfile {
         uSalt = data.uSalt;
         uPassword = data.uPassword;
         uIntro = data.uIntro;
-        uSessionKey = data.uSessionKey;
+        sessionKey = data.sessionKey;
     }
 }
