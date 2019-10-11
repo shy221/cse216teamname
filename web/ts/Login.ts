@@ -60,10 +60,14 @@ class Login {
         // listing of pwds
         if (data.mStatus === "ok") {
             loginState = true;
-            ukey = data.mData.uSessionKey;
             uid = data.mData.uId;
+            ukey = data.mData.uSessionKey;
             uemail = data.mData.uEmail;
+            Navbar.refresh();
+            NewEntryForm.refresh();
             ElementList.refresh();
+            EditEntryForm.refresh();
+            ShowDetail.refresh();
         }
         // Handle explicit errors with a detailed popup pwd
         else if (data.mStatus === "error") {

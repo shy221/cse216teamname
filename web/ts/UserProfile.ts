@@ -30,4 +30,13 @@ class UserProfile {
         $("#" + UserProfile.NAME).modal("show");
     }
     
+    public static get(){
+        $.ajax({
+            type: "GET",
+            url: "/" + uid,
+            dataType: "json",
+            data: JSON.stringify({ uEmail: uemail, sessionKey: ukey }),
+            success: UserProfile.show
+        });
+    }
 }
