@@ -61,9 +61,9 @@ class ItemListAdapter extends RecyclerView.Adapter<ItemListAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         final Message m = mData.get(position);
-//        holder.mId.setText(Integer.toString(m.mId));
-        holder.mTitle.setText(m.mTitle);
-        holder.mContent.setText(m.mContent);
+            holder.mId.setText(Integer.toString(m.mId));
+            holder.mTitle.setText(m.mTitle);
+        //holder.mContent.setText(m.mContent);
 
 
         // Attach a click listener to the view we are configuring

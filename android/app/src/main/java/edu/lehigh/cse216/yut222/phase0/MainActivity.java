@@ -2,6 +2,7 @@
 package edu.lehigh.cse216.yut222.phase0;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -34,9 +35,14 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
+
+import static edu.lehigh.cse216.yut222.phase0.LoginActivity.sharedpreferences;
 
 //import shy221.cse216.lehigh.edu.phase0.R;
 
@@ -45,6 +51,14 @@ public class MainActivity extends AppCompatActivity {
      * mData holds the data we get from Volley
      */
     ArrayList<Message> mData = new ArrayList<>();
+    /*public static final String MyPREFERENCES = "MyPrefs";
+    public static final String PrefId = "prefId";
+    public static final String PrefName = "prefName";
+    public static final String PrefKey = "prefKey";
+    public static final String PrefEmail = "prefEmail";
+    public static final String PrefSalt = "prefSalt";
+    public static final String PrefIntro = "prefIntro";*/
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +66,13 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
+        Context context = MainActivity.this;
+        sharedpreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        //String PrefKey = sharedpreferences.getString("prefKey", "default");
+        String PrefKey = sharedpreferences.getString("prefKey", "default");
+        Log.e("main page session key", PrefKey);
+        Toast toast = Toast.makeText(context, PrefKey, Toast.LENGTH_LONG);
+        toast.show();
 
         //SY
         // Instantiate the RequestQueue.
@@ -118,19 +138,25 @@ public class MainActivity extends AppCompatActivity {
             status = obj.getString("mStatus");
             //this is to check if status went wrong
             // Log.e("shy221", status);
-                if(status.equals("ok")){
-                    JSONArray data = obj.getJSONArray("mData");
-                    for (int i = 0; i < data.length(); i++){
-                        int id = data.getJSONObject(i).getInt("mId");
-                        String title = data.getJSONObject(i).getString("mTitle");
-                        String content = data.getJSONObject(i).getString("mContent");
-                        int likes = data.getJSONObject(i).getInt("mLikes");
-                        mData.add(new Message(id, title, content,likes));
-                    }
-
-                }else{
-                    Log.d("shy221","mStatus is not ok.");
+            if(status.equals("ok")){
+                JSONArray data = obj.getJSONArray("mData");
+                for (int i = 0; i < data.length(); i++){
+                    int mid = data.getJSONObject(i).getInt("mId");
+                    int uid = data.getJSONObject(i).getInt("uId");
+                    String title = data.getJSONObject(i).getString("mTitle");
+                    //String content = data.getJSONObject(i).getString("message");
+                    int likes = data.getJSONObject(i).getInt("mLikes");
+                    int dislikes = data.getJSONObject(i).getInt("mDislikes");
+                    String content = "made up content";
+                    //int likes = 0;
+                    //ArrayList<Comment> comments = new ArrayList<>();
+                    //JSONArray comments = data.getJSONObject(i).getJSONArray("mComments");
+                    //ArrayList<String> comments = data.getJSONObject(i).get("mComments");  //unsafe casting
+                    mData.add(new Message(mid, uid, title, likes, dislikes));
                 }
+            }else{
+                Log.d("shy221","mStatus is not ok.");
+            }
         } catch (final JSONException e) {
             Log.d("shy221", "Error parsing JSON file: " + e.getMessage());
             return;
@@ -150,12 +176,19 @@ public class MainActivity extends AppCompatActivity {
                 Intent i = new Intent(getApplicationContext(), DetailActivity.class);
                 i.putExtra("label_contents", "Post your message here.");
                 i.putExtra("message id", message.mId);
+                i.putExtra("user id", message.uId);
                 i.putExtra("message title", message.mTitle);
-                i.putExtra("message content", message.mContent);
+                i.putExtra("message dislikes", message.mDislikes);
                 i.putExtra("message likes", message.mLikes);
-                startActivityForResult(i, 123); // 123 is the number that will come back to us
+                //i.putExtra("message comments", message.mComments);
 
+                /*Bundle args = new Bundle();
+                args.putSerializable("ARRAYLIST", message.mComments);*/
+                //i.putExtra("message comments",args);
+                //get mComments as an arraylist using bundle
 
+                startActivityForResult(i, 123);
+                //change this function
             }
         });
     }
@@ -181,6 +214,18 @@ public class MainActivity extends AppCompatActivity {
             startActivityForResult(i, 789); // 789 is the number that will come back to us
             return true;
         }
+        if (id == R.id.action_profile) {
+            Intent i = new Intent(getApplicationContext(), ProfileActivity.class);
+            i.putExtra("label_contents", "Post your message here.");
+            startActivityForResult(i, 2);
+            return true;
+        }
+        if (id == R.id.action_login) {
+            Intent i = new Intent(getApplicationContext(), LoginActivity.class);
+            i.putExtra("label_contents", "Login here");
+            startActivityForResult(i, 3);
+            return true;
+        }
 
 
         return super.onOptionsItemSelected(item);
@@ -190,6 +235,54 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         // Check which request we're responding to
         if (requestCode == 789) {
+            // Make sure the request was successful
+            if (resultCode == RESULT_OK) {
+                // Get the "extra" string of data
+//                Log.e("shy221 result", data.getStringExtra("result"));
+//                Toast.makeText(MainActivity.this, data.getStringExtra("title") + data.getStringExtra("content"), Toast.LENGTH_LONG).show();
+
+                //refresh
+                StringRequest listR = new StringRequest(Request.Method.GET,"https://arcane-refuge-67249.herokuapp.com/messages" ,
+                        new Response.Listener<String>() {
+                            @Override
+                            public void onResponse(String response) {
+                                populateListFromVolley(response);
+
+                            }
+                        }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e("shy221", "Listing all messages didn't work!");
+                    }
+                });
+                MySingleton.getInstance(this).addToRequestQueue(listR);
+            }
+        }
+        if (requestCode == 3) {
+            // Make sure the request was successful
+            if (resultCode == RESULT_OK) {
+                // Get the "extra" string of data
+//                Log.e("shy221 result", data.getStringExtra("result"));
+//                Toast.makeText(MainActivity.this, data.getStringExtra("title") + data.getStringExtra("content"), Toast.LENGTH_LONG).show();
+
+                //refresh
+                StringRequest listR = new StringRequest(Request.Method.GET,"https://arcane-refuge-67249.herokuapp.com/messages" ,
+                        new Response.Listener<String>() {
+                            @Override
+                            public void onResponse(String response) {
+                                populateListFromVolley(response);
+
+                            }
+                        }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e("shy221", "Listing all messages didn't work!");
+                    }
+                });
+                MySingleton.getInstance(this).addToRequestQueue(listR);
+            }
+        }
+        if (requestCode == 2) {
             // Make sure the request was successful
             if (resultCode == RESULT_OK) {
                 // Get the "extra" string of data

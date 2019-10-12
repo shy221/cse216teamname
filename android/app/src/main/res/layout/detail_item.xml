@@ -6,23 +6,33 @@
     android:layout_height="match_parent">
 
     <TextView
-        android:id="@+id/detailItemId"
+        android:id="@+id/detailItemIdm"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="" />
-
+    <TextView
+        android:id="@+id/detailItemIdu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="" />
     <TextView
         android:id="@+id/detailItemTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="" />
+
     <TextView
-        android:id="@+id/detailItemContent"
+        android:id="@+id/detailItemLikes"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="" />
     <TextView
-        android:id="@+id/detailItemLikes"
+        android:id="@+id/detailItemDislikes"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="" />
+    <TextView
+        android:id="@+id/detailItemComments"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="" />
