@@ -91,6 +91,7 @@ public class DetailActivity extends AppCompatActivity {
         JSONObject c = new JSONObject(map);
 
         //get comments from route
+        //routes incomplete
         JsonObjectRequest listC = new JsonObjectRequest(Request.Method.POST, urlComments, c,
                 new Response.Listener<JSONObject>() {
                     @Override
@@ -173,7 +174,7 @@ public class DetailActivity extends AppCompatActivity {
                     toast.show();
                 }
                 else if((clickCount % 2) == 0){
-                    //deleteLike(urlLikes);
+                    deleteLike(urlLikes);
                     Toast toast = Toast.makeText(DetailActivity.this, "canceled like", Toast.LENGTH_LONG);
                     toast.show();
                 }
@@ -241,12 +242,16 @@ public class DetailActivity extends AppCompatActivity {
 
     private void postLike(String urlL){
         Log.e("postlike", "map");
+        sharedpreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         //one link to update likes
         Map<String, Object> map = new HashMap<>();
         //map.put("uid", Integer.parseInt(sharedpreferences.getString("uId","default")));
-        map.put("uid", 5);
-        map.put("sessionKey", sharedpreferences.getString("sessionKey","default"));
-        map.put("uEmail", sharedpreferences.getString("uEmail","default"));
+        int uid = Integer.parseInt(sharedpreferences.getString("prefId","default"));
+        map.put("uid", uid);
+        map.put("sessionKey", sharedpreferences.getString("prefKey","default"));
+        map.put("uEmail", sharedpreferences.getString("prefEmail","default"));
+        Toast toast = Toast.makeText(DetailActivity.this, sharedpreferences.getString("prefKey","default"), Toast.LENGTH_LONG);
+        toast.show();
 
         JSONObject m = new JSONObject(map);
         Log.e("postlike", "hash successfully");
@@ -272,11 +277,14 @@ public class DetailActivity extends AppCompatActivity {
         MySingleton.getInstance(this).addToRequestQueue(likeR);
     }
     private void deleteLike(String urlL){
+
+        sharedpreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         //one link to update likes
         Map<String, Object> map = new HashMap<>();
-        map.put("uId", Integer.parseInt(sharedpreferences.getString("uId","default")));
-        map.put("sessionKey", sharedpreferences.getString("sessionKey","default"));
-        map.put("uEmail", sharedpreferences.getString("uEmail","default"));
+        int uid = Integer.parseInt(sharedpreferences.getString("prefId","default"));
+        map.put("uid", uid);
+        map.put("sessionKey", sharedpreferences.getString("prefKey","default"));
+        map.put("uEmail", sharedpreferences.getString("prefEmail","default"));
 
         JSONObject m = new JSONObject(map);
         JsonObjectRequest likeR = new JsonObjectRequest(Request.Method.DELETE,
@@ -294,33 +302,35 @@ public class DetailActivity extends AppCompatActivity {
         MySingleton.getInstance(this).addToRequestQueue(likeR);
     }
 
-
     private void populateCommentFromVolley(JSONObject response) {
         try {
+            Log.e("comments", "try");
             mComments.clear();
-            String status;
-            status = response.getString("mStatus");
-            //this is to check if status went wrong
-            // Log.e("shy221", status);
+            String status = response.getString("mStatus");
             if (status.equals("ok")) {
                 JSONArray data = response.getJSONArray("mData");
                 for (int i = 0; i < data.length(); i++) {
+                    Log.e("comments", "enter for loop");
                     int mId = data.getJSONObject(i).getInt("mId");
                     int cId = data.getJSONObject(i).getInt("cId");
                     int uId = data.getJSONObject(i).getInt("uId");
                     String text = data.getJSONObject(i).getString("cText");
                     String username = data.getJSONObject(i).getString("cUsername");
                     mComments.add(new Comment(cId, uId, mId, text, username));
-                    Log.e("populate comments", "got comments");
+                    Log.e("comment", "exiting for loop");
                 }
+                Log.e("outside for loop", mComments.toString());
+                //Log.e("outside for loop", mComments.get(0).cUsername);
+
             } else {
-                Log.d("get comment", "mStatus is not ok.");
+                Log.e("get comment", "mStatus is not ok.");
             }
         } catch (final JSONException e) {
             Log.d("get comment", "Error parsing JSON file: " + e.getMessage());
             return;
         }
-        Log.d("zex220", "Successfully parsed JSON file.");
+        Log.d("comments", "Successfully parsed JSON file.");
+        //showComment();
     }
     private void populateDetailFromVolley(JSONObject response) {
         try {

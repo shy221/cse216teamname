@@ -38,14 +38,18 @@ import static edu.lehigh.cse216.yut222.phase0.LoginActivity.sharedpreferences;
 
 public class ProfileActivity extends AppCompatActivity {
 
+    ArrayList<User> thisUser = new ArrayList<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
+        int id = Integer.parseInt(sharedpreferences.getString("prefId","default"));
+        thisUser.add(new User(id, sharedpreferences.getString("prefUsername", "default"),
+                sharedpreferences.getString("prefIntro","default"), sharedpreferences.getString("prefEmail", "default")));
 
         // Get the parameter from the calling activity, and put it in the TextView
         Intent input = getIntent();
-
+/*
         final TextView username = (TextView)findViewById(R.id.username);
         sharedpreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         username.setText(sharedpreferences.getString("prefUsername", "username"));
@@ -60,6 +64,10 @@ public class ProfileActivity extends AppCompatActivity {
 
         final TextView uIntro = (TextView)findViewById(R.id.uintro);
         sharedpreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        uIntro.setText(sharedpreferences.getString("prefIntro", "intro"));
+        uIntro.setText(sharedpreferences.getString("prefIntro", "intro"));*/
+        RecyclerView rv = (RecyclerView) findViewById(R.id.profile_detail_view);
+        rv.setLayoutManager(new LinearLayoutManager(this));
+        ProfileListAdapter adapter = new ProfileListAdapter(this, thisUser);
+        rv.setAdapter(adapter);
     }
 }

@@ -9,50 +9,16 @@
     tools:showIn="@layout/activity_profile">
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/message_detail_view"
+        android:id="@+id/profile_detail_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:layout_editor_absoluteX="0dp"
         tools:layout_editor_absoluteY="234dp"></androidx.recyclerview.widget.RecyclerView>
 
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-        <TextView
-            android:id="@+id/uid"
-            android:layout_width="383dp"
-            android:layout_height="54dp"
-            android:text=""
-            android:layout_toEndOf="@id/username"
-            tools:layout_editor_absoluteY="8dp"
-            tools:layout_editor_absoluteX="0dp" />
-        <TextView
-            android:id="@+id/username"
-            android:layout_width="383dp"
-            android:layout_height="54dp"
-            android:text=""
-            tools:layout_editor_absoluteY="8dp"
-            tools:layout_editor_absoluteX="0dp" />
-      /*  <TextView
-            android:id="@+id/uintro"
-            android:layout_width="383dp"
-            android:layout_height="54dp"
-            android:text=""
-            android:layout_toEndOf="@id/uemail"
-            tools:layout_editor_absoluteY="8dp"
-            tools:layout_editor_absoluteX="0dp" />
-        <TextView
-            android:id="@+id/uemail"
-            android:layout_width="383dp"
-            android:layout_height="54dp"
-            android:text=""
-            android:layout_toEndOf="@id/uid"
-            tools:layout_editor_absoluteY="8dp"
-            tools:layout_editor_absoluteX="0dp" />
-
-
-
-
     </RelativeLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

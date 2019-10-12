@@ -30,7 +30,7 @@ class CommentListAdapter extends RecyclerView.Adapter<CommentListAdapter.ViewHol
             this.uId = (TextView) itemView.findViewById(R.id.commentItemIdu);
             this.cId = (TextView) itemView.findViewById(R.id.commentItemIdc);
             this.cText = (TextView) itemView.findViewById(R.id.commentItemText);
-            this.cText = (TextView) itemView.findViewById(R.id.commentItemusername);
+            this.cUsername = (TextView) itemView.findViewById(R.id.commentItemusername);
         }
     }
 
@@ -39,7 +39,6 @@ class CommentListAdapter extends RecyclerView.Adapter<CommentListAdapter.ViewHol
 
     interface ClickListener{
         void onClick(Comment c);
-
     }
 
     private ClickListener cClickListener;
@@ -68,6 +67,9 @@ class CommentListAdapter extends RecyclerView.Adapter<CommentListAdapter.ViewHol
 //        holder.mId.setText(Integer.toString(m.mId));
         holder.cText.setText(c.cText);
         holder.cId.setText(c.cId);
+        holder.uId.setText(c.cId);
+        holder.mId.setText(c.cId);
+        holder.cUsername.setText("list of comments");
 
 
         // Attach a click listener to the view we are configuring
@@ -82,6 +84,5 @@ class CommentListAdapter extends RecyclerView.Adapter<CommentListAdapter.ViewHol
 //        holder.mId.setOnClickListener(listener);
         holder.cText.setOnClickListener(listener);
         holder.cId.setOnClickListener(listener);
-
     }
 }
