@@ -26,8 +26,8 @@ public class App {
         System.out.println("  [v] Drop views");
         System.out.println("  [1] Query for a specific row");
         System.out.println("  [*] Query for all rows");
-        System.out.println("  [-] Delete a row");
-        System.out.println("  [+] Insert a new row");
+        System.out.println("  [-] Delete a row (or decrement for like or dislike)");
+        System.out.println("  [+] Insert a new row (or increment for like or dislike)");
         System.out.println("  [~] Update a row");
         System.out.println("  [q] Quit Program");
         System.out.println("  [?] Help (this message)");
@@ -88,6 +88,48 @@ public class App {
     static char promptTables(BufferedReader in) {
         // The valid actions:
         String actions = "MUCLDq";
+
+        // We repeat until a valid single-character option is selected
+        while (true) {
+            System.out.print("[" + actions + "] :> ");
+            String action;
+            try {
+                action = in.readLine();
+            } catch (IOException e) {
+                e.printStackTrace();
+                continue;
+            }
+            if (action.length() != 1)
+                continue;
+            if (actions.contains(action)) {
+                return action.charAt(0);
+            }
+            System.out.println("Invalid Command");
+        }
+    }
+
+    /**
+     * Print the table menu for our program
+     */
+    static void tblMenuLite() {
+        System.out.println("Choose a table");
+        System.out.println("  [M] tblData");
+        System.out.println("  [U] tblUser");
+        System.out.println("  [C] tblComment");
+        System.out.println("  [q] Quit to main menu");
+        System.out.println("  [?] Help (this message)");
+    }
+
+    /**
+     * Ask the user to enter a menu option; repeat until we get a valid option
+     * 
+     * @param in A BufferedReader, for reading from the keyboard
+     * 
+     * @return The character corresponding to the chosen menu option
+     */
+    static char promptTablesLite(BufferedReader in) {
+        // The valid actions:
+        String actions = "MUCq";
 
         // We repeat until a valid single-character option is selected
         while (true) {
@@ -383,26 +425,97 @@ public class App {
                     }
                 }
 
-            } else if (action == '1') { // TODOOOOOOOOOOOOOOOOOOOOO
-                int id = getInt(in, "Enter the row ID");
-                if (id == -1)
-                    continue;
-                Database.RowData res = db.selectOneFromData(id);
-                if (res != null) {
-                    System.out.println("  [" + res.mId + "] " + res.mSubject);
-                    System.out.println("  --> " + res.mMessage);
-                    System.out.println("  --> " + res.mlikes);
-                    System.out.println("  --> " + res.mDate);
+            } else if (action == '1') {
+                while (true) {
+                    action = promptTables(in);
+                    if (action == '?') {
+                        tblMenuLite();
+
+                    } else if (action == 'M') {
+                        int mid = getInt(in, "Enter the message ID");
+                        if (mid == -1)
+                            continue;
+                        Database.RowData res = db.selectOneFromData(mid);
+                        if (res != null) {
+                            System.out.println("  [" + res.mId + "] " + res.mSubject);
+                            System.out.println("  [" + res.uId + "] ");
+                            System.out.println("  --> " + res.mMessage);
+                            System.out.println("  --> " + res.mlikes);
+                            System.out.println("  --> " + res.mdislikes);
+                            System.out.println("  --> " + res.mDate);
+                        }
+
+                    } else if (action == 'U') {
+                        int uid = getInt(in, "Enter the user ID");
+                        if (uid == -1)
+                            continue;
+                        Database.RowUser res = db.selectOneFromUser(uid);
+                        if (res != null) {
+                            System.out.println("  [" + res.uId + "] " + res.username);
+                            System.out.println("  --> " + res.uEmail);
+                            System.out.println("  --> " + res.uSalt);
+                            System.out.println("  --> " + res.uPassword);
+                            System.out.println("  --> " + res.uIntro);
+                        }
+
+                    } else if (action == 'C') {
+                        int cid = getInt(in, "Enter the comment ID");
+                        if (cid == -1)
+                            continue;
+                        Database.RowComment res = db.selectOneFromComment(cid);
+                        if (res != null) {
+                            System.out.println("  [" + res.cId + "] ");
+                            System.out.println("  [" + res.uId + "] ");
+                            System.out.println("  [" + res.mId + "] ");
+                            System.out.println("  --> " + res.cText);
+                        }
+                    } else if (action == 'q') {
+                        break;
+                    }
                 }
 
-            } else if (action == '*') { // TODOOOOOOOOOOOOOOOOOOOOOOOO
-                ArrayList<Database.RowData> res = db.selectAllFromComment(1);
-                if (res == null)
-                    continue;
-                System.out.println("  Current Database Contents");
-                System.out.println("  -------------------------");
-                for (Database.RowData rd : res) {
-                    System.out.println("  [" + rd.mId + "] " + rd.mSubject);
+            } else if (action == '*') {
+                while (true) {
+                    action = promptTables(in);
+                    if (action == '?') {
+                        tblMenuLite();
+
+                    } else if (action == 'M') {
+                        ArrayList<Database.RowData> res = db.selectAllFromData();
+                        if (res == null)
+                            continue;
+                        System.out.println("  Current tblData Contents");
+                        System.out.println("  -------------------------");
+                        for (Database.RowData rd : res) {
+                            System.out.println("  [" + rd.mId + "] " + rd.mSubject);
+                        }
+
+                    } else if (action == 'U') {
+                        ArrayList<Database.RowUser> res = db.selectAllFromUser();
+                        if (res == null)
+                            continue;
+                        System.out.println("  Current tblUser Contents");
+                        System.out.println("  -------------------------");
+                        for (Database.RowUser rd : res) {
+                            System.out.println("  [" + rd.uId + "] " + rd.username);
+                        }
+
+                    } else if (action == 'C') {
+                        int mid = getInt(in, "Enter the message ID");
+                        ArrayList<Database.RowComment> res = db.selectAllFromComment(mid);
+                        if (res == null)
+                            continue;
+                        System.out.println("  Current tblComment Contents");
+                        System.out.println("  -------------------------");
+                        for (Database.RowComment rd : res) {
+                            System.out.println("  [" + rd.cId + "] ");
+                            System.out.println("  [" + rd.uId + "] ");
+                            System.out.println("  [" + rd.mId + "] ");
+                            System.out.println("  --> " + rd.cText);
+                        }
+                    } else if (action == 'q') {
+                        break;
+                    }
                 }
 
             } else if (action == '-') {
@@ -411,27 +524,47 @@ public class App {
                     if (action == '?') {
                         tblMenu();
                     } else if (action == 'M') {
-                        int id = getInt(in, "Enter the row ID");
-                        if (id == -1)
+                        int mid = getInt(in, "Enter the message ID");
+                        if (mid == -1)
                             continue;
-                        int res = db.deleteRowFromData(id);
+                        int res = db.deleteRowFromData(mid);
                         if (res == -1)
                             continue;
                         System.out.println("  " + res + " rows deleted");
                     } else if (action == 'U') {
-                        int id = getInt(in, "Enter the user ID");
-                        if (id == -1)
+                        int uid = getInt(in, "Enter the user ID");
+                        if (uid == -1)
                             continue;
-                        int res = db.deleteRowFromUser(id);
+                        int res = db.deleteRowFromUser(uid);
                         if (res == -1)
                             continue;
                         System.out.println("  " + res + " rows deleted");
                     } else if (action == 'C') {
-                        db.dropComment();
+                        int cid = getInt(in, "Enter the comment ID");
+                        if (cid == -1)
+                            continue;
+                        int res = db.deleteRowFromComment(cid);
+                        if (res == -1)
+                            continue;
+                        System.out.println("  " + res + " rows deleted");
                     } else if (action == 'L') {
-                        db.dropLike();
+                        int uid = getInt(in, "Enter the user ID");
+                        int mid = getInt(in, "Enter the message ID");
+                        if (uid == -1 || mid == -1)
+                            continue;
+                        int res = db.deleteRowFromLike(uid, mid);
+                        if (res == -1)
+                            continue;
+                        System.out.println("  " + res + " rows deleted");
                     } else if (action == 'D') {
-                        db.dropDislike();
+                        int uid = getInt(in, "Enter the user ID");
+                        int mid = getInt(in, "Enter the message ID");
+                        if (uid == -1 || mid == -1)
+                            continue;
+                        int res = db.deleteRowFromDislike(uid, mid);
+                        if (res == -1)
+                            continue;
+                        System.out.println("  " + res + " rows deleted");
                     } else if (action == 'q') {
                         break;
                     }
@@ -474,23 +607,67 @@ public class App {
                         System.out.println(res + " rows added");
 
                     } else if (action == 'L') {
-                        db.dropLike();
+                        int mid = getInt(in, "Enter the id of message");
+                        int uid = getInt(in, "Enter the your user id");
+                        if (mid <= 0 || uid <= 0) {
+                            continue;
+                        }
+                        int res = db.insertRowToLike(uid, mid);
+                        System.out.println(res + " rows added");
                     } else if (action == 'D') {
-                        db.dropDislike();
+                        int mid = getInt(in, "Enter the id of message");
+                        int uid = getInt(in, "Enter the your user id");
+                        if (mid <= 0 || uid <= 0) {
+                            continue;
+                        }
+                        int res = db.insertRowToDislike(uid, mid);
+                        System.out.println(res + " rows added");
                     } else if (action == 'q') {
                         break;
                     }
                 }
 
-            } else if (action == '~') { // TODOOOOOOOOOOOOO
-                int id = getInt(in, "Enter the row ID");
-                if (id == -1)
-                    continue;
-                String newMessage = getString(in, "Enter the new message");
-                int res = db.updateOneInData(id, newMessage);
-                if (res == -1)
-                    continue;
-                System.out.println("  " + res + " rows updated");
+            } else if (action == '~') {
+                while (true) {
+                    action = promptTables(in);
+                    if (action == '?') {
+                        tblMenuLite();
+
+                    } else if (action == 'M') {
+                        int mid = getInt(in, "Enter the message ID");
+                        String newTitle = getString(in, "Enter the new title");
+                        String newMessage = getString(in, "Enter the new message");
+                        if (mid == -1 || newTitle.equals("") || newMessage.equals(""))
+                            continue;
+                        int res = db.updateOneInData(mid, newTitle, newMessage);
+                        if (res == -1)
+                            continue;
+                        System.out.println("  " + res + " rows updated");
+
+                    } else if (action == 'U') {
+                        int uid = getInt(in, "Enter the user ID");
+                        String newUsername = getString(in, "Enter the new username");
+                        String newIntro = getString(in, "Enter the new intro");
+                        if (uid == -1 || newUsername.equals("") || newIntro.equals(""))
+                            continue;
+                        int res = db.updateOneInUser(uid, newUsername, newIntro);
+                        if (res == -1)
+                            continue;
+                        System.out.println("  " + res + " rows updated");
+
+                    } else if (action == 'C') {
+                        int uid = getInt(in, "Enter the user ID");
+                        String newText = getString(in, "Enter the new comment");
+                        if (uid == -1 || newText.equals(""))
+                            continue;
+                        int res = db.updateOneInComment(uid, newText);
+                        if (res == -1)
+                            continue;
+                        System.out.println("  " + res + " rows updated");
+                    } else if (action == 'q') {
+                        break;
+                    }
+                }
 
             } else if (action == 'L') {
                 while (true) {
@@ -498,21 +675,21 @@ public class App {
                     if (action == '?') {
                         likesMenu();
                     } else if (action == 'L') {
-                        int id = getInt(in, "Enter the mID");
-                        if (id == -1)
+                        int mid = getInt(in, "Enter the message ID");
+                        if (mid == -1)
                             continue;
-                        /*int res = db.clearLikes(id);
+                        int res = db.clearRowFromLike(mid);
                         if (res == -1)
                             continue;
-                        System.out.println("  " + res + " rows deleted");*/
+                        System.out.println("  " + res + " rows deleted");
                     } else if (action == 'D') {
-                        int id = getInt(in, "Enter the mID");
-                        if (id == -1)
+                        int mid = getInt(in, "Enter the message ID");
+                        if (mid == -1)
                             continue;
-                        /*int res = db.clearDislikes(id);
+                        int res = db.clearRowFromDislike(mid);
                         if (res == -1)
                             continue;
-                        System.out.println("  " + res + " rows deleted");*/
+                        System.out.println("  " + res + " rows deleted");
                     } else if (action == 'q') {
                         break;
                     }
