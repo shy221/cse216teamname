@@ -391,7 +391,7 @@ public class App {
         // JSON from the body of the request, turn it into a LoginRequest
         // object, extract the user email and password, insert them, and return the
         // if the password is correct.
-        Spark.put("/:uid", (request, response) -> {
+        Spark.put("/:uid/updatepwd", (request, response) -> {
             // NB: if gson.Json fails, Spark will reply with status 500 Internal
             // Server Error
             int idx = Integer.parseInt(request.params("uid"));
@@ -419,7 +419,7 @@ public class App {
          * url/:uid --> user profile: username, email, intro = get, put
          * GET route
          */
-        Spark.get("/:uid", (request, response) -> {
+        Spark.get("/:uid/userprofile", (request, response) -> {
             int idx = Integer.parseInt(request.params("uid"));
             UserProfileRequest req = gson.fromJson(request.body(), UserProfileRequest.class);
             String sk = req.sessionKey;
@@ -448,7 +448,7 @@ public class App {
          */
         // PUT route for updating a row in the DataStore. This is almost
         // exactly the same as POST
-        Spark.put("/:uid", (request, response) -> {
+        Spark.put("/:uid/userprofile", (request, response) -> {
             // If we can't get an ID or can't parse the JSON, Spark will sned
             // a status 500
             int idx = Integer.parseInt(request.params("uid"));

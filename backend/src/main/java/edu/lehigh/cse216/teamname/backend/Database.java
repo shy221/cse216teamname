@@ -114,7 +114,7 @@ public class Database {
             db.mSelectAll = db.mConnection.prepareStatement("SELECT mid, subject FROM tblData");
             db.mSelectOne = db.mConnection.prepareStatement(
                     "SELECT row.*, (SELECT COUNT(*) FROM tblLike WHERE tblLike.mid = row.mid) AS likes, (SELECT COUNT(*) FROM tblDislike WHERE tblDislike.mid = row.mid) AS dislikes FROM (SELECT * from tblData NATURAL JOIN tblUser) AS row WHERE row.mid = ?");
-            db.mUpdateOne = db.mConnection.prepareStatement("UPDATE tblData SET title = ?, message = ? WHERE mid = ?");
+            db.mUpdateOne = db.mConnection.prepareStatement("UPDATE tblData SET subject = ?, message = ? WHERE mid = ?");
             db.mClearLikes = db.mConnection.prepareStatement("DELETE FROM tblLike WHERE mid = ?");
             db.mClearDislikes = db.mConnection.prepareStatement("DELETE FROM tblDislike WHERE mid = ?");
             db.mClearComments = db.mConnection.prepareStatement("DELETE FROM tblComment WHERE mid = ?");
@@ -303,7 +303,6 @@ public class Database {
      * @param message The new message for the row
      * @return a copy of the data in the row, if exists, or null otherwise
      */
-    // I changed updateOne(int id, String subject, String message) because the prepared statement only needs message and id.
     public DataRow updateOne(int mid, String title, String message) {
         try {
             mUpdateOne.setString(1, title);
