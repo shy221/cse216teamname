@@ -10,15 +10,17 @@ class Message {
     int mId;
     //int uid;
     int mLikes;
+    int mDislikes;
     int uId;
 
     /**
      * The string title and contents that comprise this piece of data
      */
     String mTitle;
-    //ring mMessage;//
-    int mDislikes;
-    //JSONArray mComments;
+    String mContent;
+    String cUsername;
+    String mCreated;
+
 
     /**
      * Construct a Message by setting its id, title and content
@@ -27,12 +29,14 @@ class Message {
      * @param title The string title for this piece of data
      * @param content The string contents for this piece of data
      */
-    Message(int mid, int uid, String title, int likes, int dislike){
+    Message(int mid, int uid,  int likes, int dislike, String title, String content, String username, String time){
         mId = mid;
         uId = uid;
         mTitle = title;
         mDislikes = dislike;
         mLikes = likes;
-        //mComments = comments;
+        mContent = content;
+        cUsername = username;
+        mCreated = time;
     }
 }

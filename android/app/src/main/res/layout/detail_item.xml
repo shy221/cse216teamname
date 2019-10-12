@@ -11,6 +11,21 @@
         android:layout_height="wrap_content"
         android:text="" />
     <TextView
+        android:id="@+id/detailItemContent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="" />
+    <TextView
+        android:id="@+id/detailItemTime"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="" />
+    <TextView
+        android:id="@+id/detailItemUsername"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="" />
+    <TextView
         android:id="@+id/detailItemIdu"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

@@ -21,8 +21,10 @@ class DetailListAdapter extends RecyclerView.Adapter<DetailListAdapter.ViewHolde
         TextView mTitle;
         TextView uId;
         TextView mLikes;
-        TextView mComments;
+        TextView mContent;
+        TextView mCreated;
         TextView mDislikes;
+        TextView cUsername;
 
         ViewHolder(View itemView) {
             super(itemView);
@@ -32,7 +34,9 @@ class DetailListAdapter extends RecyclerView.Adapter<DetailListAdapter.ViewHolde
             //this.mContent = (TextView) itemView.findViewById(R.id.detailItemContent);
             this.mLikes = (TextView) itemView.findViewById(R.id.detailItemLikes);
             this.mDislikes = (TextView) itemView.findViewById(R.id.detailItemDislikes);
-            this.mComments = (TextView) itemView.findViewById(R.id.detailItemComments);
+            this.mContent = (TextView) itemView.findViewById(R.id.detailItemContent);
+            this.mCreated= (TextView) itemView.findViewById(R.id.detailItemTime);
+            this.cUsername = (TextView) itemView.findViewById(R.id.detailItemUsername);
         }
     }
 
@@ -70,7 +74,9 @@ class DetailListAdapter extends RecyclerView.Adapter<DetailListAdapter.ViewHolde
         holder.mId.setText(Integer.toString(m.mId));
         holder.uId.setText(Integer.toString(m.uId));
         holder.mTitle.setText(m.mTitle);
-        //holder.mContent.setText(m.mContent);
+        holder.mContent.setText(m.mContent);
+        holder.mCreated.setText(m.mCreated);
+        holder.cUsername.setText(m.cUsername);
         holder.mLikes.setText(Integer.toString(m.mLikes));
         holder.mDislikes.setText(Integer.toString(m.mDislikes));
         //String Comments = CommentSetText(m.mComments);

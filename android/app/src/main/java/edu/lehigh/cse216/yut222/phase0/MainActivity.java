@@ -147,12 +147,11 @@ public class MainActivity extends AppCompatActivity {
                     //String content = data.getJSONObject(i).getString("message");
                     int likes = data.getJSONObject(i).getInt("mLikes");
                     int dislikes = data.getJSONObject(i).getInt("mDislikes");
-                    String content = "made up content";
                     //int likes = 0;
                     //ArrayList<Comment> comments = new ArrayList<>();
                     //JSONArray comments = data.getJSONObject(i).getJSONArray("mComments");
                     //ArrayList<String> comments = data.getJSONObject(i).get("mComments");  //unsafe casting
-                    mData.add(new Message(mid, uid, title, likes, dislikes));
+                    mData.add(new Message(mid, uid, likes, dislikes, title, "unknown", "unknown", "unknown"));
                 }
             }else{
                 Log.d("shy221","mStatus is not ok.");

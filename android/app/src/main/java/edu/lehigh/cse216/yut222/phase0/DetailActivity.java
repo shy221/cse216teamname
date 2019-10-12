@@ -47,31 +47,51 @@ public class DetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
         Intent intent = getIntent();
-
         int mId = intent.getIntExtra("message id", 404);
-        int uId = intent.getIntExtra("user id", 404);
+        final String url = "https://arcane-refuge-67249.herokuapp.com/messages/" + mId;
+        sharedpreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        final Message m = new Message(0,0,0,0, "", "", "", "");
+        /*int uId = intent.getIntExtra("user id", 404);
         String mTitle = intent.getStringExtra("message title");
         final int mLikes = intent.getIntExtra("message likes", 404);
-        final int mDislikes = intent.getIntExtra("message dislikes", 404);
+        final int mDislikes = intent.getIntExtra("message dislikes", 404);*/
+        Map<String, String> mapdetail = new HashMap<>();
+        mapdetail.put("uEmail", sharedpreferences.getString("prefEmail", "default"));
+        mapdetail.put("sessionKey", sharedpreferences.getString("prefKey", "default"));
+        Log.e("email", sharedpreferences.getString("prefEmail", "default"));
+        Log.e("key", sharedpreferences.getString("prefKey", "default"));
+        JSONObject d = new JSONObject(mapdetail);
+        JsonObjectRequest listR = new JsonObjectRequest(Request.Method.POST, url, d,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        populateDetailFromVolley(response);
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e("zex220", "Listing all Details didn't work!");
+            }
+        });
+        MySingleton.getInstance(this).addToRequestQueue(listR);
+        //showDetail();
+
+
 
         //ArrayList<Comment> mComments = (ArrayList<Comment>)intent.getSerializableExtra("message comments");
         /*Bundle args = intent.getBundleExtra("BUNDLE");
         ArrayList<Comment> mComments = (ArrayList<Comment>) args.getSerializable("ARRAYLIST"); //Casting?
         */
 
-        String url = "https://arcane-refuge-67249.herokuapp.com/messages/";
-        //urlDetail leads to route of a specific message
-        final String urlDetail = url + mId;
         final String urlComments =  "https://arcane-refuge-67249.herokuapp.com/" + mId + "/listcomments";
-        final String urlLikes =  "https://arcane-refuge-67249.herokuapp.com/" + mId + "/likes";
+        final String urlLikes =  url + mId + "/likes";
         Map<String, String> map = new HashMap<>();
-        sharedpreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         map.put("uEmail", sharedpreferences.getString("prefEmail", "default"));
         map.put("sessionKey", sharedpreferences.getString("prefKey", "default"));
         JSONObject c = new JSONObject(map);
 
         //get comments from route
-        JsonObjectRequest listR = new JsonObjectRequest(Request.Method.POST, urlComments, c,
+        JsonObjectRequest listC = new JsonObjectRequest(Request.Method.POST, urlComments, c,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
@@ -80,16 +100,15 @@ public class DetailActivity extends AppCompatActivity {
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.e("zex220", "Listing all Comments didn't work!");
+                Log.e("zex220", "Listing all comments didn't work!");
             }
         });
-        MySingleton.getInstance(this).addToRequestQueue(listR);
+        MySingleton.getInstance(this).addToRequestQueue(listC);
         Log.e("zex220","outside request");
 
         //final Message m = new Message(mId, uId, mTitle, mLikes, mDislikes);
-        mData.add(new Message(mId, uId, mTitle, mLikes, mDislikes));
+        //mData.add(new Message(mId, uId, mTitle, mLikes, mDislikes));
         //show detail message SY
-        showDetail();
         //showComment();
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -141,41 +160,26 @@ public class DetailActivity extends AppCompatActivity {
         // The Like button returns updated number of likes to the caller
         //can be developed into image button with "liked" effect
         // using the two pngs I provide in res/drawable SY
-        /*Button bLike = findViewById(R.id.like);
+        Button bLike = findViewById(R.id.like);
         bLike.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                StringRequest listR = new StringRequest(Request.Method.PUT, urlList,
-                        new Response.Listener<String>() {
-                            @Override
-                            public void onResponse(String response) {
-                                populateListFromVolley(response);
-
-                            }
-                        }, new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.e("shy221", "Listing all messages didn't work!");
-                    }
-                });
-                MySingleton.getInstance(this).addToRequestQueue(listR);
-
                 //call like request function
-                /*clickCount++;
+                clickCount++;
+                Log.e("clickcount",Integer.toString(clickCount));
                 if((clickCount % 2) == 1) {
-                    mData.get(0).mLikes++;
+                    postLike(urlLikes);
+                    Toast toast = Toast.makeText(DetailActivity.this, "liked", Toast.LENGTH_LONG);
+                    toast.show();
                 }
                 else if((clickCount % 2) == 0){
-                    mData.get(0).mLikes--;
-                }*/
-
-
-                //Log.d("shy221 clickCount", "" + clickCount);
-                //postLike(urlDetail, clickCount);
-                /*showDetail();
+                    //deleteLike(urlLikes);
+                    Toast toast = Toast.makeText(DetailActivity.this, "canceled like", Toast.LENGTH_LONG);
+                    toast.show();
+                }
             }
         });
-*/
+
 
         // The Cancel button returns to the caller without sending any data
         Button bCancel = (Button) findViewById(R.id.detailCancel);
@@ -191,8 +195,8 @@ public class DetailActivity extends AppCompatActivity {
         bOK.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                postLike(urlDetail, clickCount);
-                deleteMessage(urlDetail, deleteFlag);
+                //postLike(urlDetail);
+                deleteMessage(url, deleteFlag);
                 //setResult(Activity.RESULT_CANCELED);
                 finish();
             }
@@ -202,6 +206,7 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     private void showDetail(){
+        Log.e("showDetail", "im in show detail now");
         RecyclerView rv = (RecyclerView) findViewById(R.id.message_detail_view);
         rv.setLayoutManager(new LinearLayoutManager(this));
         DetailListAdapter adapter = new DetailListAdapter(this, mData);
@@ -215,9 +220,9 @@ public class DetailActivity extends AppCompatActivity {
         rv.setAdapter(adapter);
     }*/
 
-    private void deleteMessage(String urlD, int deleteFlag){
+    private void deleteMessage(String urlD, int deleteFlag) {
         //post msg id = urlDelete if deleteFlag is marked
-        if(deleteFlag == 1) {
+        if (deleteFlag == 1) {
             StringRequest deleteR = new StringRequest(Request.Method.DELETE, urlD,
                     new Response.Listener<String>() {
                         @Override
@@ -232,18 +237,53 @@ public class DetailActivity extends AppCompatActivity {
             });
             MySingleton.getInstance(this).addToRequestQueue(deleteR);
         }
-        }
+    }
 
-    private void postLike(String urlD, int likes){
+    private void postLike(String urlL){
+        Log.e("postlike", "map");
         //one link to update likes
-        Map<String, Integer> map = new HashMap<>();
-        map.put("mLikes", likes);
+        Map<String, Object> map = new HashMap<>();
+        //map.put("uid", Integer.parseInt(sharedpreferences.getString("uId","default")));
+        map.put("uid", 5);
+        map.put("sessionKey", sharedpreferences.getString("sessionKey","default"));
+        map.put("uEmail", sharedpreferences.getString("uEmail","default"));
+
         JSONObject m = new JSONObject(map);
+        Log.e("postlike", "hash successfully");
         JsonObjectRequest likeR = new JsonObjectRequest(Request.Method.PUT,
-                urlD+"/likes", m, new Response.Listener<JSONObject>() {
+                urlL, m, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
-                Log.e("message", "Like the message here!");
+                try{
+                if(response.getString("mStatus").equals("ok")) {
+                    Log.e("message", "Like the message here!");
+                }else{
+                    Log.e("like", "error status");
+                }}catch (final JSONException e){
+                    Log.e("x","exception");
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e("shy221", "post likes went wrong.");
+            }
+        });
+        MySingleton.getInstance(this).addToRequestQueue(likeR);
+    }
+    private void deleteLike(String urlL){
+        //one link to update likes
+        Map<String, Object> map = new HashMap<>();
+        map.put("uId", Integer.parseInt(sharedpreferences.getString("uId","default")));
+        map.put("sessionKey", sharedpreferences.getString("sessionKey","default"));
+        map.put("uEmail", sharedpreferences.getString("uEmail","default"));
+
+        JSONObject m = new JSONObject(map);
+        JsonObjectRequest likeR = new JsonObjectRequest(Request.Method.DELETE,
+                urlL, m, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                Log.e("message", "UNLike the message here!");
             }
         }, new Response.ErrorListener() {
             @Override
@@ -255,16 +295,16 @@ public class DetailActivity extends AppCompatActivity {
     }
 
 
-    private void populateCommentFromVolley(JSONObject response){
+    private void populateCommentFromVolley(JSONObject response) {
         try {
             mComments.clear();
             String status;
             status = response.getString("mStatus");
             //this is to check if status went wrong
             // Log.e("shy221", status);
-            if(status.equals("ok")){
+            if (status.equals("ok")) {
                 JSONArray data = response.getJSONArray("mData");
-                for (int i = 0; i < data.length(); i++){
+                for (int i = 0; i < data.length(); i++) {
                     int mId = data.getJSONObject(i).getInt("mId");
                     int cId = data.getJSONObject(i).getInt("cId");
                     int uId = data.getJSONObject(i).getInt("uId");
@@ -273,15 +313,45 @@ public class DetailActivity extends AppCompatActivity {
                     mComments.add(new Comment(cId, uId, mId, text, username));
                     Log.e("populate comments", "got comments");
                 }
-            }else{
-                Log.d("get comment","mStatus is not ok.");
+            } else {
+                Log.d("get comment", "mStatus is not ok.");
             }
         } catch (final JSONException e) {
             Log.d("get comment", "Error parsing JSON file: " + e.getMessage());
             return;
         }
         Log.d("zex220", "Successfully parsed JSON file.");
-/*
+    }
+    private void populateDetailFromVolley(JSONObject response) {
+        try {
+            mData.clear();
+            String status;
+            status = response.getString("mStatus");
+            //this is to check if status went wrong
+            // Log.e("shy221", status);
+            if (status.equals("ok")) {
+                JSONObject data = response.getJSONObject("mData");
+                int mId = data.getInt("mId");
+                int uId = data.getInt("uId");
+                String title = data.getString("mTitle");
+                String content = data.getString("mContent");
+                int likes = data.getInt("mLikes");
+                int dislikes = data.getInt("mDislikes");
+                String username = data.getString("cUsername");
+                String time = data.getString("mCreated");
+                mData.add(new Message(mId, uId, likes, dislikes, title, content, username, time));
+                Log.e("populate detail", "got details");
+            } else {
+                Log.d("get detail", "mStatus is not ok.");
+            }
+        } catch (final JSONException e) {
+            Log.d("get detail", "Error parsing JSON file: " + e.getMessage());
+            return;
+        }
+        Log.d("/messages/mid", "Successfully parsed JSON file.");
+        showDetail();
+    }
+        /*
         RecyclerView rv = findViewById(R.id.comment_list_view);
         rv.setLayoutManager(new LinearLayoutManager(this));
         CommentListAdapter adapter = new CommentListAdapter(this, mComments);
@@ -304,7 +374,7 @@ public class DetailActivity extends AppCompatActivity {
                 //change this function
             }
         });*/
-    }
+
 
 //might need refresh function depending on your design EY
 
