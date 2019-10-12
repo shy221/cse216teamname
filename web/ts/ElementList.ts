@@ -1,6 +1,4 @@
-// a global for the main ElementList of the program.  See newEntryForm for 
-// explanation
-var mainList: ElementList;
+
 
 /**
  * The ElementList Singleton provides a way of displaying all of the data 
