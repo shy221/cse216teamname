@@ -100,7 +100,7 @@ public class App {
         // ":id" isn't a number, Spark will reply with a status 500 Internal
         // Server Error.  Otherwise, we have an integer, and the only possible 
         // error is that it doesn't correspond to a row with data.
-        Spark.get("/messages/:mid", (request, response) -> {
+        Spark.post("/messages/:mid", (request, response) -> {
             int mid = Integer.parseInt(request.params("mid"));
             // ensure status 200 OK, with a MIME type of JSON
             response.status(200);
@@ -421,7 +421,7 @@ public class App {
                 // ensure status 200 OK, with a MIME type of JSON
                 response.status(200);
                 response.type("application/json");
-                //add new functoin based on this
+                //add new function based on this
                 DataRowUserProfile data = db.uReadOne(idx);
                 if (data == null) {
                     return gson.toJson(new StructuredResponse("error", idx + " not found", null));
@@ -477,7 +477,7 @@ public class App {
         // ":uid" isn't a number, Spark will reply with a status 500 Internal
         // Server Error.  Otherwise, we have an integer, and the only possible
         // error is that it doesn't correspond to a row with data.
-        Spark.get("/:mid/comments", (request, response) -> {
+        Spark.post("/:mid/listcomments", (request, response) -> {
             //?? params =
             int mid = Integer.parseInt(request.params("mid"));
             CommentRequest req = gson.fromJson(request.body(), CommentRequest.class);

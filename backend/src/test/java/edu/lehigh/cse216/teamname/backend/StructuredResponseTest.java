@@ -33,10 +33,14 @@
 //    public void testConstructor() {
 //        String title = "Test Title";
 //        String content = "Test Content";
-//        int id = 17;
+//        int mid = 17;
+//        int uid = 4;
 //        int likes = 5;
-//        Date date= new Date();
-//        DataRow d = new DataRow(id, title, content, likes, date);
+//        int dislikes = 10;
+//        String username = "Eva";
+//        Date date = new Date();
+//        long datelong = date.getTime();
+//        DataRow d = new DataRow(mid, uid, username, title, content, likes, dislikes,  date);
 //
 //        String status = "ok";
 //        String message = "";
