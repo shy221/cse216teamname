@@ -3,3 +3,6 @@ target/*
 *.project
 *.settings
 .vscode/*
+sendgrid.env
+sendgrid.env
+sendgrid.env
