@@ -33,7 +33,7 @@ class UserProfile {
     public static get(){
         $.ajax({
             type: "POST",
-            url: "/" + uid,
+            url: "/" + uid + "/userprofile",
             dataType: "json",
             data: JSON.stringify({ uEmail: uemail, sessionKey: ukey }),
             success: UserProfile.show

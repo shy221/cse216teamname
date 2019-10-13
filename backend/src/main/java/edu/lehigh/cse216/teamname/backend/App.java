@@ -419,7 +419,7 @@ public class App {
          * url/:uid --> user profile: username, email, intro = get, put
          * GET route
          */
-        Spark.get("/:uid/userprofile", (request, response) -> {
+        Spark.post("/:uid/userprofile", (request, response) -> {
             int idx = Integer.parseInt(request.params("uid"));
             UserProfileRequest req = gson.fromJson(request.body(), UserProfileRequest.class);
             String sk = req.sessionKey;
