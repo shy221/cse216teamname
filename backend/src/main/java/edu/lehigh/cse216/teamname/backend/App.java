@@ -2,6 +2,8 @@ package edu.lehigh.cse216.teamname.backend;
 
 // Import the Spark package, so that we can make use of the "get" function to 
 // create an HTTP GET route
+
+//import bcrypt do generate salt and hash password
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import spark.Spark;
 
@@ -95,12 +97,12 @@ public class App {
          * GET route
          */
         // GET route that returns everything for a single row in the Database.
-        // The ":id" suffix in the first parameter to get() becomes 
-        // request.params("id"), so that we can get the requested row ID.  If 
-        // ":id" isn't a number, Spark will reply with a status 500 Internal
+        // The ":mid" suffix in the first parameter to get() becomes
+        // request.params("mid"), so that we can get the requested row ID.  If
+        // ":mid" isn't a number, Spark will reply with a status 500 Internal
         // Server Error.  Otherwise, we have an integer, and the only possible 
         // error is that it doesn't correspond to a row with data.
-        Spark.get("/messages/:mid", (request, response) -> {
+        Spark.post("/messages/:mid", (request, response) -> {
             int mid = Integer.parseInt(request.params("mid"));
             // ensure status 200 OK, with a MIME type of JSON
             response.status(200);
@@ -169,7 +171,7 @@ public class App {
         // PUT route for updating a row in the Database. This is almost
         // exactly the same as POST
         Spark.put("/messages/:id", (request, response) -> {
-            // If we can't get an ID or can't parse the JSON, Spark will sned
+            // If we can't get an ID or can't parse the JSON, Spark will send
             // a status 500
             int idx = Integer.parseInt(request.params("id"));
             SimpleRequest req = gson.fromJson(request.body(), SimpleRequest.class);
@@ -196,16 +198,15 @@ public class App {
          * updating likes after noticing user hasn't clicked like yet.
          * PUT route
          */
-        //modify it
         //PUT route for updating the value of likes in a row in the Database
-        Spark.put("/messages/:id/likes", (request, response) -> {
+        Spark.put("/messages/:mid/likes", (request, response) -> {
             // If we can't get an ID or can't parse the JSON, Spark will sned
             // a status 500
             int mid = Integer.parseInt(request.params("mid"));
-            int uid = Integer.parseInt(request.params("uid"));
             SimpleRequest req = gson.fromJson(request.body(), SimpleRequest.class);
             String sk = req.sessionKey;
             String em = req.uEmail;
+            int uid = req.uid;
             if (sk.equals(session.get(em))){
                 // ensure status 200 OK, with a MIME of JSON
                 response.status(200);
@@ -228,20 +229,26 @@ public class App {
          * PUT route
          */
         //PUT route for updating the value of dislikes in a row in the Database
-        Spark.put("/messages/:id/dislikes", (request, response) -> {
+        Spark.put("/messages/:mid/dislikes", (request, response) -> {
             // If we can't get an ID or can't parse the JSON, Spark will sned
             // a status 500
             int mid = Integer.parseInt(request.params("mid"));
-            int uid = Integer.parseInt(request.params("uid"));
-            // ensure status 200 OK, with a MIME of JSON
-            response.status(200);
-            response.type("application/json");
-            DataRow result = db.doDislikes(uid, mid);
-            if (result == null) {
-                return gson.toJson(new StructuredResponse("error", "unable to update dislikes of" + mid, null));
-            } else {
-                return gson.toJson(new StructuredResponse("ok", null, result));
+            SimpleRequest req = gson.fromJson(request.body(), SimpleRequest.class);
+            String sk = req.sessionKey;
+            String em = req.uEmail;
+            int uid = req.uid;
+            if (sk.equals(session.get(em))){
+                // ensure status 200 OK, with a MIME of JSON
+                response.status(200);
+                response.type("application/json");
+                DataRow result = db.doDislikes(uid, mid);
+                if (result == null) {
+                    return gson.toJson(new StructuredResponse("error", "unable to update dislikes of" + mid, null));
+                } else {
+                    return gson.toJson(new StructuredResponse("ok", null, result));
+                }
             }
+            return gson.toJson(new StructuredResponse("error", "session key not correct..", null));
         });
 
         /**
@@ -252,14 +259,14 @@ public class App {
         //phase 2 delete like
         //when a user already liked the message, the next click user has will reflect as canceling the like
         //DELETE route for updating the value of likes in a row in teh Database
-        Spark.delete("/messages/:id/likes", (request, response) -> {
+        Spark.delete("/messages/:mid/likes", (request, response) -> {
             // If we can't get an ID or can't parse the JSON, Spark will sned
             // a status 500
-            int uid = Integer.parseInt(request.params("uid"));
             int mid = Integer.parseInt(request.params("mid"));
             SimpleRequest req = gson.fromJson(request.body(), SimpleRequest.class);
             String sk = req.sessionKey;
             String em = req.uEmail;
+            int uid = req.uid;
             if (sk.equals(session.get(em))){
                 // ensure status 200 OK, with a MIME of JSON
                 response.status(200);
@@ -283,14 +290,14 @@ public class App {
          */
         //when a user already disliked the message, the next click user has will reflect as canceling the dislike
         //DELETE route for updating the value of likes in a row in teh Database
-        Spark.delete("/messages/:id/dislikes", (request, response) -> {
+        Spark.delete("/messages/:mid/dislikes", (request, response) -> {
             // If we can't get an ID or can't parse the JSON, Spark will sned
             // a status 500
-            int uid = Integer.parseInt(request.params("uid"));
             int mid = Integer.parseInt(request.params("mid"));
             SimpleRequest req = gson.fromJson(request.body(), SimpleRequest.class);
             String sk = req.sessionKey;
             String em = req.uEmail;
+            int uid = req.uid;
             if (sk.equals(session.get(em))){
                 // ensure status 200 OK, with a MIME of JSON
                 response.status(200);
@@ -306,9 +313,9 @@ public class App {
         });
 
         // DELETE route for removing a row from the Database
-        Spark.delete("/messages/:id", (request, response) -> {
+        Spark.delete("/messages/:mid", (request, response) -> {
             // If we can't get an ID, Spark will sned a status 500
-            int idx = Integer.parseInt(request.params("id"));
+            int idx = Integer.parseInt(request.params("mid"));
             SimpleRequest req = gson.fromJson(request.body(), SimpleRequest.class);
             String sk = req.sessionKey;
             String em = req.uEmail;
@@ -384,7 +391,7 @@ public class App {
         // JSON from the body of the request, turn it into a LoginRequest
         // object, extract the user email and password, insert them, and return the
         // if the password is correct.
-        Spark.put("/:uid", (request, response) -> {
+        Spark.put("/:uid/updatepwd", (request, response) -> {
             // NB: if gson.Json fails, Spark will reply with status 500 Internal
             // Server Error
             int idx = Integer.parseInt(request.params("uid"));
@@ -412,7 +419,7 @@ public class App {
          * url/:uid --> user profile: username, email, intro = get, put
          * GET route
          */
-        Spark.get("/:uid", (request, response) -> {
+        Spark.get("/:uid/userprofile", (request, response) -> {
             int idx = Integer.parseInt(request.params("uid"));
             UserProfileRequest req = gson.fromJson(request.body(), UserProfileRequest.class);
             String sk = req.sessionKey;
@@ -421,7 +428,7 @@ public class App {
                 // ensure status 200 OK, with a MIME type of JSON
                 response.status(200);
                 response.type("application/json");
-                //add new functoin based on this
+                //add new function based on this
                 DataRowUserProfile data = db.uReadOne(idx);
                 if (data == null) {
                     return gson.toJson(new StructuredResponse("error", idx + " not found", null));
@@ -441,7 +448,7 @@ public class App {
          */
         // PUT route for updating a row in the DataStore. This is almost
         // exactly the same as POST
-        Spark.put("/:uid", (request, response) -> {
+        Spark.put("/:uid/userprofile", (request, response) -> {
             // If we can't get an ID or can't parse the JSON, Spark will sned
             // a status 500
             int idx = Integer.parseInt(request.params("uid"));
@@ -477,7 +484,7 @@ public class App {
         // ":uid" isn't a number, Spark will reply with a status 500 Internal
         // Server Error.  Otherwise, we have an integer, and the only possible
         // error is that it doesn't correspond to a row with data.
-        Spark.get("/:mid/comments", (request, response) -> {
+        Spark.post("/:mid/listcomments", (request, response) -> {
             //?? params =
             int mid = Integer.parseInt(request.params("mid"));
             CommentRequest req = gson.fromJson(request.body(), CommentRequest.class);
