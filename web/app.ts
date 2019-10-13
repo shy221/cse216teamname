@@ -30,6 +30,7 @@ $(document).ready(function () {
     EditEntryForm.refresh();
     ShowDetail.refresh();
     Login.refresh();
+    UserProfile.refresh();
     // Create the object that controls the "Edit Entry" form
     // set up initial UI state
     $("#editElement").hide();
