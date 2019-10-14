@@ -87,7 +87,13 @@ public class App {
             // ensure status 200 OK, with a MIME type of JSON
             response.status(200);
             response.type("application/json");
-            return gson.toJson(new StructuredResponse("ok", null, db.readAll()));
+            SimpleRequest req = gson.fromJson(request.body(), SimpleRequest.class);
+            String sk = req.sessionKey;
+            String em = req.uEmail;
+            if (sk.equals(session.get(em))){
+                return gson.toJson(new StructuredResponse("ok", null, db.readAll()));
+            }
+            return gson.toJson(new StructuredResponse("error", "session key not correct..", null));
         });
 
         /**
@@ -419,7 +425,7 @@ public class App {
          * url/:uid --> user profile: username, email, intro = get, put
          * GET route
          */
-        Spark.get("/:uid/userprofile", (request, response) -> {
+        Spark.post("/:uid/userprofile", (request, response) -> {
             int idx = Integer.parseInt(request.params("uid"));
             UserProfileRequest req = gson.fromJson(request.body(), UserProfileRequest.class);
             String sk = req.sessionKey;
