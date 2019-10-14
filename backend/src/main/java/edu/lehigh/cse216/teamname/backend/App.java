@@ -87,7 +87,13 @@ public class App {
             // ensure status 200 OK, with a MIME type of JSON
             response.status(200);
             response.type("application/json");
-            return gson.toJson(new StructuredResponse("ok", null, db.readAll()));
+            SimpleRequest req = gson.fromJson(request.body(), SimpleRequest.class);
+            String sk = req.sessionKey;
+            String em = req.uEmail;
+            if (sk.equals(session.get(em))){
+                return gson.toJson(new StructuredResponse("ok", null, db.readAll()));
+            }
+            return gson.toJson(new StructuredResponse("error", "session key not correct..", null));
         });
 
         /**
@@ -111,8 +117,8 @@ public class App {
             DataRow data = db.readOne(mid);
             String sk = req.sessionKey;
             String em = req.uEmail;
-            System.out.println(em);
-            System.out.println(sk);
+//            System.out.println(em);
+//            System.out.println(sk);
             if (sk.equals(session.get(em))){
                 if (data == null) {
                     return gson.toJson(new StructuredResponse("error", mid + " not found", null));
@@ -378,7 +384,7 @@ public class App {
                     return gson.toJson(new StructuredResponse("ok", "Login success!", userInfo));
             }
             else{
-                return gson.toJson(new StructuredResponse("error", email + " not found", null));
+                return gson.toJson(new StructuredResponse("error", email + " not found", userInfo));
             }
         });
 
@@ -398,10 +404,14 @@ public class App {
             LoginRequest req = gson.fromJson(request.body(), LoginRequest.class);
             String sk = req.sessionKey;
             String em = req.uEmail;
+            String pwd = req.uPassword;
+            String salt = db.matchPwd(em).uSalt;
+            String hash = BCrypt.hashpw(pwd, salt);
+            System.out.println(hash);
             if (sk.equals(session.get(em))){
                 response.status(200);
                 response.type("application/json");
-                int result = db.uUpdatePwd(idx, req.uSalt, req.uPassword);
+                int result = db.uUpdatePwd(idx, salt, hash);
                 if (result == -1) {
                     return gson.toJson(new StructuredResponse("error", "unable to update password " + idx, null));
                 } else {
@@ -419,7 +429,7 @@ public class App {
          * url/:uid --> user profile: username, email, intro = get, put
          * GET route
          */
-        Spark.get("/:uid/userprofile", (request, response) -> {
+        Spark.post("/:uid/userprofile", (request, response) -> {
             int idx = Integer.parseInt(request.params("uid"));
             UserProfileRequest req = gson.fromJson(request.body(), UserProfileRequest.class);
             String sk = req.sessionKey;
