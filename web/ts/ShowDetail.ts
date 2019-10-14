@@ -66,7 +66,7 @@ class ShowDetail {
      */
     private static update(data: any) {
         // Remove the data, if it exists
-        $("#" + ShowDetail.NAME).remove();
+        //$("#" + ShowDetail.NAME).remove();
         $("body").append(Handlebars.templates[ShowDetail.NAME + ".hb"](data));
         $("#" + ShowDetail.NAME + "-userprofilebtn").click(ShowDetail.other);
         $("#" + ShowDetail.NAME + "-commentsbtn").click(ShowDetail.postComments);
@@ -83,9 +83,12 @@ class ShowDetail {
         $("#" + ShowDetail.NAME + "-title").val("");
         $("#" + ShowDetail.NAME + "-username").val("");
         $("#" + ShowDetail.NAME + "-message").val("");
-        $("#" + ShowDetail.NAME + "-editId").val("");
+        //$("#" + ShowDetail.NAME + "-editId").val("");
+        $("#" + ShowDetail.NAME + "-detailId").val("");
+        $("#" + ShowDetail.NAME + "-detailPostUid").val("");
         $("#" + ShowDetail.NAME + "-created").text("");
         $("#" + ShowDetail.NAME + "-likebtn").text("");
+        $("#" + ShowDetail.NAME).remove();
         $("#" + ShowDetail.NAME).modal("hide");
     }
 
@@ -96,6 +99,7 @@ class ShowDetail {
      * with those ways of making the modal disappear.
      */
     public static show(data: any) {
+        $("#" + ShowDetail.NAME + "-detailId").val(data.mData.mId);
         let id = "" + $("#" + ShowDetail.NAME + "-detailId").val();
         $.ajax({
             type: "POST",
@@ -107,11 +111,10 @@ class ShowDetail {
             //如果refresh 不行就改回listAllComments
         });
         $("#" + ShowDetail.NAME + "-title").text(data.mData.mTitle);
-        //这个mName名字需要和backend确认
         $("#" + ShowDetail.NAME + "-username").text(data.mData.mName);
         $("#" + ShowDetail.NAME + "-message").val(data.mData.mContent);
-        $("#" + ShowDetail.NAME + "-detailId").val(data.mData.mId);
-        $("#" + ShowDetail.NAME + "-detailPostUid").val(data.mData.mId);
+        
+        $("#" + ShowDetail.NAME + "-detailPostUid").val(data.mData.uId);
         $("#" + ShowDetail.NAME + "-created").text(data.mData.mCreated);
         $("#" + ShowDetail.NAME + "-likebtn").text("Like: " + data.mData.mLikes);
         $("#" + ShowDetail.NAME).modal("show");
@@ -213,7 +216,7 @@ class ShowDetail {
     }
 
     private static other() {
-        let uid = "" + $("#" + ShowDetail.NAME + "detailPostUid").val();
+        let uid = "" + $("#" + ShowDetail.NAME + "-detailPostUid").val();
         $.ajax({
             type: "POST",
             url: "/" + uid,

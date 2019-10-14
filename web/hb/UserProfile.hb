@@ -5,8 +5,6 @@
                 <h4 class="modal-title">User Profile</h4>
             </div>
             <div class="modal-body">
-                <label for="UserProfile-id">User ID</label>
-                <span id="UserProfile-id"></span>
                 <label for="UserProfile-name">User name</label>
                 <span id="UserProfile-name"></span>
                 <label for="UserProfile-email">User Email</label>
