@@ -83,7 +83,7 @@ public class DetailActivity extends AppCompatActivity {
         ArrayList<Comment> mComments = (ArrayList<Comment>) args.getSerializable("ARRAYLIST"); //Casting?
         */
 
-        final String urlComments =  "https://arcane-refuge-67249.herokuapp.com/" + mId + "/listcomments";
+        final String urlComments =  "https://arcane-refuge-67249.herokuapp.com/" + "1" + "/listcomments";
         final String urlLikes =  url + mId + "/likes";
         Map<String, String> map = new HashMap<>();
         map.put("uEmail", sharedpreferences.getString("prefEmail", "default"));
@@ -213,13 +213,13 @@ public class DetailActivity extends AppCompatActivity {
         DetailListAdapter adapter = new DetailListAdapter(this, mData);
         rv.setAdapter(adapter);
     }
-    /*private void showComment(){
+    private void showComment(){
         Log.e("showComment","got in");
         RecyclerView rv = findViewById(R.id.comment_list_view);
         rv.setLayoutManager(new LinearLayoutManager(this));
         CommentListAdapter adapter = new CommentListAdapter(this, mComments);
         rv.setAdapter(adapter);
-    }*/
+    }
 
     private void deleteMessage(String urlD, int deleteFlag) {
         //post msg id = urlDelete if deleteFlag is marked
@@ -359,7 +359,7 @@ public class DetailActivity extends AppCompatActivity {
             return;
         }
         Log.d("/messages/mid", "Successfully parsed JSON file.");
-        showDetail();
+        //showDetail();
     }
         /*
         RecyclerView rv = findViewById(R.id.comment_list_view);

@@ -19,6 +19,12 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+        <Button
+            android:id="@+id/Logout"
+            android:layout_width="191dp"
+            android:layout_height="50dp"
+            android:text="Logout"
+            android:onClick="logout"/>
     </RelativeLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

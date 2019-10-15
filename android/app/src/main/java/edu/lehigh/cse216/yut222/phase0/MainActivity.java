@@ -51,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
      * mData holds the data we get from Volley
      */
     ArrayList<Message> mData = new ArrayList<>();
+
     /*public static final String MyPREFERENCES = "MyPrefs";
     public static final String PrefId = "prefId";
     public static final String PrefName = "prefName";
@@ -69,16 +70,16 @@ public class MainActivity extends AppCompatActivity {
         Context context = MainActivity.this;
         sharedpreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         //String PrefKey = sharedpreferences.getString("prefKey", "default");
-        String PrefKey = sharedpreferences.getString("prefKey", "default");
-        Log.e("main page session key", PrefKey);
-        Toast toast = Toast.makeText(context, PrefKey, Toast.LENGTH_LONG);
+        String welcomeMessage = "welcome, " + sharedpreferences.getString("prefName", "default");
+        Log.e("session key:", sharedpreferences.getString("prefKey", "default"));
+        Toast toast = Toast.makeText(context, welcomeMessage, Toast.LENGTH_LONG);
         toast.show();
 
         //SY
         // Instantiate the RequestQueue.
         RequestQueue queue = MySingleton.getInstance(this.getApplicationContext()).getRequestQueue();
         //one to show all message
-        String urlList = "https://arcane-refuge-67249.herokuapp.com/messages";
+        String urlList = "https://arcane-refuge-67249.herokuapp.com/listmessages";
         //only functional, nothing to display,
         //SEE DETAIL ACTIVITY
         //one link to update message content
@@ -102,14 +103,16 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-        //SY
-        //post msg id and get message  = urlList
-        StringRequest listR = new StringRequest(Request.Method.GET, urlList,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        populateListFromVolley(response);
+        Map<String, String> map = new HashMap<>();
+        map.put("uEmail", sharedpreferences.getString("prefEmail","default"));
+        map.put("sessionKey", sharedpreferences.getString("prefKey", "default"));
+        JSONObject m = new JSONObject(map);
 
+        JsonObjectRequest listR = new JsonObjectRequest(Request.Method.POST, urlList, m,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        populateListFromVolley(response);
                     }
                 }, new Response.ErrorListener() {
             @Override
@@ -130,16 +133,15 @@ public class MainActivity extends AppCompatActivity {
 
 
     //modified method to list all messages
-    private void populateListFromVolley(String response){
+    private void populateListFromVolley(JSONObject response){
         try {
             mData.clear();
-            JSONObject obj = new JSONObject(response);
             String status;
-            status = obj.getString("mStatus");
+            status = response.getString("mStatus");
             //this is to check if status went wrong
             // Log.e("shy221", status);
             if(status.equals("ok")){
-                JSONArray data = obj.getJSONArray("mData");
+                JSONArray data = response.getJSONArray("mData");
                 for (int i = 0; i < data.length(); i++){
                     int mid = data.getJSONObject(i).getInt("mId");
                     int uid = data.getJSONObject(i).getInt("uId");
@@ -232,6 +234,10 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Map<String, String> map = new HashMap<>();
+        map.put("uEmail", sharedpreferences.getString("prefEmail","default"));
+        map.put("sessionKey", sharedpreferences.getString("prefKey", "default"));
+        JSONObject m = new JSONObject(map);
         // Check which request we're responding to
         if (requestCode == 789) {
             // Make sure the request was successful
@@ -241,10 +247,10 @@ public class MainActivity extends AppCompatActivity {
 //                Toast.makeText(MainActivity.this, data.getStringExtra("title") + data.getStringExtra("content"), Toast.LENGTH_LONG).show();
 
                 //refresh
-                StringRequest listR = new StringRequest(Request.Method.GET,"https://arcane-refuge-67249.herokuapp.com/messages" ,
-                        new Response.Listener<String>() {
+                JsonObjectRequest listR = new JsonObjectRequest(Request.Method.POST,"https://arcane-refuge-67249.herokuapp.com/listmessages" , m,
+                        new Response.Listener<JSONObject>() {
                             @Override
-                            public void onResponse(String response) {
+                            public void onResponse(JSONObject response) {
                                 populateListFromVolley(response);
 
                             }
@@ -265,10 +271,10 @@ public class MainActivity extends AppCompatActivity {
 //                Toast.makeText(MainActivity.this, data.getStringExtra("title") + data.getStringExtra("content"), Toast.LENGTH_LONG).show();
 
                 //refresh
-                StringRequest listR = new StringRequest(Request.Method.GET,"https://arcane-refuge-67249.herokuapp.com/messages" ,
-                        new Response.Listener<String>() {
+                JsonObjectRequest listR = new JsonObjectRequest(Request.Method.POST,"https://arcane-refuge-67249.herokuapp.com/listmessages" , m,
+                        new Response.Listener<JSONObject>() {
                             @Override
-                            public void onResponse(String response) {
+                            public void onResponse(JSONObject response) {
                                 populateListFromVolley(response);
 
                             }
@@ -289,10 +295,10 @@ public class MainActivity extends AppCompatActivity {
 //                Toast.makeText(MainActivity.this, data.getStringExtra("title") + data.getStringExtra("content"), Toast.LENGTH_LONG).show();
 
                 //refresh
-                StringRequest listR = new StringRequest(Request.Method.GET,"https://arcane-refuge-67249.herokuapp.com/messages" ,
-                        new Response.Listener<String>() {
+                JsonObjectRequest listR = new JsonObjectRequest (Request.Method.POST,"https://arcane-refuge-67249.herokuapp.com/listmessages" , m,
+                        new Response.Listener<JSONObject>() {
                             @Override
-                            public void onResponse(String response) {
+                            public void onResponse(JSONObject response) {
                                 populateListFromVolley(response);
 
                             }
@@ -310,10 +316,10 @@ public class MainActivity extends AppCompatActivity {
             // Make sure the request was successful
             if (resultCode == RESULT_OK) {
                 //refresh when detail activity is working fine
-                StringRequest listR = new StringRequest(Request.Method.GET,"https://arcane-refuge-67249.herokuapp.com/messages" ,
-                        new Response.Listener<String>() {
+                JsonObjectRequest listR = new JsonObjectRequest(Request.Method.POST,"https://arcane-refuge-67249.herokuapp.com/listmessages" , m,
+                        new Response.Listener<JSONObject>() {
                             @Override
-                            public void onResponse(String response) {
+                            public void onResponse(JSONObject response) {
                                 populateListFromVolley(response);
 
                             }
