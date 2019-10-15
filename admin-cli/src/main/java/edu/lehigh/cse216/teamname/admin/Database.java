@@ -251,7 +251,11 @@ public class Database {
         /**
          * The user id of this message
          */
-        int uid;
+        int uId;
+        /**
+         * Name of the user who post this message
+         */
+        String userName;
         /**
          * The subject stored in this row
          */
@@ -265,6 +269,10 @@ public class Database {
          */
         int mlikes;
         /**
+         * The count of likes
+         */
+        int mdislikes;
+        /**
          * The date of the post
          */
         Timestamp mDate;
@@ -272,12 +280,29 @@ public class Database {
         /**
          * Construct a RowData object by providing values for its fields
          */
-        public RowData(int id, String subject, String message, int likes, Timestamp date) {
-            mId = id;
+        public RowData(int mid, int uid, String username, String subject, String message, int likes, int dislikes, Timestamp date) {
+            mId = mid;
+            uId = uid;
+            userName = username;
             mSubject = subject;
             mMessage = message;
             mlikes = likes;
+            mdislikes = dislikes;
             mDate = date;
+        }
+
+        /**
+         * Construct a RowData object by providing values for its fields
+         */
+        public RowData(int mid, String subject) {
+            mId = mid;
+            uId = 0;
+            userName = null;
+            mSubject = subject;
+            mMessage = null;
+            mlikes = 0;
+            mdislikes = 0;
+            mDate = null;
         }
     }
 
@@ -295,33 +320,50 @@ public class Database {
         /**
          * The ID of this row of the database
          */
-        int mId;
+        int uId;
         /**
          * The subject stored in this row
          */
-        String mSubject;
+        String username;
         /**
          * The message stored in this row
          */
-        String mMessage;
+        String uEmail;
         /**
          * The count of likes
          */
-        int mlikes;
+        String uSalt;
         /**
-         * The date of the post
+         * The message stored in this row
          */
-        Timestamp mDate;
+        String uPassword;
+        /**
+         * The message stored in this row
+         */
+        String uIntro;
 
         /**
          * Construct a RowData object by providing values for its fields
          */
-        public RowUser(int id, String subject, String message, int likes, Timestamp date) {
-            mId = id;
-            mSubject = subject;
-            mMessage = message;
-            mlikes = likes;
-            mDate = date;
+        public RowUser(int uid, String name, String email, String salt, String password, String intro) {
+            uId = uid;
+            username = name;
+            uEmail = email;
+            uSalt = salt;
+            uPassword = password;
+            uIntro = intro;
+        }
+
+        /**
+         * Construct a RowData object by providing values for its fields
+         */
+        public RowUser(int uid, String name) {
+            uId = uid;
+            username = name;
+            uEmail = null;
+            uSalt = null;
+            uPassword = null;
+            uIntro = null;
         }
     }
 
@@ -339,33 +381,28 @@ public class Database {
         /**
          * The ID of this row of the database
          */
-        int mId;
+        int cId;
         /**
          * The subject stored in this row
          */
-        String mSubject;
+        int uId;
         /**
          * The message stored in this row
          */
-        String mMessage;
+        int mId;
         /**
          * The count of likes
          */
-        int mlikes;
-        /**
-         * The date of the post
-         */
-        Timestamp mDate;
+        String cText;
 
         /**
          * Construct a RowData object by providing values for its fields
          */
-        public RowComment(int id, String subject, String message, int likes, Timestamp date) {
-            mId = id;
-            mSubject = subject;
-            mMessage = message;
-            mlikes = likes;
-            mDate = date;
+        public RowComment(int cid, int uid, int mid, String text) {
+            cId = cid;
+            uId = uid;
+            mId = mid;
+            cText = text;
         }
     }
 
@@ -453,7 +490,7 @@ public class Database {
             db.mInsertOne = db.mConnection.prepareStatement("INSERT INTO tblData VALUES (default, ?, ?, ?, ?)");
             db.mSelectAll = db.mConnection.prepareStatement("SELECT mid, subject FROM tblData");
             db.mSelectOne = db.mConnection.prepareStatement(
-                    "SELECT * from tblData NATURAL JOIN tblUser NATURAL JOIN numOfLikes NATURAL JOIN numOfDislikes WHERE mid = ?");
+                    "SELECT row.*, (SELECT COUNT(*) FROM tblLike WHERE tblLike.mid = row.mid) AS likes, (SELECT COUNT(*) FROM tblDislike WHERE tblDislike.mid = row.mid) AS dislikes FROM (SELECT * from tblData NATURAL JOIN tblUser) AS row WHERE row.mid = ?");
             db.mUpdateOne = db.mConnection.prepareStatement("UPDATE tblData SET title = ?, message = ? WHERE mid = ?");
             db.mIncrementLikes = db.mConnection.prepareStatement("INSERT INTO tblLike VALUES (?, ?)");
             db.mDecrementLikes = db.mConnection.prepareStatement("DELETE FROM tblLike WHERE uid = ? AND mid = ?");
@@ -591,8 +628,33 @@ public class Database {
         try {
             cInsertOne.setInt(1, uid);
             cInsertOne.setInt(2, mid);
-            cInsertOne.setString(3, null);
+            cInsertOne.setString(3, text);
             count += cInsertOne.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return count;
+    }
+
+    int insertRowToLike(int uid, int mid) {
+        int count = 0;
+        try {
+            mIncrementLikes.setInt(1, uid);
+            mIncrementLikes.setInt(1, mid);
+            count += mIncrementLikes.executeUpdate();
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return count;
+    }
+
+    int insertRowToDislike(int uid, int mid) {
+        int count = 0;
+        try {
+            mIncrementLikes.setInt(1, uid);
+            mIncrementLikes.setInt(1, mid);
+            count += mIncrementLikes.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -609,8 +671,50 @@ public class Database {
         try {
             ResultSet rs = mSelectAll.executeQuery();
             while (rs.next()) {
-                res.add(new RowData(rs.getInt("id"), rs.getString("subject"), "", 0, null));
+                res.add(new RowData(rs.getInt("mid"), rs.getString("subject")));
             }
+            rs.close();
+            return res;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * Query the database for a list of all subjects and their IDs
+     * 
+     * @return All rows, as an ArrayList
+     */
+    ArrayList<RowUser> selectAllFromUser() {
+        ArrayList<RowUser> res = new ArrayList<RowUser>();
+        try {
+            ResultSet rs = uSelectAll.executeQuery();
+            while (rs.next()) {
+                res.add(new RowUser(rs.getInt("uid"), rs.getString("username")));
+            }
+            rs.close();
+            return res;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * Query the database for a list of all subjects and their IDs
+     * 
+     * @return All rows, as an ArrayList
+     */
+    ArrayList<RowComment> selectAllFromComment(int mid) {
+        ArrayList<RowComment> res = new ArrayList<RowComment>();
+        try {
+            cSelectAll.setInt(1, mid);
+            ResultSet rs = cSelectAll.executeQuery();
+            while (rs.next()) {
+                res.add(new RowComment(rs.getInt("cid"), rs.getInt("uid"), rs.getInt("mid"), rs.getString("text")));
+            }
+            
             rs.close();
             return res;
         } catch (SQLException e) {
@@ -626,14 +730,57 @@ public class Database {
      * 
      * @return The data for the requested row, or null if the ID was invalid
      */
-    RowData selectOneFromData(int id) {
+    RowData selectOneFromData(int mid) {
         RowData res = null;
         try {
-            mSelectOne.setInt(1, id);
+            mSelectOne.setInt(1, mid);
             ResultSet rs = mSelectOne.executeQuery();
             if (rs.next()) {
-                res = new RowData(rs.getInt("id"), rs.getString("subject"), rs.getString("message"), rs.getInt("likes"),
-                        rs.getTimestamp("date"));
+                res = new RowData(rs.getInt("mid"), rs.getInt("uid"), rs.getString("username"), rs.getString("subject"), rs.getString("message"), rs.getInt("likes"),
+                    rs.getInt("dislikes"), rs.getTimestamp("date"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return res;
+    }
+
+    /**
+     * Get all data for a specific row, by ID
+     * 
+     * @param id The id of the row being requested
+     * 
+     * @return The data for the requested row, or null if the ID was invalid
+     */
+    RowUser selectOneFromUser(int uid) {
+        RowUser res = null;
+        try {
+            uSelectOne.setInt(1, uid);
+            ResultSet rs = uSelectOne.executeQuery();
+            if (rs.next()) {
+                res = new RowUser(rs.getInt("uid"), rs.getString("username"), rs.getString("email"), rs.getString("salt"),
+                        rs.getString("password"), rs.getString("intro"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return res;
+    }
+
+    /**
+     * Get all data for a specific row, by ID
+     * 
+     * @param id The id of the row being requested
+     * 
+     * @return The data for the requested row, or null if the ID was invalid
+     */
+    RowComment selectOneFromComment(int uid) {
+        RowComment res = null;
+        try {
+            mSelectOne.setInt(1, uid);
+            ResultSet rs = mSelectOne.executeQuery();
+            if (rs.next()) {
+                res = new RowComment(rs.getInt("cid"), rs.getInt("uid"), rs.getInt("mid"), rs.getString("text"));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -678,6 +825,98 @@ public class Database {
     }
 
     /**
+     * Delete a row by ID
+     * 
+     * @param id The id of the row to delete
+     * 
+     * @return The number of rows that were deleted. -1 indicates an error.
+     */
+    int deleteRowFromComment(int cid) {
+        int res = -1;
+        try {
+            cDeleteOne.setInt(1, cid);
+            res = cDeleteOne.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return res;
+    }
+
+    /**
+     * Delete a row by ID
+     * 
+     * @param id The id of the row to delete
+     * 
+     * @return The number of rows that were deleted. -1 indicates an error.
+     */
+    int deleteRowFromLike(int uid, int mid) {
+        int res = -1;
+        try {
+            mDecrementDislikes.setInt(1, uid);
+            mDecrementDislikes.setInt(2, mid);
+            res = mDecrementDislikes.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return res;
+    }
+
+    /**
+     * Delete a row by ID
+     * 
+     * @param id The id of the row to delete
+     * 
+     * @return The number of rows that were deleted. -1 indicates an error.
+     */
+    int deleteRowFromDislike(int uid, int mid) {
+        int res = -1;
+        try {
+            mDecrementLikes.setInt(1, uid);
+            mDecrementLikes.setInt(2, mid);
+            res = mDecrementLikes.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return res;
+    }
+
+    /**
+     * Delete a row by ID
+     * 
+     * @param id The id of the row to delete
+     * 
+     * @return The number of rows that were deleted. -1 indicates an error.
+     */
+    int clearRowFromLike(int mid) {
+        int res = -1;
+        try {
+            mClearLikes.setInt(1, mid);
+            res = mClearLikes.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return res;
+    }
+
+    /**
+     * Delete a row by ID
+     * 
+     * @param id The id of the row to delete
+     * 
+     * @return The number of rows that were deleted. -1 indicates an error.
+     */
+    int clearRowFromDislike(int mid) {
+        int res = -1;
+        try {
+            mClearDislikes.setInt(1, mid);
+            res = mClearDislikes.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return res;
+    }
+
+    /**
      * Update the message for a row in the database
      * 
      * @param id      The id of the row to update
@@ -685,11 +924,12 @@ public class Database {
      * 
      * @return The number of rows that were updated. -1 indicates an error.
      */
-    int updateOneInData(int id, String message) {
+    int updateOneInData(int mid, String title, String message) {
         int res = -1;
         try {
             mUpdateOne.setString(1, message);
-            mUpdateOne.setInt(2, id);
+            mUpdateOne.setString(2, title);
+            mUpdateOne.setInt(3, mid);
             res = mUpdateOne.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -697,16 +937,45 @@ public class Database {
         return res;
     }
 
-    public RowData incrementLikes(int uid, int mid) {
+    /**
+     * Update the message for a row in the database
+     * 
+     * @param id      The id of the row to update
+     * @param message The new message contents
+     * 
+     * @return The number of rows that were updated. -1 indicates an error.
+     */
+    int updateOneInUser(int uid, String username, String intro) {
+        int res = -1;
         try {
-            mIncrementLikes.setInt(1, uid);
-            mIncrementLikes.setInt(1, mid);
-            mIncrementLikes.executeUpdate();
-            return selectOneFromData(uid);
+            mUpdateOne.setString(1, username);
+            mUpdateOne.setString(2, intro);
+            mUpdateOne.setInt(3, uid);
+            res = mUpdateOne.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
-            return null;
         }
+        return res;
+    }
+
+    /**
+     * Update the message for a row in the database
+     * 
+     * @param id      The id of the row to update
+     * @param message The new message contents
+     * 
+     * @return The number of rows that were updated. -1 indicates an error.
+     */
+    int updateOneInComment(int uid, String text) {
+        int res = -1;
+        try {
+            mUpdateOne.setString(1, text);
+            mUpdateOne.setInt(2, uid);
+            res = mUpdateOne.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return res;
     }
 
     /**
