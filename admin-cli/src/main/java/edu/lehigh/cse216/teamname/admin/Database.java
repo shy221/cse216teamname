@@ -253,6 +253,10 @@ public class Database {
          */
         int uId;
         /**
+         * Name of the user who post this message
+         */
+        String userName;
+        /**
          * The subject stored in this row
          */
         String mSubject;
@@ -276,9 +280,10 @@ public class Database {
         /**
          * Construct a RowData object by providing values for its fields
          */
-        public RowData(int mid, int uid, String subject, String message, int likes, int dislikes, Timestamp date) {
+        public RowData(int mid, int uid, String username, String subject, String message, int likes, int dislikes, Timestamp date) {
             mId = mid;
             uId = uid;
+            userName = username;
             mSubject = subject;
             mMessage = message;
             mlikes = likes;
@@ -292,6 +297,7 @@ public class Database {
         public RowData(int mid, String subject) {
             mId = mid;
             uId = 0;
+            userName = null;
             mSubject = subject;
             mMessage = null;
             mlikes = 0;
@@ -730,7 +736,7 @@ public class Database {
             mSelectOne.setInt(1, mid);
             ResultSet rs = mSelectOne.executeQuery();
             if (rs.next()) {
-                res = new RowData(rs.getInt("mid"), rs.getInt("uid"), rs.getString("subject"), rs.getString("message"), rs.getInt("likes"),
+                res = new RowData(rs.getInt("mid"), rs.getInt("uid"), rs.getString("username"), rs.getString("subject"), rs.getString("message"), rs.getInt("likes"),
                     rs.getInt("dislikes"), rs.getTimestamp("date"));
             }
         } catch (SQLException e) {
@@ -749,8 +755,8 @@ public class Database {
     RowUser selectOneFromUser(int uid) {
         RowUser res = null;
         try {
-            mSelectOne.setInt(1, uid);
-            ResultSet rs = mSelectOne.executeQuery();
+            uSelectOne.setInt(1, uid);
+            ResultSet rs = uSelectOne.executeQuery();
             if (rs.next()) {
                 res = new RowUser(rs.getInt("uid"), rs.getString("username"), rs.getString("email"), rs.getString("salt"),
                         rs.getString("password"), rs.getString("intro"));

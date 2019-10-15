@@ -87,7 +87,7 @@ public class App {
      */
     static char promptTables(BufferedReader in) {
         // The valid actions:
-        String actions = "MUCLDq";
+        String actions = "MUCLDq?";
 
         // We repeat until a valid single-character option is selected
         while (true) {
@@ -129,7 +129,7 @@ public class App {
      */
     static char promptTablesLite(BufferedReader in) {
         // The valid actions:
-        String actions = "MUCq";
+        String actions = "MUCq?";
 
         // We repeat until a valid single-character option is selected
         while (true) {
@@ -170,7 +170,7 @@ public class App {
      */
     static char promptViews(BufferedReader in) {
         // The valid actions:
-        String actions = "LDq";
+        String actions = "LDq?";
 
         // We repeat until a valid single-character option is selected
         while (true) {
@@ -211,7 +211,7 @@ public class App {
      */
     static char promptLikes(BufferedReader in) {
         // The valid actions:
-        String actions = "LDq";
+        String actions = "LDq?";
 
         // We repeat until a valid single-character option is selected
         while (true) {
@@ -438,7 +438,7 @@ public class App {
                         Database.RowData res = db.selectOneFromData(mid);
                         if (res != null) {
                             System.out.println("  [" + res.mId + "] " + res.mSubject);
-                            System.out.println("  [" + res.uId + "] ");
+                            System.out.println("  [" + res.uId + "] " + res.userName);
                             System.out.println("  --> " + res.mMessage);
                             System.out.println("  --> " + res.mlikes);
                             System.out.println("  --> " + res.mdislikes);
