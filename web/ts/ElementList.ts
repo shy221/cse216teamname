@@ -63,11 +63,12 @@ class ElementList {
         // whose "delete" button was clicked
         let id = $(this).data("value");
         $.ajax({
-            type: "GET",
+            type: "POST",
             url: "/messages/" + id,
             dataType: "json",
             // TODO: we should really have a function that looks at the return
             //       value and possibly prints an error message.
+            data: JSON.stringify({ uEmail: uemail, sessionKey: ukey }),
             success: ShowDetail.show
         });
     }

@@ -17,11 +17,10 @@ let Handlebars: any;
 // a global for the EditEntryForm of the program.  See newEntryForm for 
 // explanation
 let editEntryForm: EditEntryForm;
-let uid: number;
-let uemail: String;
-let ukey: String;
-let loginState: boolean = false;
-
+var uemail: String;
+var ukey: String;
+var loginState: boolean = false;
+var uid: number;
 
 // Run some configuration code when the web page loads
 $(document).ready(function () {
@@ -31,6 +30,7 @@ $(document).ready(function () {
     EditEntryForm.refresh();
     ShowDetail.refresh();
     Login.refresh();
+    UserProfile.refresh();
     // Create the object that controls the "Edit Entry" form
     // set up initial UI state
     $("#editElement").hide();

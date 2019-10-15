@@ -15,7 +15,6 @@ class UserProfile {
     }
 
     private static hide() {
-        $("#" + UserProfile.NAME + "-id").val("");
         $("#" + UserProfile.NAME + "-name").text("");
         $("#" + UserProfile.NAME + "-email").text("");
         $("#" + UserProfile.NAME + "-intro").text("");
@@ -23,11 +22,19 @@ class UserProfile {
     }
 
     public static show(data:any) {
-        $("#" + UserProfile.NAME + "-id").val(data.mData.uId);
         $("#" + UserProfile.NAME + "-name").text(data.mData.uSername);
         $("#" + UserProfile.NAME + "-email").text(data.mData.uEmail);
         $("#" + UserProfile.NAME + "-intro").text(data.mData.uIntro);
         $("#" + UserProfile.NAME).modal("show");
     }
     
+    public static get(){
+        $.ajax({
+            type: "POST",
+            url: "/" + uid + "/userprofile",
+            dataType: "json",
+            data: JSON.stringify({ uEmail: uemail, sessionKey: ukey }),
+            success: UserProfile.show
+        });
+    }
 }

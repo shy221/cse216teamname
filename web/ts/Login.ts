@@ -44,8 +44,7 @@ class Login {
             //not sure abour url
             url: "/login",
             dataType: "json",
-            // double check the name
-            data: JSON.stringify({ uEmail: ID, uPassword: pwd }),
+            data: JSON.stringify({ "uEmail": ID, "uPassword": pwd }),
             success: Login.onSubmitResponse
         });
     }
@@ -60,10 +59,14 @@ class Login {
         // listing of pwds
         if (data.mStatus === "ok") {
             loginState = true;
-            ukey = data.mData.uSessionKey;
             uid = data.mData.uId;
+            ukey = data.mData.sessionKey;
             uemail = data.mData.uEmail;
+            Navbar.refresh();
+            NewEntryForm.refresh();
             ElementList.refresh();
+            EditEntryForm.refresh();
+            ShowDetail.refresh();
         }
         // Handle explicit errors with a detailed popup pwd
         else if (data.mStatus === "error") {

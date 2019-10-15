@@ -22,7 +22,8 @@ class ShowDetail {
         if (!ShowDetail.isInit) {
             ShowDetail.isInit = true;
             $("body").append(Handlebars.templates[ShowDetail.NAME + ".hb"]());
-            $("#" + ShowDetail.NAME + "-commentsbtn").click(ShowDetail.showComments);
+            $("#" + ShowDetail.NAME + "-userprofilebtn").click(ShowDetail.other);
+            $("#" + ShowDetail.NAME + "-commentsbtn").click(ShowDetail.postComments);
             $("#" + ShowDetail.NAME + "-likebtn").click(ShowDetail.likePost);
             $("#" + ShowDetail.NAME + "-editbtn").click(ShowDetail.clickEdit);
             $("#" + ShowDetail.NAME + "-delbtn").click(ShowDetail.clickDelete);
@@ -31,16 +32,18 @@ class ShowDetail {
     }
 
     private static reloadLike() {
+        //因为现在还看不到有多少人likes过，所以暂不用ajax
+        /*
         let id = "" + $("#" + ShowDetail.NAME + "-detailId").val();
-
         // Issue a GET, and then pass the result to update()
         $.ajax({
             type: "GET",
-            url: "/messages/" + id,
+            url: "/messages/" + id + "/likes",
             dataType: "json",
             data: JSON.stringify({ uEmail: uemail, sessionKey: ukey }),
             success: ShowDetail.likeResponse
         });
+        */
     }
 
     private static likeResponse(data: any) {
@@ -63,9 +66,10 @@ class ShowDetail {
      */
     private static update(data: any) {
         // Remove the data, if it exists
-        $("#" + ShowDetail.NAME).remove();
+        //$("#" + ShowDetail.NAME).remove();
         $("body").append(Handlebars.templates[ShowDetail.NAME + ".hb"](data));
-        $("#" + ShowDetail.NAME + "-commentsbtn").click(ShowDetail.showComments);
+        $("#" + ShowDetail.NAME + "-userprofilebtn").click(ShowDetail.other);
+        $("#" + ShowDetail.NAME + "-commentsbtn").click(ShowDetail.postComments);
         $("#" + ShowDetail.NAME + "-likebtn").click(ShowDetail.likePost);
         $("#" + ShowDetail.NAME + "-editbtn").click(ShowDetail.clickEdit);
         $("#" + ShowDetail.NAME + "-delbtn").click(ShowDetail.clickDelete);
@@ -79,9 +83,12 @@ class ShowDetail {
         $("#" + ShowDetail.NAME + "-title").val("");
         $("#" + ShowDetail.NAME + "-username").val("");
         $("#" + ShowDetail.NAME + "-message").val("");
-        $("#" + ShowDetail.NAME + "-editId").val("");
+        //$("#" + ShowDetail.NAME + "-editId").val("");
+        $("#" + ShowDetail.NAME + "-detailId").val("");
+        $("#" + ShowDetail.NAME + "-detailPostUid").val("");
         $("#" + ShowDetail.NAME + "-created").text("");
         $("#" + ShowDetail.NAME + "-likebtn").text("");
+        $("#" + ShowDetail.NAME).remove();
         $("#" + ShowDetail.NAME).modal("hide");
     }
 
@@ -92,10 +99,11 @@ class ShowDetail {
      * with those ways of making the modal disappear.
      */
     public static show(data: any) {
+        $("#" + ShowDetail.NAME + "-detailId").val(data.mData.mId);
         let id = "" + $("#" + ShowDetail.NAME + "-detailId").val();
         $.ajax({
-            type: "GET",
-            url: "/messages/" + id + "/comments",
+            type: "POST",
+            url: "/" + id + "/listcomments",
             dataType: "json",
             data: JSON.stringify({ uEmail: uemail, sessionKey: ukey }),
             // 用ShowComments里的show
@@ -103,10 +111,10 @@ class ShowDetail {
             //如果refresh 不行就改回listAllComments
         });
         $("#" + ShowDetail.NAME + "-title").text(data.mData.mTitle);
-        //这个mName名字需要和backend确认
         $("#" + ShowDetail.NAME + "-username").text(data.mData.mName);
         $("#" + ShowDetail.NAME + "-message").val(data.mData.mContent);
-        $("#" + ShowDetail.NAME + "-detailId").val(data.mData.mId);
+        
+        $("#" + ShowDetail.NAME + "-detailPostUid").val(data.mData.uId);
         $("#" + ShowDetail.NAME + "-created").text(data.mData.mCreated);
         $("#" + ShowDetail.NAME + "-likebtn").text("Like: " + data.mData.mLikes);
         $("#" + ShowDetail.NAME).modal("show");
@@ -132,16 +140,14 @@ class ShowDetail {
             success: ShowDetail.reloadLike
         });
     }
-
-    /**
-     * 显示与message对应的所有comments
-     */
+/*
+    
     private static showComments() {
-        let id = "" + $("#" + ShowDetail.NAME + "-detailId").val();
+        let mid = "" + $("#" + ShowDetail.NAME + "-detailId").val();
         ShowDetail.hide();
         $.ajax({
-            type: "GET",
-            url: "/messages/" + id + "/comments",
+            type: "POST",
+            url: "/" + mid + "/listcomments",
             dataType: "json",
             data: JSON.stringify({ uEmail: uemail, sessionKey: ukey }),
             // 用ShowComments里的show
@@ -156,6 +162,19 @@ class ShowDetail {
         //带入数据再load一边
         $("body").append(Handlebars.templates[ShowDetail.NAME + ".hb"](data));
 
+    }
+    */
+
+    private static postComments(){
+        let mid = "" + $("#" + ShowDetail.NAME + "-detailId").val();
+        let text = "" + $("#" + ShowDetail.NAME + "-postcomments").val();
+        $.ajax({
+            type: "POST",
+            url: "/" + mid + "/comments",
+            dataType: "json",
+            data: JSON.stringify({ uEmail: uemail, sessionKey: ukey, uid: uid, mid: mid, text: text}),
+            success: ShowDetail.refresh
+        });
     }
 
 
@@ -193,6 +212,17 @@ class ShowDetail {
             dataType: "json",
             data: JSON.stringify({ uEmail: uemail, sessionKey: ukey }),
             success: EditEntryForm.show
+        });
+    }
+
+    private static other() {
+        let uid = "" + $("#" + ShowDetail.NAME + "-detailPostUid").val();
+        $.ajax({
+            type: "POST",
+            url: "/" + uid,
+            dataType: "json",
+            data: JSON.stringify({ uEmail: uemail, sessionKey: ukey }),
+            success: UserProfile.show
         });
     }
 } // end class ShowDetails
