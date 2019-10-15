@@ -58,7 +58,7 @@ public class SecondActivity extends AppCompatActivity {
                     setResult(Activity.RESULT_OK, i);
                     String title = etTitle.getText().toString();
                     String content = etContent.getText().toString();
-                    postMessage(title, content);
+                    postMessage(title, content, 7);//uid is 7 for now
                 }
                 finish();
 
@@ -76,13 +76,15 @@ public class SecondActivity extends AppCompatActivity {
         });
     }
 
-    private void postMessage(final String t, final String c){
+    private void postMessage(final String t, final String c, int uid){
         //map is hashMap, m is jsonObject
         //one link to post
         String urlPost = "https://arcane-refuge-67249.herokuapp.com/messages";
         Map<String, String> map = new HashMap<>();
         map.put("mTitle", t);
         map.put("mMessage", c);
+        String i = Integer.toString(uid);
+        map.put("uid", i);
         JSONObject m = new JSONObject(map);
         JsonObjectRequest postR = new JsonObjectRequest(Request.Method.POST,
                 urlPost, m, new Response.Listener<JSONObject>() {
