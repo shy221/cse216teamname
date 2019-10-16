@@ -257,7 +257,7 @@ public class Database {
             cSelectAll.setInt(1, mId);
             ResultSet rs = cSelectAll.executeQuery();
             while (rs.next()) {
-                res.add(new Comment(rs.getInt("cid"), mId, rs.getInt("uid"), rs.getString("username"), rs.getString("text")));
+                res.add(new Comment(rs.getInt("cid"), rs.getInt("uid"), mId, rs.getString("username"), rs.getString("text")));
             }
             rs.close();
             return res;

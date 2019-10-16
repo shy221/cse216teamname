@@ -11,8 +11,10 @@
                 <span id="UserProfile-email"></span>
                 <label for="UserProfile-intro">Details</label>
                 <textarea class="form-control" id="UserProfile-intro"></textarea>
+                <input type="hidden" id="UserProfile-detailId" />
             </div>
             <div class="modal-footer">
+                <button type="button" class="btn btn-default" id="UserProfile-editbtn">Edit</button>
                 <button type="button" class="btn btn-default" id="UserProfile-Close">Close</button>
             </div>
         </div>

@@ -20,6 +20,7 @@ class Login {
         $("#" + Login.NAME + "-ID").val("");
         $("#" + Login.NAME + "-pwd").val("");
         $("#" + Login.NAME).modal("hide");
+        Navbar.refresh();
     }
     public static show() {
         $("#" + Login.NAME + "-ID").val("");
