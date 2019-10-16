@@ -13,8 +13,9 @@ class ShowComments {
         ShowComments.init();
     }
     private static hide() {
-        $("#" + ShowComments.NAME).modal("hide");
+        $('.modal-backdrop').remove();
         $("#" + ShowComments.NAME).remove();
+        $("#" + ShowComments.NAME).modal("hide");
     }
     public static show(data: any) {
         $("#" + ShowComments.NAME).remove();
