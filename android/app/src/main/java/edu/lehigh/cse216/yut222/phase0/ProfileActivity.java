@@ -25,6 +25,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -39,35 +40,53 @@ import static edu.lehigh.cse216.yut222.phase0.LoginActivity.sharedpreferences;
 public class ProfileActivity extends AppCompatActivity {
 
     ArrayList<User> thisUser = new ArrayList<>();
+    Button logout = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
         int id = Integer.parseInt(sharedpreferences.getString("prefId","default"));
-        thisUser.add(new User(id, sharedpreferences.getString("prefUsername", "default"),
+        thisUser.add(new User(id, sharedpreferences.getString("prefName", "default"),
                 sharedpreferences.getString("prefIntro","default"), sharedpreferences.getString("prefEmail", "default")));
 
-        // Get the parameter from the calling activity, and put it in the TextView
-        Intent input = getIntent();
-/*
-        final TextView username = (TextView)findViewById(R.id.username);
-        sharedpreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        username.setText(sharedpreferences.getString("prefUsername", "username"));
+        logout = (Button) findViewById(R.id.Logout);
 
-        final TextView uid = (TextView)findViewById(R.id.uid);
-        sharedpreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        uid.setText(sharedpreferences.getString("prefId", "id"));
+        /*final String urlComments =  "https://arcane-refuge-67249.herokuapp.com/" + mId + "/listcomments";
+        Map<String, String> map = new HashMap<>();
+        map.put("uEmail", sharedpreferences.getString("prefEmail", "default"));
+        map.put("sessionKey", sharedpreferences.getString("prefKey", "default"));
+        JSONObject c = new JSONObject(map);
 
-        final TextView uemail = (TextView)findViewById(R.id.uemail);
-        sharedpreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        uemail.setText(sharedpreferences.getString("prefEmail", "email"));
+        //get comments from route
+        //routes incomplete
+        JsonObjectRequest listC = new JsonObjectRequest(Request.Method.POST, urlComments, c,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        populateCommentFromVolley(response);
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e("zex220", "Listing all comments didn't work!");
+            }
+        });
+        MySingleton.getInstance(this).addToRequestQueue(listC);
+        Log.e("zex220","outside request");
+*/
 
-        final TextView uIntro = (TextView)findViewById(R.id.uintro);
-        sharedpreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        uIntro.setText(sharedpreferences.getString("prefIntro", "intro"));*/
+
+
         RecyclerView rv = (RecyclerView) findViewById(R.id.profile_detail_view);
         rv.setLayoutManager(new LinearLayoutManager(this));
         ProfileListAdapter adapter = new ProfileListAdapter(this, thisUser);
         rv.setAdapter(adapter);
+    }
+    public void logout(View view){
+        SharedPreferences sharedpreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        SharedPreferences.Editor editor = sharedpreferences.edit();
+        editor.clear();
+        editor.commit();
+        finish();
     }
 }
