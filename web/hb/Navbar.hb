@@ -24,6 +24,7 @@
                 </li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
+                {{#if loginState}}
                 <li>
                     <a class="btn btn-link" id="Navbar-Account">
                         <span class="glyphicon glyphicon-user"></span> Account
@@ -35,12 +36,14 @@
                         <span class="glyphicon glyphicon-log-out"></span><span class="sr-only">Show</span>
                     </a>
                 </li>
+                {{else}}
                 <li>
                     <a class="btn btn-link" id="Navbar-login">
                         Login
                         <span class="glyphicon glyphicon-log-in"></span><span class="sr-only">Show</span>
                     </a>
                 </li>
+                {{/if}}
             </ul>
         </div>
     </div>

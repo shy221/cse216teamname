@@ -18,18 +18,11 @@
                 <input type="hidden" id="ShowDetail-detailPostUid" />
                 <label for="ShowDetail-postcomments">Comments</label>
                 <input class="form-control" type="text" id="ShowDetail-postcomments"></textarea>
-                <div class="comments">
-                    <tbody>
-                        {{#each mData}}
-                        <tr>
-                            <td>{{this.mComments}}</td>
-                        </tr>
-                        {{/each}}
-                    </tbody>
-                </div>
+                
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" id="ShowDetail-commentsbtn">Leave Comments</button>
+                <button type="button" class="btn btn-default" id="ShowDetail-scommentsbtn">Show Comments</button>
                 <button type="button" class="btn btn-default" id="ShowDetail-likebtn"></button>
                 <button type="button" class="btn btn-default" id="ShowDetail-editbtn">Edit</button>
                 <button type="button" class="btn btn-default" id="ShowDetail-delbtn">Delete</button>

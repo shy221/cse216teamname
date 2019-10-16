@@ -33,9 +33,10 @@ class ElementList {
         ElementList.init();
         // Issue a GET, and then pass the result to update()
         $.ajax({
-            type: "GET",
-            url: "/messages",
+            type: "POST",
+            url: "/listmessages",
             dataType: "json",
+            data: JSON.stringify({ uEmail: uemail, sessionKey: ukey }),
             success: ElementList.update
         });
     }

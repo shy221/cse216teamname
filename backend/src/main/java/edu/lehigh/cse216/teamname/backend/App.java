@@ -83,7 +83,7 @@ public class App {
         // Get the data, embed it in a StructuredResponse, turn it into JSON,
         // and return it.  If there's no data, we return "[]", so there's no need
         // for error handling.
-        Spark.get("/messages", (request, response) -> {
+        Spark.post("/listmessages", (request, response) -> {
             // ensure status 200 OK, with a MIME type of JSON
             response.status(200);
             response.type("application/json");

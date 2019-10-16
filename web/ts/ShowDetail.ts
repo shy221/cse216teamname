@@ -24,6 +24,7 @@ class ShowDetail {
             $("body").append(Handlebars.templates[ShowDetail.NAME + ".hb"]());
             $("#" + ShowDetail.NAME + "-userprofilebtn").click(ShowDetail.other);
             $("#" + ShowDetail.NAME + "-commentsbtn").click(ShowDetail.postComments);
+            $("#" + ShowDetail.NAME + "-scommentsbtn").click(ShowDetail.showComments);
             $("#" + ShowDetail.NAME + "-likebtn").click(ShowDetail.likePost);
             $("#" + ShowDetail.NAME + "-editbtn").click(ShowDetail.clickEdit);
             $("#" + ShowDetail.NAME + "-delbtn").click(ShowDetail.clickDelete);
@@ -32,8 +33,6 @@ class ShowDetail {
     }
 
     private static reloadLike() {
-        //因为现在还看不到有多少人likes过，所以暂不用ajax
-        /*
         let id = "" + $("#" + ShowDetail.NAME + "-detailId").val();
         // Issue a GET, and then pass the result to update()
         $.ajax({
@@ -43,7 +42,6 @@ class ShowDetail {
             data: JSON.stringify({ uEmail: uemail, sessionKey: ukey }),
             success: ShowDetail.likeResponse
         });
-        */
     }
 
     private static likeResponse(data: any) {
@@ -70,6 +68,7 @@ class ShowDetail {
         $("body").append(Handlebars.templates[ShowDetail.NAME + ".hb"](data));
         $("#" + ShowDetail.NAME + "-userprofilebtn").click(ShowDetail.other);
         $("#" + ShowDetail.NAME + "-commentsbtn").click(ShowDetail.postComments);
+        $("#" + ShowDetail.NAME + "-scommentsbtn").click(ShowDetail.showComments);
         $("#" + ShowDetail.NAME + "-likebtn").click(ShowDetail.likePost);
         $("#" + ShowDetail.NAME + "-editbtn").click(ShowDetail.clickEdit);
         $("#" + ShowDetail.NAME + "-delbtn").click(ShowDetail.clickDelete);
@@ -80,6 +79,7 @@ class ShowDetail {
      * Hide the ShowDetail.  Be sure to clear its fields first
      */
     private static hide() {
+        
         $("#" + ShowDetail.NAME + "-title").val("");
         $("#" + ShowDetail.NAME + "-username").val("");
         $("#" + ShowDetail.NAME + "-message").val("");
@@ -88,7 +88,6 @@ class ShowDetail {
         $("#" + ShowDetail.NAME + "-detailPostUid").val("");
         $("#" + ShowDetail.NAME + "-created").text("");
         $("#" + ShowDetail.NAME + "-likebtn").text("");
-        $("#" + ShowDetail.NAME).remove();
         $("#" + ShowDetail.NAME).modal("hide");
     }
 
@@ -100,16 +99,18 @@ class ShowDetail {
      */
     public static show(data: any) {
         $("#" + ShowDetail.NAME + "-detailId").val(data.mData.mId);
+        /*
         let id = "" + $("#" + ShowDetail.NAME + "-detailId").val();
         $.ajax({
             type: "POST",
             url: "/" + id + "/listcomments",
             dataType: "json",
             data: JSON.stringify({ uEmail: uemail, sessionKey: ukey }),
-            // 用ShowComments里的show
+            // 用里的show
             success: ShowDetail.update
             //如果refresh 不行就改回listAllComments
         });
+        */
         $("#" + ShowDetail.NAME + "-title").text(data.mData.mTitle);
         $("#" + ShowDetail.NAME + "-username").text(data.mData.mName);
         $("#" + ShowDetail.NAME + "-message").val(data.mData.mContent);
@@ -140,22 +141,20 @@ class ShowDetail {
             success: ShowDetail.reloadLike
         });
     }
-/*
-    
+
     private static showComments() {
         let mid = "" + $("#" + ShowDetail.NAME + "-detailId").val();
-        ShowDetail.hide();
         $.ajax({
             type: "POST",
             url: "/" + mid + "/listcomments",
             dataType: "json",
             data: JSON.stringify({ uEmail: uemail, sessionKey: ukey }),
             // 用ShowComments里的show
-            success: ShowDetail.listAllComments
+            success: ShowComments.show
             //如果refresh 不行就改回listAllComments
         });
     }
-
+/*
     private static listAllComments(data: any) {
         //页面清空
         $("#" + ShowDetail.NAME).remove();
@@ -219,7 +218,7 @@ class ShowDetail {
         let uid = "" + $("#" + ShowDetail.NAME + "-detailPostUid").val();
         $.ajax({
             type: "POST",
-            url: "/" + uid,
+            url: "/" + uid + "/userprofile",
             dataType: "json",
             data: JSON.stringify({ uEmail: uemail, sessionKey: ukey }),
             success: UserProfile.show
