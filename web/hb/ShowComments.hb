@@ -10,7 +10,7 @@
                         {{#each mData}}
                         <tr>
                             <td>{{this.cText}}</td>
-                            <td><button class="ShowComments-user" data-value="{{this.uId}}"></button></td>
+                            <td><button class="ShowComments-user" data-value="{{this.uId}}">{{this.cUsername}}</button></td>
                         </tr>
                         {{/each}}
                     </tbody>

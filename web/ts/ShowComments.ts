@@ -13,15 +13,15 @@ class ShowComments {
         ShowComments.init();
     }
     private static hide() {
-        $("#" + ShowComments.NAME).remove();
         $("#" + ShowComments.NAME).modal("hide");
+        $("#" + ShowComments.NAME).remove();
     }
     public static show(data: any) {
         $("#" + ShowComments.NAME).remove();
         // Use a template to re-generate the table, and then insert it
         $("body").append(Handlebars.templates[ShowComments.NAME + ".hb"](data));
         $("." + ShowComments.NAME + "-user").click(ShowComments.user);
-        $("#" + ShowComments.NAME + "-user").text(data.mData.cUsername);
+        //$("." + ShowComments.NAME + "-user").text(data.mData.cUsername);
         $("#" + ShowComments.NAME + "-Close").click(ShowComments.hide);
         $("#" + ShowComments.NAME).modal("show");
     }

@@ -24,6 +24,7 @@
                 <button type="button" class="btn btn-default" id="ShowDetail-commentsbtn">Leave Comments</button>
                 <button type="button" class="btn btn-default" id="ShowDetail-scommentsbtn">Show Comments</button>
                 <button type="button" class="btn btn-default" id="ShowDetail-likebtn"></button>
+                <button type="button" class="btn btn-default" id="ShowDetail-dislikebtn"></button>
                 <button type="button" class="btn btn-default" id="ShowDetail-editbtn">Edit</button>
                 <button type="button" class="btn btn-default" id="ShowDetail-delbtn">Delete</button>
                 <button type="button" class="btn btn-default" id="ShowDetail-closebtn">Close</button>

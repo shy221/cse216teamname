@@ -6,6 +6,7 @@
 /// <reference path="ts/Login.ts"/>
 /// <reference path="ts/UserProfile.ts"/>
 /// <reference path="ts/ShowComments.ts"/>
+/// <reference path="ts/EditUserProfile.ts"/>
 
 // Prevent compiler errors when using jQuery.  "$" will be given a type of 
 // "any", so that we can use it anywhere, and assume it has any fields or
@@ -33,6 +34,7 @@ $(document).ready(function () {
     Login.refresh();
     UserProfile.refresh();
     ShowComments.refresh();
+    EditUserProfile.refresh();
     // Create the object that controls the "Edit Entry" form
     // set up initial UI state
     $("#editElement").hide();
