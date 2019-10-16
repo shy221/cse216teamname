@@ -66,10 +66,10 @@ class CommentListAdapter extends RecyclerView.Adapter<CommentListAdapter.ViewHol
         final Comment c = mComments.get(position);
 //        holder.mId.setText(Integer.toString(m.mId));
         holder.cText.setText(c.cText);
-        holder.cId.setText(c.cId);
-        holder.uId.setText(c.cId);
-        holder.mId.setText(c.cId);
-        holder.cUsername.setText("list of comments");
+        holder.cId.setText(Integer.toString(c.cId));
+        holder.uId.setText(Integer.toString(c.uId));
+        holder.mId.setText(Integer.toString(c.mId));
+        holder.cUsername.setText(c.cUsername);
 
 
         // Attach a click listener to the view we are configuring
@@ -82,7 +82,7 @@ class CommentListAdapter extends RecyclerView.Adapter<CommentListAdapter.ViewHol
         };
 
 //        holder.mId.setOnClickListener(listener);
-        holder.cText.setOnClickListener(listener);
-        holder.cId.setOnClickListener(listener);
+        //holder.cText.setOnClickListener(listener);
+        //holder.cId.setOnClickListener(listener);
     }
 }

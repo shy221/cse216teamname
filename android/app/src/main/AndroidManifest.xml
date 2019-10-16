@@ -43,6 +43,10 @@
             android:label="My Profile"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
+            android:name=".CommentActivity"
+            android:label="My Profile"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
             android:name=".MainActivity"
             android:label="THE BUZZ"
             android:theme="@style/AppTheme.NoActionBar">
