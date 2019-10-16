@@ -198,7 +198,8 @@ class ShowDetail {
         // for now, just print the ID that goes along with the data in the row
         // whose "delete" button was clicked
         let id = "" + $("#" + ShowDetail.NAME + "-detailId").val();
-        if (Number(id) == uid) {
+        let uId = "" + $("#" + ShowDetail.NAME + "-detailPostUid").val();
+        if (Number(uId) == uid) {
             ShowDetail.hide();
             $.ajax({
                 type: "DELETE",
@@ -209,6 +210,8 @@ class ShowDetail {
                 //       value and possibly prints an error message.
                 success: ElementList.refresh
             });
+        } else {
+            window.alert("Cannot delete other's post");
         }
     }
 
@@ -218,7 +221,8 @@ class ShowDetail {
     private static clickEdit() {
         // as in clickDelete, we need the ID of the row
         let id = "" + $("#" + ShowDetail.NAME + "-detailId").val();
-        if (Number(id) == uid) {
+        let uId = "" + $("#" + ShowDetail.NAME + "-detailPostUid").val();
+        if (Number(uId) == uid) {
             ShowDetail.hide();
             $.ajax({
                 type: "POST",
@@ -227,6 +231,8 @@ class ShowDetail {
                 data: JSON.stringify({ uEmail: uemail, sessionKey: ukey }),
                 success: EditEntryForm.show
             });
+        } else {
+            window.alert("Cannot edit other's post");
         }
     }
 
