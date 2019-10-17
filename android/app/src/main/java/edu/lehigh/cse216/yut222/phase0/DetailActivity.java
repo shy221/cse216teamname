@@ -138,16 +138,18 @@ public class DetailActivity extends AppCompatActivity {
                 //call like request function
                 clickCount++;
                 Log.e("clickcount",Integer.toString(clickCount));
-                if((clickCount % 2) == 1) {
-                    postLike(urlLikes);
+                /*if((clickCount % 2) == 1) {
+                    postLike(urlLikes, mId);
                     Toast toast = Toast.makeText(DetailActivity.this, "liked", Toast.LENGTH_LONG);
                     toast.show();
                 }
                 else if((clickCount % 2) == 0){
-                    postLike(urlLikes);
+                    postLike(urlLikes, mId);
                     Toast toast = Toast.makeText(DetailActivity.this, "canceled like", Toast.LENGTH_LONG);
                     toast.show();
-                }
+                }*/
+                postLike(urlLikes, mId);
+
             }
         });
         // The Cancel button returns to the caller without sending any data
@@ -199,7 +201,8 @@ public class DetailActivity extends AppCompatActivity {
         }
     }
 
-    private void postLike(String urlL){
+    private void postLike(String urlL, int mId){
+        final int mid = mId;
         Log.e("postlike", "map");
         sharedpreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         //one link to update likes
@@ -218,7 +221,10 @@ public class DetailActivity extends AppCompatActivity {
             public void onResponse(JSONObject response) {
                 try{
                 if(response.getString("mStatus").equals("ok")) {
+
                     Log.e("message", "Like the message here!");
+
+
                 }else{
                     Log.e("like", "error status");
                 }}catch (final JSONException e){
@@ -231,9 +237,31 @@ public class DetailActivity extends AppCompatActivity {
                 Log.e("shy221", "post likes went wrong.");
             }
         });
+        final String url = "https://arcane-refuge-67249.herokuapp.com/messages/" + mId;
         MySingleton.getInstance(this).addToRequestQueue(likeR);
-        showDetail();
-        finish();
+        Map<String, String> mapdetail = new HashMap<>();
+        mapdetail.put("uEmail", sharedpreferences.getString("prefEmail", "default"));
+        mapdetail.put("sessionKey", sharedpreferences.getString("prefKey", "default"));
+        Log.e("email", sharedpreferences.getString("prefEmail", "default"));
+        Log.e("key", sharedpreferences.getString("prefKey", "default"));
+        JSONObject d = new JSONObject(mapdetail);
+        JsonObjectRequest listR = new JsonObjectRequest(Request.Method.POST, url, d,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        populateDetailFromVolley(response);
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e("zex220", "Listing all Details didn't work!");
+            }
+        });
+        MySingleton.getInstance(this).addToRequestQueue(listR);
+
+
+
+
     }
     private void deleteLike(String urlL){
 
