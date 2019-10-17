@@ -98,14 +98,4 @@ class DetailListAdapter extends RecyclerView.Adapter<DetailListAdapter.ViewHolde
         //holder.mContent.setOnClickListener(listener);
 
     }
-    /*
-    public String CommentSetText(ArrayList<Comment> m){
-        /*for (int i = 0; i <= m.size(); i++) {
-            String []s = new
-            s[i]= Integer.toString(m.get(i).cId);
-        }*/
-
-        //implement!!
-        //return "comment";
-    //}
 }
