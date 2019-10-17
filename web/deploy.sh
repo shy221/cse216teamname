@@ -41,6 +41,11 @@ node_modules/handlebars/bin/handlebars hb/EditEntryForm.hb >> $TARGETFOLDER/$WEB
 node_modules/handlebars/bin/handlebars hb/NewEntryForm.hb >> $TARGETFOLDER/$WEBFOLDERNAME/templates.js
 node_modules/handlebars/bin/handlebars hb/Navbar.hb >> $TARGETFOLDER/$WEBFOLDERNAME/templates.js
 node_modules/handlebars/bin/handlebars hb/ShowDetail.hb >> $TARGETFOLDER/$WEBFOLDERNAME/templates.js
+node_modules/handlebars/bin/handlebars hb/Login.hb >> $TARGETFOLDER/$WEBFOLDERNAME/templates.js
+node_modules/handlebars/bin/handlebars hb/UserProfile.hb >> $TARGETFOLDER/$WEBFOLDERNAME/templates.js
+node_modules/handlebars/bin/handlebars hb/ShowComments.hb >> $TARGETFOLDER/$WEBFOLDERNAME/templates.js
+node_modules/handlebars/bin/handlebars hb/EditUserProfile.hb >> $TARGETFOLDER/$WEBFOLDERNAME/templates.js
+
 
 # set up Jasmine
 node_modules/typescript/bin/tsc apptest.ts --strict --outFile $TARGETFOLDER/$WEBFOLDERNAME/apptest.js

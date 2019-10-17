@@ -50,10 +50,15 @@ public class AppTest
     private BufferedReader in;
 
     public void testPrompt() {
+        // Main Menue Promt
         in = new BufferedReader(new StringReader("T"));
         assertEquals('T', test.prompt(in));
         in = new BufferedReader(new StringReader("D"));
         assertEquals('D', test.prompt(in));
+        in = new BufferedReader(new StringReader("V"));
+        assertEquals('V', test.prompt(in));
+        in = new BufferedReader(new StringReader("v"));
+        assertEquals('v', test.prompt(in));
         in = new BufferedReader(new StringReader("1"));
         assertEquals('1', test.prompt(in));
         in = new BufferedReader(new StringReader("*"));
@@ -70,6 +75,54 @@ public class AppTest
         assertEquals('?', test.prompt(in));
         in = new BufferedReader(new StringReader("L"));
         assertEquals('L', test.prompt(in));
+
+        // promptTables
+        in = new BufferedReader(new StringReader("M"));
+        assertEquals('M', test.promptTables(in));
+        in = new BufferedReader(new StringReader("U"));
+        assertEquals('U', test.promptTables(in));
+        in = new BufferedReader(new StringReader("C"));
+        assertEquals('C', test.promptTables(in));
+        in = new BufferedReader(new StringReader("L"));
+        assertEquals('L', test.promptTables(in));
+        in = new BufferedReader(new StringReader("D"));
+        assertEquals('D', test.promptTables(in));
+        in = new BufferedReader(new StringReader("q"));
+        assertEquals('q', test.promptTables(in));
+        in = new BufferedReader(new StringReader("?"));
+        assertEquals('?', test.promptTables(in));
+
+        // promptTablesLite
+        in = new BufferedReader(new StringReader("M"));
+        assertEquals('M', test.promptTablesLite(in));
+        in = new BufferedReader(new StringReader("U"));
+        assertEquals('U', test.promptTablesLite(in));
+        in = new BufferedReader(new StringReader("C"));
+        assertEquals('C', test.promptTablesLite(in));
+        in = new BufferedReader(new StringReader("q"));
+        assertEquals('q', test.promptTablesLite(in));
+        in = new BufferedReader(new StringReader("?"));
+        assertEquals('?', test.promptTablesLite(in));
+
+        // promptViews
+        in = new BufferedReader(new StringReader("L"));
+        assertEquals('L', test.promptViews(in));
+        in = new BufferedReader(new StringReader("D"));
+        assertEquals('D', test.promptViews(in));
+        in = new BufferedReader(new StringReader("q"));
+        assertEquals('q', test.promptViews(in));
+        in = new BufferedReader(new StringReader("?"));
+        assertEquals('?', test.promptViews(in));
+
+        // promptLikes
+        in = new BufferedReader(new StringReader("L"));
+        assertEquals('L', test.promptLikes(in));
+        in = new BufferedReader(new StringReader("D"));
+        assertEquals('D', test.promptLikes(in));
+        in = new BufferedReader(new StringReader("q"));
+        assertEquals('q', test.promptLikes(in));
+        in = new BufferedReader(new StringReader("?"));
+        assertEquals('?', test.promptLikes(in));
     }
 
     public void testGetString() {

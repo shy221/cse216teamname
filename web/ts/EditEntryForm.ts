@@ -55,6 +55,7 @@ class EditEntryForm {
      */
     public static show(data: any) {
         $("#" + EditEntryForm.NAME + "-title").val(data.mData.mTitle);
+        console.log(data.mData.mTitle);
         $("#" + EditEntryForm.NAME + "-message").val(data.mData.mContent);
         $("#" + EditEntryForm.NAME + "-editId").val(data.mData.mId);
         $("#" + EditEntryForm.NAME + "-created").text(data.mData.mCreated);
@@ -84,7 +85,7 @@ class EditEntryForm {
             type: "PUT",
             url: "/messages/" + id,
             dataType: "json",
-            data: JSON.stringify({ mTitle: title, mMessage: msg }),
+            data: JSON.stringify({ mTitle: title, mMessage: msg, uEmail: uemail, sessionKey: ukey}),
             success: EditEntryForm.onSubmitResponse
         });
     }

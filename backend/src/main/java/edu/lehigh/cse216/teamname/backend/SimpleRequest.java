@@ -8,6 +8,8 @@ package edu.lehigh.cse216.teamname.backend;
  *     do not need a constructor.
  */
 public class SimpleRequest {
+    public int mid;
+    public int uid;
     /**
      * The title being provided by the client.
      */
@@ -17,4 +19,12 @@ public class SimpleRequest {
      * The message being provided by the client.
      */
     public String mMessage;
+    /**
+     * The email being provided by the client.
+     */
+    public String uEmail;
+    /**
+     * The sessoinKey being provided by the client.
+     */
+    public String sessionKey;
 }
