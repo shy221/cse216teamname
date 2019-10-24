@@ -1,3 +1,4 @@
+//Shenyi Yu Phase 1
 package edu.lehigh.cse216.yut222.phase0;
 
 import org.junit.Test;
@@ -16,9 +17,12 @@ public class ExampleUnitTest {
     }
 
     @Test
-    public void Datum_constructor_sets_fields() throws Exception {
-        Datum d = new Datum(7, "hello world");
-        assertEquals(d.mIndex, 7);
-        assertEquals(d.mText, "hello world");
+    public void Message_constructor_sets_fields() throws Exception {
+        Message d = new Message(999,"test title","test content",0);
+        assertEquals(d.mId,999);
+        assertEquals(d.mTitle, "test title");
+        assertEquals(d.mLikes,0);
+        assertEquals(d.mContent, "test content");
+
     }
 }

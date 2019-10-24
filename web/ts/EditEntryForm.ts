@@ -6,74 +6,87 @@
  * EditEntryForm encapsulates all of the code for the form for editing an entry
  */
 class EditEntryForm {
+
+    private static readonly NAME = "EditEntryForm";
+
     /**
-     * To initialize the object, we say what method of EditEntryForm should be
-     * run in response to each of the form's buttons being clicked.
+     * Track if the Singleton has been initialized
      */
-    constructor() {
-        $("#editCancel").click(this.clearForm);
-        $("#editButton").click(this.submitForm);
-    }
+    private static isInit = false;
 
     /**
      * init() is called from an AJAX GET, and should populate the form if and 
      * only if the GET did not have an error
      */
-    init(data: any) {
-        if (data.mStatus === "ok") {
-            $("#editTitle").val(data.mData.mTitle);
-            $("#editMessage").val(data.mData.mContent);
-            $("#editId").val(data.mData.mId);
-            $("#editCreated").text(data.mData.mCreated);
-            // show the edit form
-            $("#addElement").hide();
-            $("#editElement").show();
-            $("#showElements").hide();
-        }
-        else if (data.mStatus === "error") {
-            window.alert("Error: " + data.mMessage);
-        }
-        else {
-            window.alert("An unspecified error occurred");
+    private static init() {
+        if (!EditEntryForm.isInit) {
+            $("body").append(Handlebars.templates[EditEntryForm.NAME + ".hb"]());
+            $("#" + EditEntryForm.NAME + "-Update").click(EditEntryForm.submitForm);
+            $("#" + EditEntryForm.NAME + "-Cancel").click(EditEntryForm.hide);
+            EditEntryForm.isInit = true;
         }
     }
 
     /**
-     * Clear the form's input fields
+     * Refresh() doesn't really have much meaning, but just like in sNavbar, we
+     * have a refresh() method so that we don't have front-end code calling
+     * init().
      */
-    clearForm() {
-        $("#editTitle").val("");
-        $("#editMessage").val("");
-        $("#editId").val("");
-        $("#editCreated").text("");
-        // reset the UI
-        $("#addElement").hide();
-        $("#editElement").hide();
-        $("#showElements").show();
+    public static refresh() {
+        EditEntryForm.init();
     }
 
     /**
-     * Check if the input fields are both valid, and if so, do an AJAX call.
+     * Hide the EditEntryForm.  Be sure to clear its fields first
      */
-    submitForm() {
+    private static hide() {
+        $("#" + EditEntryForm.NAME + "-title").val("");
+        $("#" + EditEntryForm.NAME + "-message").val("");
+        $("#" + EditEntryForm.NAME + "-editId").val("");
+        $("#" + EditEntryForm.NAME + "-created").text("");
+        $("#" + EditEntryForm.NAME).modal("hide");
+    }
+
+    /**
+     * Show the EditEntryForm.  Be sure to clear its fields, because there are
+     * ways of making a Bootstrap modal disapper without clicking Close, and
+     * we haven't set up the hooks to clear the fields on the events associated
+     * with those ways of making the modal disappear.
+     */
+    public static show(data: any) {
+        $("#" + EditEntryForm.NAME + "-title").val(data.mData.mTitle);
+        console.log(data.mData.mTitle);
+        $("#" + EditEntryForm.NAME + "-message").val(data.mData.mContent);
+        $("#" + EditEntryForm.NAME + "-editId").val(data.mData.mId);
+        $("#" + EditEntryForm.NAME + "-created").text(data.mData.mCreated);
+        $("#" + EditEntryForm.NAME).modal("show");
+    }
+
+
+    /**
+     * Send data to submit the form only if the fields are both valid.  
+     * Immediately hide the form when we send data, so that the user knows that 
+     * their click was received.
+     */
+    private static submitForm() {
         // get the values of the two fields, force them to be strings, and check 
         // that neither is empty
-        let title = "" + $("#editTitle").val();
-        let msg = "" + $("#editMessage").val();
-        // NB: we assume that the user didn't modify the value of #editId
-        let id = "" + $("#editId").val();
+        let title = "" + $("#" + EditEntryForm.NAME + "-title").val();
+        let msg = "" + $("#" + EditEntryForm.NAME + "-message").val();
+        let id = "" + $("#" + EditEntryForm.NAME + "-editId").val();
         if (title === "" || msg === "") {
             window.alert("Error: title or message is not valid");
             return;
         }
+        EditEntryForm.hide();
         // set up an AJAX post.  When the server replies, the result will go to
         // onSubmitResponse
         $.ajax({
             type: "PUT",
             url: "/messages/" + id,
             dataType: "json",
-            data: JSON.stringify({ mTitle: title, mMessage: msg }),
-            success: editEntryForm.onSubmitResponse
+            data: JSON.stringify({ mTitle: title, mMessage: msg, uEmail: uemail, sessionKey: ukey}),
+            success: EditEntryForm.onSubmitResponse
         });
     }
 
@@ -83,12 +96,11 @@ class EditEntryForm {
      * 
      * @param data The object returned by the server
      */
-    private onSubmitResponse(data: any) {
+    private static onSubmitResponse(data: any) {
         // If we get an "ok" message, clear the form and refresh the main 
         // listing of messages
         if (data.mStatus === "ok") {
-            editEntryForm.clearForm();
-            //mainList.refresh();
+            ElementList.refresh();
         }
         // Handle explicit errors with a detailed popup message
         else if (data.mStatus === "error") {

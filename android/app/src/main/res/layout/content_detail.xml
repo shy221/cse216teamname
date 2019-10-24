@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context=".DetailActivity"
+    tools:showIn="@layout/activity_detail">
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/message_detail_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="234dp"></androidx.recyclerview.widget.RecyclerView>
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/comment_list_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="234dp"></androidx.recyclerview.widget.RecyclerView>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <TextView
+            android:id="@+id/UpdateMessage"
+            android:layout_width="383dp"
+            android:layout_height="54dp"
+            android:text=""
+            tools:layout_editor_absoluteY="8dp"
+            tools:layout_editor_absoluteX="0dp" />
+
+
+        <EditText
+            android:id="@+id/editContent"
+            android:layout_width="392dp"
+            android:layout_height="136dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="12dp"
+            android:layout_marginLeft="12dp"
+            android:layout_marginTop="344dp"
+            android:ems="10"
+            android:inputType="textPersonName"
+            android:text=""
+            tools:layout_editor_absoluteX="0dp"
+            tools:layout_editor_absoluteY="62dp" />
+
+        <Button
+            android:id="@+id/detailCancel"
+            android:layout_width="191dp"
+            android:layout_height="50dp"
+            android:text="Cancel"
+
+            android:layout_alignTop="@+id/detailOk"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_toLeftOf="@+id/detailOk"
+            android:layout_toStartOf="@+id/detailOk" />
+
+        <Button
+            android:id="@+id/detailOk"
+            android:layout_width="191dp"
+            android:layout_height="50dp"
+            android:text="OK"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginBottom="50dp" />
+
+        <Button
+            android:id="@+id/edit"
+            android:layout_width="191dp"
+            android:layout_height="50dp"
+            android:text="edit"
+            android:layout_alignTop="@+id/drop"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_toLeftOf="@+id/drop"
+            android:layout_toStartOf="@+id/drop"
+            />
+
+        <Button
+            android:id="@+id/drop"
+            android:layout_width="191dp"
+            android:layout_height="50dp"
+            android:text="delete"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+
+            android:layout_marginBottom="100dp"/>
+
+        <Button
+            android:id="@+id/like"
+            android:text="like"
+            android:layout_width="191dp"
+            android:layout_height="50dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginBottom="333dp"
+         />
+        <Button
+            android:id="@+id/comment"
+            android:text="comment"
+            android:layout_width="191dp"
+            android:layout_height="50dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginBottom="270dp"
+            />
+
+
+    </RelativeLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

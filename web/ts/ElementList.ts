@@ -1,6 +1,4 @@
-// a global for the main ElementList of the program.  See newEntryForm for 
-// explanation
-var mainList: ElementList;
+
 
 /**
  * The ElementList Singleton provides a way of displaying all of the data 
@@ -35,9 +33,10 @@ class ElementList {
         ElementList.init();
         // Issue a GET, and then pass the result to update()
         $.ajax({
-            type: "GET",
-            url: "/messages",
+            type: "POST",
+            url: "/listmessages",
             dataType: "json",
+            data: JSON.stringify({ uEmail: uemail, sessionKey: ukey }),
             success: ElementList.update
         });
     }
@@ -52,55 +51,26 @@ class ElementList {
         // Use a template to re-generate the table, and then insert it
         $("body").append(Handlebars.templates[ElementList.NAME + ".hb"](data));
         // Find rows in the table and set behavior
-        $("." + ElementList.NAME + "-detailbtn").click(ElementList.clickEdit);
-        // Find all of the delete buttons, and set their behavior
-        $("." + ElementList.NAME + "-delbtn").click(ElementList.clickDelete);
-        // Find all of the Edit buttons, and set their behavior
-        $("." + ElementList.NAME + "-editbtn").click(ElementList.clickEdit);
+        // Find all of the detail buttons, and set their behavior
+        $("." + ElementList.NAME + "-detailbtn").click(ElementList.clickDetail);
     }
 
-    /**
-     * clickDelete is the code we run in response to a click of a delete button
-     */
-    /*private static clickDetail() {
-        // as in clickDelete, we need the ID of the row
-        let id = $(this).data("value");
-        $.ajax({
-            type: "GET",
-            url: "/messages/" + id,
-            dataType: "json",
-            success: editEntryForm.init
-        });
-    }*/
 
     /**
-     * clickDelete is the code we run in response to a click of a delete button
+     * clickDetail is the code we run in response to a click of a detail button
      */
-    private static clickDelete() {
+    private static clickDetail() {
         // for now, just print the ID that goes along with the data in the row
         // whose "delete" button was clicked
         let id = $(this).data("value");
         $.ajax({
-            type: "DELETE",
+            type: "POST",
             url: "/messages/" + id,
             dataType: "json",
             // TODO: we should really have a function that looks at the return
             //       value and possibly prints an error message.
-            success: ElementList.refresh
-        });
-    }
-
-    /**
-     * clickEdit is the code we run in response to a click of a delete button
-     */
-    private static clickEdit() {
-        // as in clickDelete, we need the ID of the row
-        let id = $(this).data("value");
-        $.ajax({
-            type: "GET",
-            url: "/messages/" + id,
-            dataType: "json",
-            success: editEntryForm.init
+            data: JSON.stringify({ uEmail: uemail, sessionKey: ukey }),
+            success: ShowDetail.show
         });
     }
 } // end class ElementList

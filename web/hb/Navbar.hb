@@ -10,7 +10,7 @@
               <span class="icon-bar"></span>
             </button>
             <!-- Clicking the brand refreshes the page -->
-            <a class="navbar-brand" href="/">My Web Frontend</a>
+            <a class="navbar-brand" href="/">Buzz</a>
         </div>
 
         <!-- Collect the nav links, forms, and other content for toggling -->
@@ -18,8 +18,27 @@
             <ul class="nav navbar-nav">
                 <li>
                     <a class="btn btn-link" id="Navbar-add">
-                        Add Entry
+                        Post a Event
                         <span class="glyphicon glyphicon-plus"></span><span class="sr-only">Show Trending Posts</span>
+                    </a>
+                </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a class="btn btn-link" id="Navbar-Account">
+                        <span class="glyphicon glyphicon-user"></span> Account
+                    </a>
+                </li>
+                <li>
+                    <a class="btn btn-link" id="Navbar-logout">
+                        Logout
+                        <span class="glyphicon glyphicon-log-out"></span><span class="sr-only">Show</span>
+                    </a>
+                </li>
+                <li>
+                    <a class="btn btn-link" id="Navbar-login">
+                        Login
+                        <span class="glyphicon glyphicon-log-in"></span><span class="sr-only">Show</span>
                     </a>
                 </li>
             </ul>
