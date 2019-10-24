@@ -3,8 +3,6 @@ package edu.lehigh.cse216.teamname.backend;
 // Import the Spark package, so that we can make use of the "get" function to 
 // create an HTTP GET route
 
-//import bcrypt do generate salt and hash password
-import org.springframework.security.crypto.bcrypt.BCrypt;
 import spark.Spark;
 
 // Import Google's JSON library
@@ -347,8 +345,8 @@ public class App {
          */
 
         /**
-         * phase 2
-         * login with email and password
+         * phase 3
+         * login with Google Gmail
          * POST route
          */
 
@@ -359,14 +357,18 @@ public class App {
         Spark.post("/login", (request, response) -> {
             // NB: if gson.Json fails, Spark will reply with status 500 Internal
             // Server Error
+            
             KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
             SecureRandom secureRandom = new SecureRandom();
             int keyBitSize = 256;
             keyGenerator.init(keyBitSize, secureRandom);
             SecretKey secretKey = keyGenerator.generateKey();
-            LoginRequest req = gson.fromJson(request.body(), LoginRequest.class);
+            // LoginRequest req = gson.fromJson(request.body(), LoginRequest.class);
+            
             response.status(200);
             response.type("application/json");
+
+            /* Code from Phase 2, no longer needed
             // modify functions here
             String email = req.uEmail;
             String password = req.uPassword;
@@ -374,18 +376,23 @@ public class App {
             String salt = db.matchPwd(email).uSalt;
             String hash = BCrypt.hashpw(password, salt);
             // get base64 encoded version of the key
+            */
+
+            // Obtain token from Google
+            // TODO: Implement Google API
+
+            // Obtain user's Gmail using the token provided by Google
+            String email = "";
+            // TODO: Access data from Google resource server
+
             String sessionKey = Base64.getEncoder().encodeToString(secretKey.getEncoded());
-//            String sessionKey = secretKey.toString();
-            DataRowUserProfile userInfo = new DataRowUserProfile(db.matchPwd(email).uId,db.matchPwd(email).uSername, db.matchPwd(email).uEmail, db.matchPwd(email).uSalt, db.matchPwd(email).uPassword, db.matchPwd(email).uIntro, sessionKey);
             session.put(email, sessionKey);
-//            boolean matched = BCrypt.checkpw(password + salt, hash);
-////            System.out.println(matched);
-            if (db.matchPwd(email).uPassword.equals(hash)){
-                    return gson.toJson(new StructuredResponse("ok", "Login success!", userInfo));
+            if (db.matchUsr(email) == null){
+                // We need to create a user
+                db.insertRowToUser(email);
             }
-            else{
-                return gson.toJson(new StructuredResponse("error", email + " not found", userInfo));
-            }
+            DataRowUserProfile userInfo = new DataRowUserProfile(db.matchUsr(email).uId,db.matchUsr(email).uSername, db.matchUsr(email).uEmail, db.matchUsr(email).uIntro, sessionKey);
+            return gson.toJson(new StructuredResponse("ok", "Login success!", userInfo));
         });
 
         /**
@@ -397,6 +404,7 @@ public class App {
         // JSON from the body of the request, turn it into a LoginRequest
         // object, extract the user email and password, insert them, and return the
         // if the password is correct.
+        /*
         Spark.put("/:uid/updatepwd", (request, response) -> {
             // NB: if gson.Json fails, Spark will reply with status 500 Internal
             // Server Error
@@ -422,6 +430,7 @@ public class App {
 
 
         });
+        */
 
         /**
          * phase 2
@@ -575,7 +584,7 @@ public class App {
 //            // ensure status 200 OK, with a MIME type of JSON
 //            response.status(200);
 //            response.type("application/json");
-//            //TODO: add new function
+//            //TO-DO: add new function
 //            DataRow data = db.readOne(idx);
 //            if (data == null) {
 //                return gson.toJson(new StructuredResponse("error", idx + " not found", null));
