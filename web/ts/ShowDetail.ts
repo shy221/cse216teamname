@@ -49,7 +49,7 @@ class ShowDetail {
         $("#" + ShowDetail.NAME + "-likebtn").text("");
         $("#" + ShowDetail.NAME + "-likebtn").text("Like: " + data.mData.mLikes);
         $("#" + ShowDetail.NAME + "-dislikebtn").text("");
-        $("#" + ShowDetail.NAME + "-dislikebtn").text("Like: " + data.mData.mDislikes);
+        $("#" + ShowDetail.NAME + "-dislikebtn").text("Disike: " + data.mData.mDislikes);
     }
 
 
