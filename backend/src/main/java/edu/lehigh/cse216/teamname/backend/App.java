@@ -19,6 +19,11 @@ import java.util.Map;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
+import javax.net.ssl.HttpsURLConnection;
+
+//to send https requests
+import java.net.*;
+import java.io.*;
 
 /**
  * For now, our app creates an HTTP server that can only get and add data.
@@ -340,20 +345,55 @@ public class App {
 
         });
 
-        /**
-         * phase 2 routes
-         */
 
         /**
-         * phase 3
+         * Modified for phase 3
          * login with Google Gmail
          * POST route
          */
 
+        Spark.post("/callback", (request, response) -> {
+            // Obtain access code from Google
+            if (request.params("code") == null)
+                response.redirect("https://accounts.google.com/o/oauth2/v2/auth?" +
+                "scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email&" +
+                "include_granted_scopes=true&" +
+                "redirect_uri=https%3A%2F%2Farcane-refuge-67249.herokuapp.com%2Fcallback&" +
+                "response_type=code&" +
+                "client_id=<Our Client ID>");
+            String access_code = request.params("code");
+
+            // Exchange access code for token
+            URL token_url = new URL("https://accounts.google.com/o/oauth2/v4/token");
+            String query = "code=" + access_code + "&" +
+                "client_id=<Our Client Id>&" +
+                "client_secret=<Our Client Secret>&" +
+                "redirect_uri=https%3A%2F%2Farcane-refuge-67249.herokuapp.com%2Flogin&" +
+                "grant_type=authorization_code";
+            try {
+                HttpsURLConnection conn = (HttpsURLConnection)token_url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Content-length", String.valueOf(query.length()));
+                conn.setRequestProperty("Content-type", "application/x-www-form-urlencoded");
+                conn.setDoOutput(true);
+                // Pass the query to OAuth Server
+                DataOutputStream output = new DataOutputStream(conn.getOutputStream());
+                output.writeBytes(query);
+                output.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+                return gson.toJson(new StructuredResponse("error", "Encountered exceptions", e));
+            }
+            response.status(200);
+            response.type("application/json");
+            return gson.toJson(new StructuredResponse("ok", "Sent request for access token", null));
+        });
+
         // POST route for adding a new element to the Database.
-        // This will read JSON from the body of the request,
-        // turn it into a LoginRequest object, extract the user email and password,
-        // insert them, and return if the password is correct.
+        // This will read JSON sent by Google OAuth server,
+        // obtain the access token,
+        // use the token to access user info 
+        // and insert it to our own database.
         Spark.post("/login", (request, response) -> {
             // NB: if gson.Json fails, Spark will reply with status 500 Internal
             // Server Error
@@ -364,9 +404,6 @@ public class App {
             keyGenerator.init(keyBitSize, secureRandom);
             SecretKey secretKey = keyGenerator.generateKey();
             // LoginRequest req = gson.fromJson(request.body(), LoginRequest.class);
-            
-            response.status(200);
-            response.type("application/json");
 
             /* Code from Phase 2, no longer needed
             // modify functions here
@@ -377,20 +414,31 @@ public class App {
             String hash = BCrypt.hashpw(password, salt);
             // get base64 encoded version of the key
             */
-
-            // Obtain token from Google
-            // TODO: Implement Google API
+            
+            OAuthRequest req = gson.fromJson(request.body(), OAuthRequest.class);
+            String access_token = req.access_token;
+            response.status(200);
+            response.type("application/json");
 
             // Obtain user's Gmail using the token provided by Google
-            String email = "";
-            // TODO: Access data from Google resource server
-
-            String sessionKey = Base64.getEncoder().encodeToString(secretKey.getEncoded());
-            session.put(email, sessionKey);
+            String email;
+            URL oauth_url = new URL("https://www.googleapis.com/auth/userinfo.email?access_token=" + access_token);
+            try {
+                HttpsURLConnection conn = (HttpsURLConnection)oauth_url.openConnection();
+                conn.setRequestMethod("GET");
+                conn.setRequestProperty("Content-type", "application/x-www-form-urlencoded");
+                email = conn.getResponseMessage();
+            } catch (Exception e) {
+                e.printStackTrace();
+                return gson.toJson(new StructuredResponse("error", "Encountered exceptions", e));
+            }
+            
             if (db.matchUsr(email) == null){
                 // We need to create a user
                 db.insertRowToUser(email);
             }
+            String sessionKey = Base64.getEncoder().encodeToString(secretKey.getEncoded());
+            session.put(email, sessionKey);
             DataRowUserProfile userInfo = new DataRowUserProfile(db.matchUsr(email).uId,db.matchUsr(email).uSername, db.matchUsr(email).uEmail, db.matchUsr(email).uIntro, sessionKey);
             return gson.toJson(new StructuredResponse("ok", "Login success!", userInfo));
         });
