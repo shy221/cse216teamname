@@ -354,20 +354,13 @@ public class App {
 
         Spark.post("/callback", (request, response) -> {
             // Obtain access code from Google
-            if (request.params("code") == null)
-                response.redirect("https://accounts.google.com/o/oauth2/v2/auth?" +
-                "scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email&" +
-                "include_granted_scopes=true&" +
-                "redirect_uri=https%3A%2F%2Farcane-refuge-67249.herokuapp.com%2Fcallback&" +
-                "response_type=code&" +
-                "client_id=<Our Client ID>");
             String access_code = request.params("code");
 
             // Exchange access code for token
             URL token_url = new URL("https://accounts.google.com/o/oauth2/v4/token");
             String query = "code=" + access_code + "&" +
-                "client_id=<Our Client Id>&" +
-                "client_secret=<Our Client Secret>&" +
+                "client_id=689219964832-6m703l22ir6jh9ra1m1lhrgg12bv7olt.apps.googleusercontent.com&" +
+                "client_secret=kHV5Rr_1_dRPTnkDnB2XjPKO&" +
                 "redirect_uri=https%3A%2F%2Farcane-refuge-67249.herokuapp.com%2Flogin&" +
                 "grant_type=authorization_code";
             try {
