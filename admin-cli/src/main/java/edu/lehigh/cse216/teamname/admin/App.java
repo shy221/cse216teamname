@@ -275,58 +275,58 @@ public class App {
         return i;
     }
 
-    /**
-     * Method to send a email with email address
-     */
-    static boolean sendEmail(String from_email, String to_email, String password) {
-        Email from = new Email(from_email);
-        String subject = "[Buzz] Welcome to Buzz!";
-        Email to = new Email(to_email);
-        Content content = new Content("text/plain", "Your Buzz password is: " + password
-                + "\n\nTo reset your password, please login with your email address at: "
-                + "https://arcane-refuge-67249.herokuapp.com" + " and reset your password in the profile page.");
-        Mail mail = new Mail(from, subject, to, content);
+//    /**
+//     * Method to send a email with email address
+//     */
+//    static boolean sendEmail(String from_email, String to_email, String password) {
+//        Email from = new Email(from_email);
+//        String subject = "[Buzz] Welcome to Buzz!";
+//        Email to = new Email(to_email);
+//        Content content = new Content("text/plain", "Your Buzz password is: " + password
+//                + "\n\nTo reset your password, please login with your email address at: "
+//                + "https://arcane-refuge-67249.herokuapp.com" + " and reset your password in the profile page.");
+//        Mail mail = new Mail(from, subject, to, content);
+//
+//        SendGrid sg = new SendGrid(System.getenv("SENDGRID_API_KEY"));
+//        Request request = new Request();
+//        try {
+//            request.setMethod(Method.POST);
+//            request.setEndpoint("mail/send");
+//            request.setBody(mail.build());
+//            Response response = sg.api(request);
+//            System.out.println(response.getStatusCode());
+//            System.out.println(response.getBody());
+//            System.out.println(response.getHeaders());
+//        } catch (IOException ex) {
+//            ex.printStackTrace();
+//            return false;
+//        }
+//        return true;
+//    }
 
-        SendGrid sg = new SendGrid(System.getenv("SENDGRID_API_KEY"));
-        Request request = new Request();
-        try {
-            request.setMethod(Method.POST);
-            request.setEndpoint("mail/send");
-            request.setBody(mail.build());
-            Response response = sg.api(request);
-            System.out.println(response.getStatusCode());
-            System.out.println(response.getBody());
-            System.out.println(response.getHeaders());
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * function to generate a random string of length n
-     */
-    static String randomPassword(int n) {
-        // chose a Character random from this String
-        String AlphaNumericString = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" + "0123456789" + "abcdefghijklmnopqrstuvxyz"
-                + ",./;-=+!@#$%^&*";
-
-        // create StringBuffer size of AlphaNumericString
-        StringBuilder sb = new StringBuilder(n);
-
-        for (int i = 0; i < n; i++) {
-
-            // generate a random number between
-            // 0 to AlphaNumericString variable length
-            int index = (int) (AlphaNumericString.length() * Math.random());
-
-            // add Character one by one in end of sb
-            sb.append(AlphaNumericString.charAt(index));
-        }
-
-        return sb.toString();
-    }
+//    /**
+//     * function to generate a random string of length n
+//     */
+//    static String randomPassword(int n) {
+//        // chose a Character random from this String
+//        String AlphaNumericString = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" + "0123456789" + "abcdefghijklmnopqrstuvxyz"
+//                + ",./;-=+!@#$%^&*";
+//
+//        // create StringBuffer size of AlphaNumericString
+//        StringBuilder sb = new StringBuilder(n);
+//
+//        for (int i = 0; i < n; i++) {
+//
+//            // generate a random number between
+//            // 0 to AlphaNumericString variable length
+//            int index = (int) (AlphaNumericString.length() * Math.random());
+//
+//            // add Character one by one in end of sb
+//            sb.append(AlphaNumericString.charAt(index));
+//        }
+//
+//        return sb.toString();
+//    }
 
     /**
      * The main routine runs a loop that gets a request from the user and processes
@@ -453,8 +453,8 @@ public class App {
                         if (res != null) {
                             System.out.println("  [" + res.uId + "] " + res.username);
                             System.out.println("  --> " + res.uEmail);
-                            System.out.println("  --> " + res.uSalt);
-                            System.out.println("  --> " + res.uPassword);
+//                            System.out.println("  --> " + res.uSalt);
+//                            System.out.println("  --> " + res.uPassword);
                             System.out.println("  --> " + res.uIntro);
                         }
 
@@ -590,10 +590,10 @@ public class App {
                         if (email.equals("")) {
                             continue;
                         }
-                        String password = randomPassword(8);
+//                        String password = randomPassword(8);
 
-                        int res = db.insertRowToUser(email, password);
-                        System.out.println(sendEmail("admin@buzz.com", email, password));
+                        int res = db.insertRowToUser(email);
+//                        System.out.println(sendEmail("admin@buzz.com", email));
                         System.out.println(res + " rows added");
 
                     } else if (action == 'C') {
