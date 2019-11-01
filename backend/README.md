@@ -23,11 +23,13 @@ In phase1:
 
 Google OAuth work flow (phase3):
     1. Frontend/android sends an authenticate code to backend /callback
-    2. Backend use the authenticate code to exchange for an access token
+    2. Backend use the authenticate code to exchange for an access token,
+       which will be sent to backend /login
     3. Backend access user email using the access token
+    4. Backend checks whether a user with the given email exists in our
+       own database (if not, create a new user) and generates a session
+       key
 
-what next phase might work on:
-    the datatype name in DataRow, SimpleRequest, StructuredResponse need to be checked. 
 
 
 
