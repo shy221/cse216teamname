@@ -396,17 +396,6 @@ public class App {
             int keyBitSize = 256;
             keyGenerator.init(keyBitSize, secureRandom);
             SecretKey secretKey = keyGenerator.generateKey();
-            // LoginRequest req = gson.fromJson(request.body(), LoginRequest.class);
-
-            /* Code from Phase 2, no longer needed
-            // modify functions here
-            String email = req.uEmail;
-            String password = req.uPassword;
-            //get salt from db
-            String salt = db.matchPwd(email).uSalt;
-            String hash = BCrypt.hashpw(password, salt);
-            // get base64 encoded version of the key
-            */
             
             OAuthRequest req = gson.fromJson(request.body(), OAuthRequest.class);
             String access_token = req.access_token;
@@ -435,43 +424,6 @@ public class App {
             DataRowUserProfile userInfo = new DataRowUserProfile(db.matchUsr(email).uId,db.matchUsr(email).uSername, db.matchUsr(email).uEmail, db.matchUsr(email).uIntro, sessionKey);
             return gson.toJson(new StructuredResponse("ok", "Login success!", userInfo));
         });
-
-        /**
-         * phase 2
-         * update password
-         * PUT route
-         */
-        // PUT route for updating password to the Database.  This will read
-        // JSON from the body of the request, turn it into a LoginRequest
-        // object, extract the user email and password, insert them, and return the
-        // if the password is correct.
-        /*
-        Spark.put("/:uid/updatepwd", (request, response) -> {
-            // NB: if gson.Json fails, Spark will reply with status 500 Internal
-            // Server Error
-            int idx = Integer.parseInt(request.params("uid"));
-            LoginRequest req = gson.fromJson(request.body(), LoginRequest.class);
-            String sk = req.sessionKey;
-            String em = req.uEmail;
-            String pwd = req.uPassword;
-            String salt = db.matchPwd(em).uSalt;
-            String hash = BCrypt.hashpw(pwd, salt);
-            System.out.println(hash);
-            if (sk.equals(session.get(em))){
-                response.status(200);
-                response.type("application/json");
-                int result = db.uUpdatePwd(idx, salt, hash);
-                if (result == -1) {
-                    return gson.toJson(new StructuredResponse("error", "unable to update password " + idx, null));
-                } else {
-                    return gson.toJson(new StructuredResponse("ok", null, result));
-                }
-            }
-            return gson.toJson(new StructuredResponse("error", "session key not correct..", null));
-
-
-        });
-        */
 
         /**
          * phase 2
