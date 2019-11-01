@@ -21,6 +21,11 @@ In phase1:
     StructuredResponseTest.java:
         check the response format
 
+Google OAuth work flow (phase3):
+    1. Frontend/android sends an authenticate code to backend /callback
+    2. Backend use the authenticate code to exchange for an access token
+    3. Backend access user email using the access token
+
 what next phase might work on:
     the datatype name in DataRow, SimpleRequest, StructuredResponse need to be checked. 
 
