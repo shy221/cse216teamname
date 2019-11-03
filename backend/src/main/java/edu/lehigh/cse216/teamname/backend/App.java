@@ -352,6 +352,7 @@ public class App {
          * POST route
          */
 
+        /*
         Spark.post("/callback", (request, response) -> {
             // Obtain access code from Google
             String access_code = request.params("code");
@@ -381,6 +382,7 @@ public class App {
             response.type("application/json");
             return gson.toJson(new StructuredResponse("ok", "Sent request for access token", null));
         });
+        */
 
         // POST route for adding a new element to the Database.
         // This will read JSON sent by Google OAuth server,
