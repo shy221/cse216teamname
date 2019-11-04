@@ -13,16 +13,5 @@ package edu.lehigh.cse216.teamname.backend;
     /**
      * The short-lifed access token returned from Google
      */
-    public String access_token;
-
-    /**
-     * The remaining lifetime of the access token in seconds
-     */
-    public int expires_in;
-
-    /**
-     * Token type. Accoring to Google's documentation, for now
-     * it would always be 'Bearer'
-     */
-    public String token_type;
+    public String id_token;
  }

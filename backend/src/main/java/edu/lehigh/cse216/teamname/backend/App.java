@@ -11,6 +11,7 @@ import com.google.gson.*;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,6 +25,13 @@ import javax.net.ssl.HttpsURLConnection;
 //to send https requests
 import java.net.*;
 import java.io.*;
+
+//for google oauth
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 
 /**
  * For now, our app creates an HTTP server that can only get and add data.
@@ -400,21 +408,24 @@ public class App {
             SecretKey secretKey = keyGenerator.generateKey();
             
             OAuthRequest req = gson.fromJson(request.body(), OAuthRequest.class);
-            String access_token = req.access_token;
+            String idTokenString = req.id_token;
             response.status(200);
             response.type("application/json");
 
             // Obtain user's Gmail using the token provided by Google
+            
             String email;
-            URL oauth_url = new URL("https://www.googleapis.com/auth/userinfo.email?access_token=" + access_token);
-            try {
-                HttpsURLConnection conn = (HttpsURLConnection)oauth_url.openConnection();
-                conn.setRequestMethod("GET");
-                conn.setRequestProperty("Content-type", "application/x-www-form-urlencoded");
-                email = conn.getResponseMessage();
-            } catch (Exception e) {
-                e.printStackTrace();
-                return gson.toJson(new StructuredResponse("error", "Encountered exceptions", e));
+
+            GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new JacksonFactory())
+                .setAudience(Collections.singletonList("689219964832-6m703l22ir6jh9ra1m1lhrgg12bv7olt.apps.googleusercontent.com"))
+                .build();
+            
+            GoogleIdToken idToken = verifier.verify(idTokenString);
+            if (idToken != null) {
+                Payload payload = idToken.getPayload();
+                email = payload.getEmail();
+            } else {
+                return gson.toJson(new StructuredResponse("error", "invalid id token", null));
             }
             
             if (db.matchUsr(email) == null){
@@ -424,6 +435,7 @@ public class App {
             String sessionKey = Base64.getEncoder().encodeToString(secretKey.getEncoded());
             session.put(email, sessionKey);
             DataRowUserProfile userInfo = new DataRowUserProfile(db.matchUsr(email).uId,db.matchUsr(email).uSername, db.matchUsr(email).uEmail, db.matchUsr(email).uIntro, sessionKey);
+
             return gson.toJson(new StructuredResponse("ok", "Login success!", userInfo));
         });
 
