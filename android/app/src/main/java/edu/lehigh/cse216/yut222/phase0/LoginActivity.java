@@ -10,6 +10,13 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.SignInButton;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -36,64 +43,149 @@ import android.widget.Toast;
 import android.preference.PreferenceManager;
 
 public class LoginActivity  extends AppCompatActivity{
+    private static final String TAG = "lez221";
+    private static final int RC_SIGN_IN = 9001;
     public static SharedPreferences sharedpreferences;
+    private GoogleSignInClient mGoogleSignInClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, "Beginning of onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        // Get the parameter from the calling activity, and put it in the TextView
-        Intent input = getIntent();
-        String label_contents = input.getStringExtra("label_contents");
 
+        // Configure sign-in to request the user's ID, email address, and basic
+        // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .requestIdToken(getString(R.string.server_client_id))
+                .build();
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        final EditText etEmail = (EditText) findViewById(R.id.editText);
-        final EditText etPassword = (EditText) findViewById(R.id.editText4);
+        // Build a GoogleSignInClient with the options specified by gso.
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
-        Button bOk = (Button) findViewById(R.id.buttonOk);
-        bOk.setOnClickListener(new View.OnClickListener() {
+        SignInButton signInButton = findViewById(R.id.sign_in_button);
+        signInButton.setSize(SignInButton.SIZE_STANDARD);
+
+        signInButton.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View view) {
-                Log.e("login", "ok button");
-                Intent i = new Intent();
-                if (!etEmail.getText().toString().equals("")&& !etPassword.getText().toString().equals("") ) {
-                    i.putExtra("title", etEmail.getText().toString());
-                    i.putExtra("content", etPassword.getText().toString());
-                    setResult(Activity.RESULT_OK, i);
-                    String email = etEmail.getText().toString();
-                    String password = etPassword.getText().toString();
-                    login(email, password);//uid is 7 for now
-                    Log.e("login", "login method called");
-                }else {
-                    setResult(Activity.RESULT_OK, i);
-                    Context context = LoginActivity.this;
-                    Toast toast = Toast.makeText(context, "Please enter your email and password", Toast.LENGTH_LONG);
-                    toast.show();
-                    Log.e("where am i", "No input?");
-                    //finish();
-                }
+                signIn();
             }
-        });
-        Button bCancel = (Button) findViewById(R.id.buttonCancel);
-        bCancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Log.e("login", "cancel button");
-                Intent i = new Intent();
-                setResult(Activity.RESULT_CANCELED, i);
-                finish();
-            }
-        });
 
-        /*if(!(sharedpreferences.getString("prefKey", "default" ).equals("default"))){
-            finish();
-        }*/
+            private void signIn() {
+                Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+                startActivityForResult(signInIntent, RC_SIGN_IN);
+            }
+        });
 
     }
-    private void login(final String e, final String p){
+
+    protected void onStart() {
+        super.onStart();
+
+        // Check for existing Google Sign In account, if the user is already signed in
+        // the GoogleSignInAccount will be non-null.
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+        updateUI(account);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
+        if (requestCode == RC_SIGN_IN) {
+            // The Task returned from this call is always completed, no need to attach
+            // a listener.
+            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+            handleSignInResult(task);
+        }
+    }
+
+    private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
+        try {
+            Log.w(TAG, "Task = " + completedTask);
+            GoogleSignInAccount account = completedTask.getResult(ApiException.class);
+            String token = account.getIdToken();
+
+            String urlLogin = "https://arcane-refuge-67249.herokuapp.com/login";
+            Map<String, String> map = new HashMap<>();
+            map.put("id_token", token);
+            JSONObject m = new JSONObject(map);
+
+            JsonObjectRequest postR = new JsonObjectRequest(Request.Method.POST,
+                    urlLogin, m, new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    try {
+                        String status = response.getString("mStatus");
+                        if (status.equals("ok")) {
+                            //store user profile into a user object
+                            //shared preference
+
+                            JSONObject data = response.getJSONObject("mData");
+                            String uId = data.getString("uId");
+                            String uSername = data.getString("uSername");
+                            String uKey = data.getString("sessionKey");
+                            String uEmail = data.getString("uEmail");
+                            String uIntro = data.getString("uIntro");
+
+                            Log.e("Login page session key", uKey);
+                            //Context context = LoginActivity.this;
+                            sharedpreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                            SharedPreferences.Editor editor = sharedpreferences.edit();
+                            editor.putString("prefId",uId);
+                            editor.putString("prefName",uSername);
+                            editor.putString("prefEmail",uEmail);
+                            editor.putString("prefIntro",uIntro);
+                            editor.putString("prefKey",uKey);
+                            editor.commit();
+                            String PrefKey = sharedpreferences.getString("prefKey", "default");
+                            Log.e("Login page session key", PrefKey);
+                            Intent in = new Intent(LoginActivity.this, WelcomeActivity.class);
+                            startActivity(in);
+                        } else {
+                            Context context = LoginActivity.this;
+                            Toast toast = Toast.makeText(context, "WRONG PASSWORD", Toast.LENGTH_LONG);
+                            toast.show();
+                            Log.e("login", "onResponse mStatus error(password incorrect)");
+                        }
+                    } catch (final JSONException e) {
+                        Log.e("login", "Error parsing JSON file: onPostResponse/login" );
+                        return;
+                    }
+                    Log.d("login", "successfully get string response session key");
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.e("login", "Volley error");
+                }
+            });
+
+            // Signed in successfully, show authenticated UI.
+            updateUI(account);
+        } catch (ApiException e) {
+            // The ApiException status code indicates the detailed failure reason.
+            // Please refer to the GoogleSignInStatusCodes class reference for more information.
+            Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
+            updateUI(null);
+        }
+    }
+
+    private void updateUI(GoogleSignInAccount account) {
+        if (account != null) {
+            Intent in = new Intent(LoginActivity.this, WelcomeActivity.class);
+            startActivity(in);
+        } else {
+            Log.d(TAG, "account = null");
+            return;
+        }
+    }
+
+    /*private void login(final String e, final String p){
         //map is hashMap, m is jsonObject
         //one link to post
 
@@ -122,9 +214,9 @@ public class LoginActivity  extends AppCompatActivity{
             toast.show();
             Log.e("login", "onResponse mStatus error(password incorrect)");
         }*/
-        JsonObjectRequest postR = new JsonObjectRequest(Request.Method.POST,
+        /*JsonObjectRequest postR = new JsonObjectRequest(Request.Method.POST,
                 urlLogin, m, new Response.Listener<JSONObject>() {
-                @Override
+            @Override
             public void onResponse(JSONObject response) {
                 try {
                     String status = response.getString("mStatus");
@@ -133,13 +225,13 @@ public class LoginActivity  extends AppCompatActivity{
                         //shared preference
 
                         JSONObject data = response.getJSONObject("mData");
-                            String uId = data.getString("uId");
-                            String uSername = data.getString("uSername");
-                            String uPassword = data.getString("uPassword");
-                            String uSalt = data.getString("uSalt");
-                            String uKey = data.getString("sessionKey");
-                            String uEmail = data.getString("uEmail");
-                            String uIntro = data.getString("uIntro");
+                        String uId = data.getString("uId");
+                        String uSername = data.getString("uSername");
+                        String uPassword = data.getString("uPassword");
+                        String uSalt = data.getString("uSalt");
+                        String uKey = data.getString("sessionKey");
+                        String uEmail = data.getString("uEmail");
+                        String uIntro = data.getString("uIntro");
 
                         Log.e("Login page session key", uKey);
                         //Context context = LoginActivity.this;
@@ -163,9 +255,9 @@ public class LoginActivity  extends AppCompatActivity{
                         Log.e("login", "onResponse mStatus error(password incorrect)");
                     }
                 } catch (final JSONException e) {
-                        Log.e("login", "Error parsing JSON file: onPostResponse/login" );
-                        return;
-                    }
+                    Log.e("login", "Error parsing JSON file: onPostResponse/login" );
+                    return;
+                }
                 Log.d("login", "successfully get string response session key");
             }
         }, new Response.ErrorListener() {
@@ -175,6 +267,6 @@ public class LoginActivity  extends AppCompatActivity{
             }
         });
         MySingleton.getInstance(this).addToRequestQueue(postR);
-    }
+    }*/
 }
 

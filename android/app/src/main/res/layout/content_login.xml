@@ -11,70 +11,11 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-        <TextView
-            android:id="@+id/specialMessage"
-            android:layout_width="383dp"
-            android:layout_height="54dp"
-            android:text=""
-            tools:layout_editor_absoluteY="8dp"
-            tools:layout_editor_absoluteX="0dp" />
-
-        <Button
-            android:id="@+id/buttonCancel"
-            android:layout_width="191dp"
-            android:layout_height="50dp"
-            android:text="Cancel"
-            tools:layout_editor_absoluteY="371dp"
-            tools:layout_editor_absoluteX="0dp"
-            android:layout_alignTop="@+id/buttonOk"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_toLeftOf="@+id/buttonOk"
-            android:layout_toStartOf="@+id/buttonOk" />
-
-        <Button
-            android:id="@+id/buttonOk"
-            android:layout_width="191dp"
-            android:layout_height="50dp"
-            android:text="OK"
-            tools:layout_editor_absoluteY="371dp"
-            tools:layout_editor_absoluteX="191dp"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
-            android:layout_marginBottom="162dp" />
-
-        <EditText
-            android:id="@+id/editText"
-            android:layout_width="384dp"
-            android:layout_height="52dp"
-            android:layout_below="@+id/specialMessage"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentLeft="true"
-            android:layout_marginStart="3dp"
-            android:layout_marginLeft="3dp"
-            android:layout_marginTop="2dp"
-            android:ems="10"
-            android:inputType="textPersonName"
-            android:text=""
-            tools:layout_editor_absoluteX="0dp"
-            tools:layout_editor_absoluteY="62dp" />
-
-        <EditText
-            android:id="@+id/editText4"
-            android:layout_width="384dp"
-            android:layout_height="52dp"
-            android:layout_below="@+id/specialMessage"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentLeft="true"
-            android:layout_marginStart="6dp"
-            android:layout_marginLeft="6dp"
-            android:layout_marginTop="106dp"
-            android:ems="10"
-            android:inputType="textPersonName"
-            android:text=""
-            tools:layout_editor_absoluteX="0dp"
-            tools:layout_editor_absoluteY="62dp" />
+        <com.google.android.gms.common.SignInButton
+            android:id="@+id/sign_in_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"/>
     </RelativeLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

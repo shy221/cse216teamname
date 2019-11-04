@@ -41,15 +41,25 @@ public class ProfileActivity extends AppCompatActivity {
 
     ArrayList<User> thisUser = new ArrayList<>();
     Button logout = null;
+    Button activity = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
-        int id = Integer.parseInt(sharedpreferences.getString("prefId","default"));
+        final int id = Integer.parseInt(sharedpreferences.getString("prefId","default"));
         thisUser.add(new User(id, sharedpreferences.getString("prefName", "default"),
                 sharedpreferences.getString("prefIntro","default"), sharedpreferences.getString("prefEmail", "default")));
 
         logout = (Button) findViewById(R.id.Logout);
+        activity = (Button) findViewById(R.id.Activity);
+        activity.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(ProfileActivity.this, ProfileActivityActivity.class);
+                i.putExtra("user id", id);
+                startActivity(i);
+            }
+        });
 
         /*final String urlComments =  "https://arcane-refuge-67249.herokuapp.com/" + mId + "/listcomments";
         Map<String, String> map = new HashMap<>();
