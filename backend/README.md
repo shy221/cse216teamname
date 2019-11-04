@@ -22,8 +22,8 @@ In phase1:
         check the response format
 
 Google OAuth work flow (phase3):
-    1. Front-end sends an authenticate token to backend /login
-    2. Backend access user email using the access token
+    1. Front-end sends an id_token to backend /login
+    2. Backend access user email using the id_token
     3. Backend checks whether a user with the given email exists in our
        own database (if not, create a new user) and generates a session
        key

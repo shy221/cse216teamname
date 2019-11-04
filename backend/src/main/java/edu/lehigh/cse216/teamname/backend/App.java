@@ -20,11 +20,6 @@ import java.util.Map;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
-import javax.net.ssl.HttpsURLConnection;
-
-//to send https requests
-import java.net.*;
-import java.io.*;
 
 //for google oauth
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
