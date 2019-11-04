@@ -428,13 +428,17 @@ public class App {
                 return gson.toJson(new StructuredResponse("error", "invalid id token", null));
             }
             
+            
             if (db.matchUsr(email) == null){
                 // We need to create a user
-                db.insertRowToUser(email);
+                int addResult = db.insertRowToUser(email);
+                if (addResult != 1)
+                    return gson.toJson(new StructuredResponse("error", "failed to add user", addResult));
             }
             String sessionKey = Base64.getEncoder().encodeToString(secretKey.getEncoded());
             session.put(email, sessionKey);
             DataRowUserProfile userInfo = new DataRowUserProfile(db.matchUsr(email).uId,db.matchUsr(email).uSername, db.matchUsr(email).uEmail, db.matchUsr(email).uIntro, sessionKey);
+            
 
             return gson.toJson(new StructuredResponse("ok", "Login success!", userInfo));
         });

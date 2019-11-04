@@ -568,7 +568,7 @@ public class Database {
             // Use email as default user name
             uInsertOne.setString(1, email.split("@")[0]);
             uInsertOne.setString(2, email);
-            uInsertOne.setString(5, "This person is lazy, so nothing's here");
+            uInsertOne.setString(3, "This person is lazy, so nothing's here");
             count += uInsertOne.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
