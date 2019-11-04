@@ -439,8 +439,8 @@ public class App {
         });
 
         /**
-         * phase 2
-         * display user profile
+         * phase 3 modified
+         * display user profile and all posts uploaded
          * url/:uid --> user profile: username, email, intro = get, put
          * GET route
          */
@@ -454,11 +454,12 @@ public class App {
                 response.status(200);
                 response.type("application/json");
                 //add new function based on this
-                DataRowUserProfile data = db.uReadOne(idx);
-                if (data == null) {
+                DataRowUserProfile userProfile = db.uReadOne(idx);
+                ArrayList<DataRow> posts = db.readAllByUser(idx);
+                if (userProfile == null) {
                     return gson.toJson(new StructuredResponse("error", idx + " not found", null));
                 } else {
-                    return gson.toJson(new StructuredResponse("ok", null, data));
+                    return gson.toJson(new StructuredResponse("ok", null, new DataRowUserProfilePosts(userProfile, posts)));
                 }
             }
             return gson.toJson(new StructuredResponse("error", "session key not correct..", null));
