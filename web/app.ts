@@ -35,7 +35,20 @@ $(document).ready(function () {
     UserProfile.refresh();
     ShowComments.refresh();
     EditUserProfile.refresh();
+    /*gapi.load('auth2', function() {
+        // Initialize `auth2`
+        gapi.auth2.init().then(function(auth2) {
+            
+          // If the user is already signed in
+          if (auth2.isSignedIn.get()) {
+            var googleUser = auth2.currentUser.get();
+            
+            // Change user's profile information
+            changeProfile(googleUser);
+          }
+        });
+      });
     // Create the object that controls the "Edit Entry" form
     // set up initial UI state
-    $("#editElement").hide();
+    $("#editElement").hide();*/
 });
