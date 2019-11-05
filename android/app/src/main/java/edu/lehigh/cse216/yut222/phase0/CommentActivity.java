@@ -87,10 +87,17 @@ public class CommentActivity extends AppCompatActivity {
                     mComments.add(new Comment(cId, uId, mId, text, username));
                     Log.e("comment", "exiting for loop");
                 }
-                Log.e("outside for loop", mComments.get(0).cText);
+                Log.e("outside for loop", "Comment");
                 //Log.e("outside for loop", mComments.get(0).cUsername);
 
             } else {
+                if(response.getString("mMessage").equals("session key not correct..")){
+                    Toast toast = Toast.makeText(CommentActivity.this, "Session Time Out", Toast.LENGTH_LONG);
+                    toast.show();
+                    Intent intent = new Intent(CommentActivity.this, LoginActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(intent);
+                }
                 Log.e("get comment", "mStatus is not ok.");
             }
         } catch (final JSONException e) {
@@ -106,5 +113,19 @@ public class CommentActivity extends AppCompatActivity {
         rv.setLayoutManager(new LinearLayoutManager(this));
         CommentListAdapter adapter = new CommentListAdapter(this, mComments);
         rv.setAdapter(adapter);
+
+        adapter.setClickListener(new CommentListAdapter.ClickListener() {
+
+            @Override
+            public void onClick(Comment c) {
+                //Toast for fun effect SY
+                //Toast.makeText(MainActivity.this, message.mTitle , Toast.LENGTH_LONG).show();
+                Intent i = new Intent(CommentActivity.this, ProfileActivityActivity.class);
+                i.putExtra("user id", c.uId);
+
+                startActivity(i);
+                //change this function
+            }
+        });
     }
 }

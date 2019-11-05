@@ -114,6 +114,17 @@
             android:layout_alignParentEnd="true"
             android:layout_marginBottom="270dp"
             />
+        <Button
+            android:id="@+id/detailProfile"
+            android:layout_width="191dp"
+            android:layout_height="50dp"
+            android:text="Profile"
+
+            android:layout_alignTop="@+id/comment"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_toLeftOf="@+id/comment"
+            android:layout_toStartOf="@+id/comment" />
 
 
     </RelativeLayout>

@@ -1,10 +1,13 @@
 package edu.lehigh.cse216.yut222.phase0;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -35,16 +38,16 @@ public class ProfileActivityActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_profileactivity);
         Intent intent = getIntent();
         final int uid = intent.getIntExtra("user id", 404);
 
         RequestQueue queue = MySingleton.getInstance(this.getApplicationContext()).getRequestQueue();
         //one to show all message
-        String urlList = "https://arcane-refuge-67249.herokuapp.com/listmessages";
+        String urlList = "https://arcane-refuge-67249.herokuapp.com/" + uid + "/userposts";
         Map<String, String> map = new HashMap<>();
-        map.put("uEmail", sharedpreferences.getString("prefEmail","default"));
         map.put("sessionKey", sharedpreferences.getString("prefKey", "default"));
+        map.put("uEmail", sharedpreferences.getString("prefEmail", "default"));
         JSONObject m = new JSONObject(map);
 
         JsonObjectRequest listR = new JsonObjectRequest(Request.Method.POST, urlList, m,
@@ -61,6 +64,15 @@ public class ProfileActivityActivity extends AppCompatActivity {
         });
         MySingleton.getInstance(this).addToRequestQueue(listR);
 
+        Button bBack = (Button) findViewById(R.id.back);
+        bBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                setResult(Activity.RESULT_CANCELED);
+                finish();
+            }
+        });
+
     }
 
     private void populateListFromVolley(JSONObject response){
@@ -69,7 +81,11 @@ public class ProfileActivityActivity extends AppCompatActivity {
             String status;
             status = response.getString("mStatus");
             //this is to check if status went wrong
-            // Log.e("shy221", status);
+            String message = "";
+            if (status == "error") {
+                message = response.getString("mMessage");
+            }
+            Log.e("shy221", status + " " + message);
             if(status.equals("ok")){
                 JSONArray data = response.getJSONArray("mData");
                 for (int i = 0; i < data.length(); i++){
@@ -86,6 +102,13 @@ public class ProfileActivityActivity extends AppCompatActivity {
                     mData.add(new Message(mid, uid, likes, dislikes, title, "unknown", "unknown", "unknown"));
                 }
             }else{
+                if(response.getString("mMessage").equals("session key not correct..")){
+                    Toast toast = Toast.makeText(ProfileActivityActivity.this, "Session Time Out", Toast.LENGTH_LONG);
+                    toast.show();
+                    Intent intent = new Intent(ProfileActivityActivity.this, LoginActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(intent);
+                }
                 Log.d("shy221","mStatus is not ok.");
             }
         } catch (final JSONException e) {
@@ -94,7 +117,7 @@ public class ProfileActivityActivity extends AppCompatActivity {
         }
         Log.d("shy221", "Successfully parsed JSON file.");
 
-        RecyclerView rv = findViewById(R.id.message_list_view);
+        RecyclerView rv = findViewById(R.id.activity_list_view);
         rv.setLayoutManager(new LinearLayoutManager(this));
         ItemListAdapter adapter = new ItemListAdapter(this, mData);
         rv.setAdapter(adapter);

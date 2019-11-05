@@ -21,6 +21,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -29,6 +30,8 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+
+import static edu.lehigh.cse216.yut222.phase0.LoginActivity.sharedpreferences;
 
 public class SecondActivity extends AppCompatActivity {
 
@@ -58,7 +61,7 @@ public class SecondActivity extends AppCompatActivity {
                     setResult(Activity.RESULT_OK, i);
                     String title = etTitle.getText().toString();
                     String content = etContent.getText().toString();
-                    postMessage(title, content, 7);//uid is 7 for now
+                    postMessage(title, content, sharedpreferences.getString("prefId","default"));//uid is 7 for now
                 }
                 finish();
 
@@ -76,20 +79,38 @@ public class SecondActivity extends AppCompatActivity {
         });
     }
 
-    private void postMessage(final String t, final String c, int uid){
+    private void postMessage(final String t, final String c, final String uid){
         //map is hashMap, m is jsonObject
         //one link to post
         String urlPost = "https://arcane-refuge-67249.herokuapp.com/messages";
         Map<String, String> map = new HashMap<>();
+        map.put("uid", uid);
         map.put("mTitle", t);
         map.put("mMessage", c);
-        String i = Integer.toString(uid);
-        map.put("uid", i);
+
+        map.put("sessionKey", sharedpreferences.getString("prefKey", "default"));
+        map.put("uEmail", sharedpreferences.getString("prefEmail", "default"));
         JSONObject m = new JSONObject(map);
         JsonObjectRequest postR = new JsonObjectRequest(Request.Method.POST,
                 urlPost, m, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
+                try {
+                    String status = response.getString("mStatus");
+                    if(!status.equals("ok")){
+                        if(response.getString("mMessage").equals("session key not correct..")){
+                            Toast toast = Toast.makeText(SecondActivity.this, "Session Time Out", Toast.LENGTH_LONG);
+                            toast.show();
+                            Intent intent = new Intent(SecondActivity.this, LoginActivity.class);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            startActivity(intent);
+                        }
+                        Log.d("get detail", "mStatus is not ok.");
+                    }
+                } catch (final JSONException e) {
+                    Log.d("shy221", "Error parsing JSON file: " + e.getMessage());
+                    return;
+                }
                 Log.e("message", "enter your message with title and content here.");
             }
         }, new Response.ErrorListener() {
