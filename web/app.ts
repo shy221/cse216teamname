@@ -24,6 +24,8 @@ var ukey: String;
 var loginState: boolean = false;
 var uid: number;
 var signedin: boolean = false;
+var idToken : string;
+
 
 var changeProfile = function(googleUser: gapi.auth2.GoogleUser) {
   if (googleUser) {
@@ -88,7 +90,7 @@ $(document).ready(function () {
             changeProfile(googleUser);
             if (googleUser.hasGrantedScopes("https://www.googleapis.com/auth/userinfo.email")) {
               console.log('granted');
-              var idToken = googleUser.getAuthResponse().id_token;
+              idToken = googleUser.getAuthResponse().id_token;
               console.log('idToken'+idToken);
               if (!idToken) {
                 throw 'Authentication failed.';
@@ -125,9 +127,44 @@ $(document).ready(function () {
           else{
             console.log('signing in');
             //window.location.replace(google);
-            auth2.signIn()
-              .then(changeProfile);
-          };
+            auth2.signIn();
+            var googleUser = auth2.currentUser.get();
+            // Change user's profile information
+            changeProfile(googleUser);
+              if (googleUser.hasGrantedScopes("https://www.googleapis.com/auth/userinfo.email")) {
+              console.log('granted');
+              idToken = googleUser.getAuthResponse().id_token;
+              console.log('idToken'+idToken);
+              if (!idToken) {
+                throw 'Authentication failed.';
+              }
+              $.ajax({
+                type: "POST",
+                //not sure abour url
+                url: "/login",
+                dataType: "json",
+                data: JSON.stringify({"id_token": idToken}),
+                success: onSubmitResponse
+              });
+              }
+            else {
+              console.log('else');
+              // Ask the user for a permission.
+              // This is for client side API call
+              googleUser.grant({
+                scope: "https://www.googleapis.com/auth/userinfo.email"
+              }).then(function() {
+                // Make API call
+                console.log('googleUser.grant');
+                var idToken = googleUser.getAuthResponse().id_token;
+                console.log('idToken'+idToken);
+                if (!idToken) {
+                  throw 'Authentication failed.';
+                }
+
+              });
+            }
+          }
                      
             //window.location.replace(google);
         });

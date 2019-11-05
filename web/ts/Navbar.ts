@@ -26,8 +26,24 @@ class Navbar {
             $("#"+Navbar.NAME+"-add").click(NewEntryForm.show);
             //$("#"+Navbar.NAME+"-login").click(Login.show);
             $("#"+Navbar.NAME+"-Account").click(UserProfile.get);
+            $("#"+Navbar.NAME+"-logout").click(Navbar.logout);
             Navbar.isInit = true;
         }
+    }
+    public static logout() {
+        var auth2 = gapi.auth2.getAuthInstance();
+        auth2.signOut();
+        ukey = "";
+        idToken = "";
+        window.location.replace("https://arcane-refuge-67249.herokuapp.com/");
+        /*$.ajax({
+            type: "POST",
+            //not sure abour url
+            url: "/logout",
+            dataType: "json",
+            data: JSON.stringify({"id_token": idToken}),
+            success: Navbar.init
+        });*/
     }
 
     /**
