@@ -1,0 +1,9 @@
+﻿1. Is our app easy to use?
+Yes, only too many pop up windows. But the functions are all working and 
+2. What is confusing about our app?
+We named users’ post as ‘event’ but there is no restriction on what to post, it might be confusing to users between upcoming events and the posts in the app. 
+3. What features/functions would you like to add/take away from our current version?
+Be able to buy tickets or have a link to the website that can purchase tickets. List events in chronological order (not based on posting time but on the event happening date). A search function in the navbar as well. 
+4. Would you like to use our app? Why or why not?
+Yes/No. Yes for concert lover because it is easier to find events if we have enough 
+5. Is there any way to simplify our app idea?

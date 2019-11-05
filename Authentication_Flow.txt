@@ -1,0 +1,5 @@
+﻿1. On click the login button, direct user to https://accounts.google.com/o/oauth2/v2/auth?redirect_uri=https%3A%2F%2Farcane-refuge-67249.herokuapp.com&response_type=code&client_id=689219964832-6m703l22ir6jh9ra1m1lhrgg12bv7olt.apps.googleusercontent.com&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email&include_granted_scopes=true
+2. Upon user sign in, front ends are redirected to the redirect url with id_token attached. 
+3. Front ends send the id_token to backend.
+4. Backend use the id_token to access user email.
+5. Backend check the accessed user email with our database user table. If user does not exist, add the email into our user table. Then generate session key for the user.
