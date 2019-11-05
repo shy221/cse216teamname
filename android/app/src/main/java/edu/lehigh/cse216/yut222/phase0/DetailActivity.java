@@ -42,6 +42,7 @@ public class DetailActivity extends AppCompatActivity {
     int clickCount = 0;
     int deleteFlag = 0;
     Button comment = null;
+    Message m = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,7 +51,6 @@ public class DetailActivity extends AppCompatActivity {
         final int mId = intent.getIntExtra("message id", 404);
         final String url = "https://arcane-refuge-67249.herokuapp.com/messages/" + mId;
         sharedpreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        final Message m = new Message(0,0,0,0, "", "", "", "");
         /*int uId = intent.getIntExtra("user id", 404);
         String mTitle = intent.getStringExtra("message title");
         final int mLikes = intent.getIntExtra("message likes", 404);
@@ -103,6 +103,16 @@ public class DetailActivity extends AppCompatActivity {
         //getting user's inout from editText and put into Intent
         // SY
 
+
+        Button activity = (Button) findViewById(R.id.detailProfile);
+        activity.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(DetailActivity.this, ProfileActivity.class);
+                i.putExtra("user id", m.uId);
+                startActivity(i);
+            }
+        });
 
         // The Delete button returns to the caller without sending any data SY
         Button bDelete = (Button) findViewById(R.id.drop);
@@ -185,17 +195,28 @@ public class DetailActivity extends AppCompatActivity {
     private void deleteMessage(String urlD, int deleteFlag) {
         //post msg id = urlDelete if deleteFlag is marked
         if (deleteFlag == 1) {
-            StringRequest deleteR = new StringRequest(Request.Method.DELETE, urlD,
-                    new Response.Listener<String>() {
+            Map<String, String> map = new HashMap<>();
+            map.put("sessionKey", sharedpreferences.getString("prefKey", "default"));
+            map.put("uEmail", sharedpreferences.getString("prefEmail", "default"));
+            JSONObject c = new JSONObject(map);
+            JsonObjectRequest deleteR = new JsonObjectRequest(Request.Method.DELETE, urlD, c,
+                    new Response.Listener<JSONObject>() {
                         @Override
-                        public void onResponse(String response) {
+                        public void onResponse(JSONObject response) {
+                            try {
+                                String status = response.getString("mStatus");
+                                if (status.equals("ok")) {
+                                    //TODO
+                                }
+                            } catch (final JSONException e){
 
+                            }
                         }
                     }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    Log.e("shy221", "Deleting message didn't work.");
-                }
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e("shy221", "Deleting message didn't work.");
+                    }
             });
             MySingleton.getInstance(this).addToRequestQueue(deleteR);
         }
@@ -226,6 +247,13 @@ public class DetailActivity extends AppCompatActivity {
 
 
                 }else{
+                    if(response.getString("mMessage").equals("session key not correct..")){
+                        Toast toast = Toast.makeText(DetailActivity.this, "Session Time Out", Toast.LENGTH_LONG);
+                        toast.show();
+                        Intent intent = new Intent(DetailActivity.this, LoginActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        startActivity(intent);
+                    }
                     Log.e("like", "error status");
                 }}catch (final JSONException e){
                     Log.e("x","exception");
@@ -306,9 +334,17 @@ public class DetailActivity extends AppCompatActivity {
                 int dislikes = data.getInt("mDislikes");
                 String username = data.getString("cUsername");
                 String time = data.getString("mCreated");
-                mData.add(new Message(mId, uId, likes, dislikes, title, content, username, time));
+                m = new Message(mId, uId, likes, dislikes, title, content, username, time);
+                mData.add(m);
                 Log.e("populate detail", "got details");
             } else {
+                if(response.getString("mMessage").equals("session key not correct..")){
+                    Toast toast = Toast.makeText(DetailActivity.this, "Session Time Out", Toast.LENGTH_LONG);
+                    toast.show();
+                    Intent intent = new Intent(DetailActivity.this, LoginActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(intent);
+                }
                 Log.d("get detail", "mStatus is not ok.");
             }
         } catch (final JSONException e) {
