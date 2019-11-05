@@ -355,38 +355,6 @@ public class App {
          * POST route
          */
 
-        /*
-        Spark.post("/callback", (request, response) -> {
-            // Obtain access code from Google
-            String access_code = request.params("code");
-
-            // Exchange access code for token
-            URL token_url = new URL("https://accounts.google.com/o/oauth2/v4/token");
-            String query = "code=" + access_code + "&" +
-                "client_id=689219964832-6m703l22ir6jh9ra1m1lhrgg12bv7olt.apps.googleusercontent.com&" +
-                "client_secret=kHV5Rr_1_dRPTnkDnB2XjPKO&" +
-                "redirect_uri=https%3A%2F%2Farcane-refuge-67249.herokuapp.com%2Flogin&" +
-                "grant_type=authorization_code";
-            try {
-                HttpsURLConnection conn = (HttpsURLConnection)token_url.openConnection();
-                conn.setRequestMethod("POST");
-                conn.setRequestProperty("Content-length", String.valueOf(query.length()));
-                conn.setRequestProperty("Content-type", "application/x-www-form-urlencoded");
-                conn.setDoOutput(true);
-                // Pass the query to OAuth Server
-                DataOutputStream output = new DataOutputStream(conn.getOutputStream());
-                output.writeBytes(query);
-                output.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-                return gson.toJson(new StructuredResponse("error", "Encountered exceptions", e));
-            }
-            response.status(200);
-            response.type("application/json");
-            return gson.toJson(new StructuredResponse("ok", "Sent request for access token", null));
-        });
-        */
-
         // POST route for adding a new element to the Database.
         // This will read JSON sent by Google OAuth server,
         // obtain the access token,
@@ -441,6 +409,21 @@ public class App {
             
 
             return gson.toJson(new StructuredResponse("ok", "Login success!", userInfo));
+        });
+
+        Spark.post("/logout", (request, response) -> {
+            SimpleRequest req = gson.fromJson(request.body(), SimpleRequest.class);
+            String sk = req.sessionKey;
+            String em = req.uEmail;
+            if (sk.equals(session.get(em))) {
+                // ensure status 200 OK, witha MIME type of JSON
+                response.status(200);
+                response.type("application/json");
+                // remove the session key of current user
+                session.remove(em);
+                return gson.toJson(new StructuredResponse("ok", "Logout success!", null));
+            }
+            return gson.toJson(new StructuredResponse("error", "session key not correct..", null));
         });
 
         /**
