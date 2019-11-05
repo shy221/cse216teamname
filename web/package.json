@@ -3,9 +3,12 @@
     "version": "1.0.0",
     "description": "Web Front-End",
     "dependencies": {
+        "@types/gapi": "0.0.39",
+        "@types/gapi.auth2": "0.0.50",
         "bootstrap": "^3.4.1",
+        "gapi": "0.0.3",
         "handlebars": "^4.4.3",
-        "jasmine-core": "^3.4.0",
+        "jasmine-core": "^3.5.0",
         "jquery": "^3.4.1",
         "typescript": "^3.6.4"
     }

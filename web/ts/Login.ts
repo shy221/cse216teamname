@@ -58,6 +58,21 @@ class Login {
     private static onSubmitResponse(data: any) {
         // If we get an "ok" pwd, clear the form and refresh the main 
         // listing of pwds
+        // Initialization:
+        // Add `auth2` module
+        /*gapi.load('auth2', function() {
+        // Initialize `auth2`
+        gapi.auth2.init().then(function(auth2) {
+            
+          // If the user is already signed in
+          if (auth2.isSignedIn.get()) {
+            var googleUser = auth2.currentUser.get();
+            
+            // Change user's profile information
+            changeProfile(googleUser);
+          }
+        });
+      });*/
         if (data.mStatus === "ok") {
             loginState = true;
             uid = data.mData.uId;

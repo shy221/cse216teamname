@@ -23,7 +23,7 @@ class UserProfile {
         $("#" + UserProfile.NAME).modal("hide");
     }
 
-    public static show(data:any) {
+    public static showBasic(data:any) {
         $("#" + UserProfile.NAME + "-detailId").val(data.mData.uId);
         console.log(data.mData.uId);
         let id = "" + $("#" + UserProfile.NAME + "-detailId").val();
@@ -33,7 +33,12 @@ class UserProfile {
         $("#" + UserProfile.NAME + "-intro").text(data.mData.uIntro);
         $("#" + UserProfile.NAME).modal("show");
     }
-    
+    public static showPosts(data:any) {
+        console.log('show posts');
+        $("#" + UserProfile.NAME + "-title").text(data.mData.mTitle);
+        $("#" + UserProfile.NAME).modal("show");
+    }
+
     //called when click Account in Navbar
     public static get(){
         $.ajax({
@@ -41,7 +46,14 @@ class UserProfile {
             url: "/" + uid + "/userprofile",
             dataType: "json",
             data: JSON.stringify({ uEmail: uemail, sessionKey: ukey }),
-            success: UserProfile.show
+            success: UserProfile.showBasic
+        });
+        $.ajax({
+            type: "POST",
+            url: "/" + uid + "/userposts",
+            dataType: "json",
+            data: JSON.stringify({ uEmail: uemail, sessionKey: ukey }),
+            success: UserProfile.showPosts
         });
     }
 
