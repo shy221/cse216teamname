@@ -57,6 +57,7 @@ public class Database {
     //added insert comment
     private PreparedStatement cInsertOne;
     private PreparedStatement mSelectAll;
+    private PreparedStatement mSelectAllByUser;
     private PreparedStatement mSelectOne;
     private PreparedStatement mUpdateOne;
 
@@ -113,6 +114,7 @@ public class Database {
             db.mDeleteOne = db.mConnection.prepareStatement("DELETE FROM tblData WHERE mid = ?");
             db.mInsertOne = db.mConnection.prepareStatement("INSERT INTO tblData VALUES (default, ?, ?, ?, ?)");
             db.mSelectAll = db.mConnection.prepareStatement("SELECT mid, subject FROM tblData");
+            db.mSelectAllByUser = db.mConnection.prepareStatement("SELECT mid, subject FROM tblData Where uid = ?");
             db.mSelectOne = db.mConnection.prepareStatement(
                     "SELECT row.*, (SELECT COUNT(*) FROM tblLike WHERE tblLike.mid = row.mid) AS likes, (SELECT COUNT(*) FROM tblDislike WHERE tblDislike.mid = row.mid) AS dislikes FROM (SELECT * from tblData NATURAL JOIN tblUser) AS row WHERE row.mid = ?");
             db.mUpdateOne = db.mConnection.prepareStatement("UPDATE tblData SET subject = ?, message = ? WHERE mid = ?");
@@ -287,6 +289,22 @@ public class Database {
                 //phase 2 with more parameters
                 res.add(new DataRow(rs.getInt("mid"), rs.getString("subject")));
 //                res.add(new DataRow(rs.getInt("mid"), rs.getInt("uid"), rs.getString("username"), rs.getString("subject"), rs.getString("message"), rs.getInt("likes"), rs.getInt("dislikes"), rs.getDate("date")));
+            }
+            rs.close();
+            return res;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public ArrayList<DataRow> readAllByUser(int uid) {
+        ArrayList<DataRow> res = new ArrayList<DataRow>();
+        try {
+            mSelectAllByUser.setInt(1, uid);
+            ResultSet rs = mSelectAllByUser.executeQuery();
+            while (rs.next()) {
+                res.add(new DataRow(rs.getInt("mid"), rs.getString("subject")));
             }
             rs.close();
             return res;
