@@ -3,7 +3,7 @@
 /// <reference path="ts/ElementList.ts"/>
 /// <reference path="ts/Navbar.ts"/>
 /// <reference path="ts/ShowDetail.ts"/>
-/// <reference path="ts/Login.ts"/>
+///// <reference path="ts/Login.ts"/>
 /// <reference path="ts/UserProfile.ts"/>
 /// <reference path="ts/ShowComments.ts"/>
 /// <reference path="ts/EditUserProfile.ts"/>
@@ -26,35 +26,40 @@ var uid: number;
 var signedin: boolean = false;
 
 var changeProfile = function(googleUser: gapi.auth2.GoogleUser) {
-  // See if `GoogleUser` object is obtained
-  // If not, the user is signed out
   if (googleUser) {
-    // Get `BasicProfile` object
     var profile = googleUser.getBasicProfile();
-    // Get user's basic profile information
-    /*profile = {
-      name: profile.getName(),
-      email: profile.getEmail(),
-      imageUrl: profile.getImageUrl()
-    };*/
-    console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
+
+    console.log('ID: ' + profile.getId()); 
     console.log('Name: ' + profile.getName());
     console.log('Email: ' + profile.getEmail()); 
-    /*toast('show-toast', {
-      text: "You're signed in."
-    });*/
-    //$.dialog.close();
+
   } else {
-    // Remove profile information
-    // Polymer will take care of the rest
-    
-    //profile = null;
-    
-    /*fire('show-toast', {
-      text: "You're signed out."
-    });*/
+
   }
 };
+var onSubmitResponse = function(data: any) {
+  if (data.mStatus === "ok") {
+      console.log('backend ok');
+      loginState = true;
+      uid = data.mData.uId;
+      ukey = data.mData.sessionKey;
+      uemail = data.mData.uEmail;
+      Navbar.refresh();
+      NewEntryForm.refresh();
+      ElementList.refresh();
+      EditEntryForm.refresh();
+      ShowDetail.refresh();
+  }
+  // Handle explicit errors with a detailed popup pwd
+  else if (data.mStatus === "error") {
+      window.alert("The server replied with an error:\n" + data.mpwd);
+  }
+  // Handle other errors with a less-detailed popup pwd
+  else {
+      window.alert("Unspecified error");
+  }
+}
+
 
 // Run some configuration code when the web page loads
 $(document).ready(function () {
@@ -63,7 +68,7 @@ $(document).ready(function () {
     ElementList.refresh();
     EditEntryForm.refresh();
     ShowDetail.refresh();
-    Login.refresh();
+    //Login.refresh();
     UserProfile.refresh();
     ShowComments.refresh();
     EditUserProfile.refresh();
@@ -81,8 +86,40 @@ $(document).ready(function () {
             var googleUser = auth2.currentUser.get();
             // Change user's profile information
             changeProfile(googleUser);
-            if (googleUser.hasGrantedScopes("https://mail.google.com/")) {
+            if (googleUser.hasGrantedScopes("https://www.googleapis.com/auth/userinfo.email")) {
               console.log('granted');
+              var idToken = googleUser.getAuthResponse().id_token;
+              console.log('idToken'+idToken);
+              if (!idToken) {
+                throw 'Authentication failed.';
+              }
+              $.ajax({
+                type: "POST",
+                //not sure abour url
+                url: "/login",
+                dataType: "json",
+                data: JSON.stringify({"id_token": idToken}),
+                success: onSubmitResponse
+            });
+            }
+            else {
+              console.log('else');
+              // Ask the user for a permission.
+              // This is for client side API call
+              googleUser.grant({
+                scope: "https://www.googleapis.com/auth/userinfo.email"
+              }).then(function() {
+                // Make API call
+                console.log('googleUser.grant');
+                var idToken = googleUser.getAuthResponse().id_token;
+                console.log('idToken'+idToken);
+                if (!idToken) {
+                  throw 'Authentication failed.';
+                }
+                //authenticateWithServer
+
+              });
+              
             }
           }
           else{
@@ -95,32 +132,5 @@ $(document).ready(function () {
             //window.location.replace(google);
         });
       });
-
-      /*if(window.location.href != home && window.location.href != google){
-        signedin == true;
-      }
-      if(signedin == false){
-        window.location.replace(google);
-      }
-      else{
-        console.log(window.location.href);
-      }
-      */
-      
-      /*var authCode : string = window.location.href;
-      if(window.location.href != google && window.location.href != home ){
-        window.location.replace(google);
-        console.log(window.location.href);
-        window.location.replace("https://arcane-refuge-67249.herokuapp.com/");
-      }
-      else if(window.location.href != google){
-        window.location.replace(google);
-        console.log('g');
-      }
-
-      */
-      //window.location.replace(window.location.href);
-    // Create the object that controls the "Edit Entry" form
-    // set up initial UI state
     $("#editElement").hide();
 });
