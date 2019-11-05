@@ -34,7 +34,14 @@ class ShowComments {
             url: "/" + uid + "/userprofile",
             dataType: "json",
             data: JSON.stringify({ uEmail: uemail, sessionKey: ukey }),
-            success: UserProfile.show
+            success: UserProfile.showBasic
+        });
+        $.ajax({
+            type: "POST",
+            url: "/" + uid + "/userposts",
+            dataType: "json",
+            data: JSON.stringify({ uEmail: uemail, sessionKey: ukey }),
+            success: UserProfile.showPosts
         });
     }
 }
