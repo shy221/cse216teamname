@@ -415,7 +415,7 @@ public class App {
                 .setAudience(Collections.singletonList("689219964832-6m703l22ir6jh9ra1m1lhrgg12bv7olt.apps.googleusercontent.com"))
                 .build();
             
-            //for debugging
+            //for debug
             if (idTokenString.equals("faketoken")) {
                 email = "yut222@lehigh.edu";
             } else {
@@ -460,15 +460,33 @@ public class App {
                 response.type("application/json");
                 //add new function based on this
                 DataRowUserProfile userProfile = db.uReadOne(idx);
-                ArrayList<DataRow> posts = db.readAllByUser(idx);
                 if (userProfile == null) {
                     return gson.toJson(new StructuredResponse("error", idx + " not found", null));
                 } else {
-                    return gson.toJson(new StructuredResponse("ok", null, new DataRowUserProfilePosts(userProfile, posts)));
+                    return gson.toJson(new StructuredResponse("ok", null, userProfile));
                 }
             }
             return gson.toJson(new StructuredResponse("error", "session key not correct..", null));
 
+        });
+
+        /**
+         * phase 3
+         * display all posts uploaded by a specific user
+         */
+        Spark.post("/:uid/userposts", (request, response) -> {
+            int idx = Integer.parseInt(request.params("uid"));
+            UserProfileRequest req = gson.fromJson(request.body(), UserProfileRequest.class);
+            String sk = req.sessionKey;
+            String em = req.uEmail;
+            if (sk.equals(session.get(em))){
+                // ensure status 200 OK, with a MIME type of JSON
+                response.status(200);
+                response.type("application/json");
+                ArrayList<DataRow> posts = db.readAllByUser(idx);
+                return gson.toJson(new StructuredResponse("ok", null, posts));
+            }
+            return gson.toJson(new StructuredResponse("error", "session key not correct..", null));
         });
 
         /**
