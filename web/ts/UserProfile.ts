@@ -7,6 +7,8 @@ class UserProfile {
             $("body").append(Handlebars.templates[UserProfile.NAME + ".hb"]());
             $("#" + UserProfile.NAME + "-Close").click(UserProfile.hide);
             $("#" + UserProfile.NAME + "-editbtn").click(UserProfile.clickEdit);
+            
+            $("#" + UserProfile.NAME + "-showposts").click(UserProfile.showPosts);
             UserProfile.isInit = true;
         }
     }
@@ -32,15 +34,29 @@ class UserProfile {
         $("#" + UserProfile.NAME + "-email").text(data.mData.uEmail);
         $("#" + UserProfile.NAME + "-intro").text(data.mData.uIntro);
         $("#" + UserProfile.NAME).modal("show");
+        
     }
-    public static showPosts(data:any) {
+/*    public static showPosts(data:any) {
+        // Remove the table of data, if it exists
+        $("#" + UserProfile.NAME).remove();
+        // Use a template to re-generate the table, and then insert it
+        $("body").append(Handlebars.templates[UserProfile.NAME + ".hb"](data));
+        // Find rows in the table and set behavior
+        // Find all of the detail buttons, and set their behavior
+
         console.log('show posts');
+        console.log(data.mData.mLikes);
+        
+        $("#" + UserProfile.NAME + "-title").val(data.mData.mLikes);
+        let likes = "" + $("#" + UserProfile.NAME + "-title").val();
+        console.log(likes);
         $("#" + UserProfile.NAME + "-title").text(data.mData.mTitle);
         $("#" + UserProfile.NAME).modal("show");
-    }
+    }*/
 
     //called when click Account in Navbar
     public static get(){
+        
         $.ajax({
             type: "POST",
             url: "/" + uid + "/userprofile",
@@ -48,12 +64,17 @@ class UserProfile {
             data: JSON.stringify({ uEmail: uemail, sessionKey: ukey }),
             success: UserProfile.showBasic
         });
+    }
+    private static showPosts(){
+        
+        //let uid = "" + $("#" + "ShowDetail" + "-detailPostUid").val();
+        
         $.ajax({
             type: "POST",
             url: "/" + uid + "/userposts",
             dataType: "json",
             data: JSON.stringify({ uEmail: uemail, sessionKey: ukey }),
-            success: UserProfile.showPosts
+            success: ShowPosts.show
         });
     }
 

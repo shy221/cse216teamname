@@ -41,7 +41,7 @@ class ShowComments {
             url: "/" + uid + "/userposts",
             dataType: "json",
             data: JSON.stringify({ uEmail: uemail, sessionKey: ukey }),
-            success: UserProfile.showPosts
+            success: ShowPosts.show
         });
     }
 }

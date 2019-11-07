@@ -18,6 +18,7 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" id="UserProfile-editbtn">Edit</button>
                 <button type="button" class="btn btn-default" id="UserProfile-Close">Close</button>
+                <button type="button" class="btn btn-default" id="UserProfile-showposts">Show Posts</button>
             </div>
         </div>
     </div>

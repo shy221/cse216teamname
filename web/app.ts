@@ -8,6 +8,8 @@
 /// <reference path="ts/ShowComments.ts"/>
 /// <reference path="ts/EditUserProfile.ts"/>
 
+/// <reference path="ts/ShowPosts.ts"/>
+
 // Prevent compiler errors when using jQuery.  "$" will be given a type of 
 // "any", so that we can use it anywhere, and assume it has any fields or
 // methods, without the compiler producing an error.
@@ -124,7 +126,8 @@ $(document).ready(function () {
               
             }
           }
-          else{
+          else
+          {
             console.log('signing in');
             //window.location.replace(google);
             auth2.signIn();
