@@ -391,6 +391,9 @@ public class App {
             if (idToken != null) {
                 Payload payload = idToken.getPayload();
                 email = payload.getEmail();
+                if (!email.contains("@lehigh.edu")) {
+                    return gson.toJson(new StructuredResponse("error", "invalid email", null));
+                }
             } else {
                 return gson.toJson(new StructuredResponse("error", "invalid id token", null));
             }
