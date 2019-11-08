@@ -156,6 +156,13 @@ public class MainActivity extends AppCompatActivity {
                     mData.add(new Message(mid, uid, likes, dislikes, title, "unknown", "unknown", "unknown"));
                 }
             }else{
+                if(response.getString("mMessage").equals("session key not correct..")){
+                    Toast toast = Toast.makeText(MainActivity.this, "Session Time Out", Toast.LENGTH_LONG);
+                    toast.show();
+                    Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(intent);
+                }
                 Log.d("shy221","mStatus is not ok.");
             }
         } catch (final JSONException e) {
@@ -218,6 +225,7 @@ public class MainActivity extends AppCompatActivity {
         if (id == R.id.action_profile) {
             Intent i = new Intent(getApplicationContext(), ProfileActivity.class);
             i.putExtra("label_contents", "Post your message here.");
+            i.putExtra("user id", Integer.parseInt(sharedpreferences.getString("prefId","default")));
             startActivityForResult(i, 2);
             return true;
         }
