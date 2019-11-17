@@ -18,8 +18,8 @@
             <ul class="nav navbar-nav">
                 <li>
                     <a class="btn btn-link" id="Navbar-add">
-                        Post a Event
                         <span class="glyphicon glyphicon-plus"></span><span class="sr-only">Show Trending Posts</span>
+                        Post a Event
                     </a>
                 </li>
             </ul>
@@ -30,9 +30,9 @@
                     </a>
                 </li>
                 <li>
-                    <a class="btn btn-link" id="Navbar-logout">
-                        Logout
-                        <span class="glyphicon glyphicon-log-out"></span><span class="sr-only">Show</span>
+                    <a class="btn btn-link" id="Navbar-login">
+                        <span class="glyphicon glyphicon-log-in"></span><span class="sr-only">Show</span>
+                        Login
                     </a>
                 </li>
                 

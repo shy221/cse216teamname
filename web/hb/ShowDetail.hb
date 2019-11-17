@@ -10,15 +10,27 @@
                     <h5 class="user-name" id="ShowDetail-username"></h5>
                 </div>
                 <button type="button" class="btn btn-default" id="ShowDetail-userprofilebtn">user</button>
+                <hr>
                 <label for="ShowDetail-message">Details</label>
                 <textarea class="form-control" id="ShowDetail-message"></textarea>
+                <label for="ShowDetail-link">Link</label>
+                <a id="ShowDetail-link"></a>
+                <br>
+                <label for="ShowDetail-attachment">Attachment</label>
+                <br>
+                <iframe width="100%" id="ShowDetail-attachment"></iframe>
+                <br>
                 <label for="ShowDetail-created">Event created</label>
                 <span id="ShowDetail-created"></span>
                 <input type="hidden" id="ShowDetail-detailId" />
                 <input type="hidden" id="ShowDetail-detailPostUid" />
-                <label for="ShowDetail-postcomments">Comments</label>
+                <hr>
+                <label for="ShowDetail-postcomments">Comment</label>
                 <input class="form-control" type="text" id="ShowDetail-postcomments"></textarea>
-                
+                <label for="ShowDetail-postcomments-link">Comment-Link</label>
+                <input class="form-control" type="text" id="ShowDetail-postcomments-link" />
+                <label for="ShowDetail-postcomments-attachment">Comment-File</label>
+                <input class="form-control" type="file" accept=".pdf" id="ShowDetail-postcomments-attachment" />
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" id="ShowDetail-commentsbtn">Leave Comments</button>
