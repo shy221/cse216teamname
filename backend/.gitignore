@@ -4,4 +4,4 @@
 .settings/
 target/
 .vscode/
-src/main/resources
+src/main/resources/web
