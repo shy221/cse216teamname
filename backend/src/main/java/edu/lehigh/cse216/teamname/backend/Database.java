@@ -180,7 +180,7 @@ public class Database {
      * @return The Id of the new row, or -1 if no row was created
      */
     //detail: title, content, likes, dislikes, comment.userid, comments.text
-    public int createEntry(int uid, String subject, String message) {
+    public int createEntry(int uid, String subject, String message, String fileid, String mLink) {
         if (subject == null || message == null)
             return -1;
         int id = mCount++;
@@ -191,6 +191,8 @@ public class Database {
             Date date= new Date();
             Timestamp ts = new Timestamp(date.getTime());
             mInsertOne.setTimestamp(4, ts);
+            //mInsertOne.setString(5, fileid);
+            //mInsertOne.setString(6, mLink);
             mInsertOne.execute();
         } catch (SQLException e) {
             e.printStackTrace();

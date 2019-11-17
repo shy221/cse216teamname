@@ -27,4 +27,8 @@ public class SimpleRequest {
      * The sessoinKey being provided by the client.
      */
     public String sessionKey;
+
+    public String fileData;
+
+    public String mLink;
 }

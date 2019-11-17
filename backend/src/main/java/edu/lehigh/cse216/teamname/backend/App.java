@@ -1,18 +1,19 @@
 package edu.lehigh.cse216.teamname.backend;
 
-// Import the Spark package, so that we can make use of the "get" function to 
-// create an HTTP GET route
-
-import spark.Spark;
-
-// Import Google's JSON library
-import com.google.gson.*;
-
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URLConnection;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 //import org.springframework.security.crypto.bcrypt;
@@ -22,16 +23,42 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 
 //for google oauth
+import com.google.api.client.auth.oauth2.Credential;
+import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
+import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
+import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
+import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
+import com.google.api.services.drive.model.File;
+import com.google.api.client.http.FileContent;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.JsonFactory;
+import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.client.util.store.FileDataStoreFactory;
+import com.google.api.services.drive.Drive;
+import com.google.api.services.drive.DriveScopes;
+// Import Google's JSON library
+import com.google.gson.Gson;
+
+// Import the Spark package, so that we can make use of the "get" function to 
+// create an HTTP GET route
+
+import spark.Spark;
 
 /**
  * For now, our app creates an HTTP server that can only get and add data.
  */
 public class App {
+    private static int fileEnding = 0;
+    private static final String APPLICATION_NAME = "cse216 teamname";
+    private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
+    private static final String TOKENS_DIRECTORY_PATH = "tokens";
+
+    private static final List<String> SCOPES = Collections.singletonList(DriveScopes.DRIVE_METADATA_READONLY);
+    private static final String CREDENTIALS_FILE_PATH = "/credentials.json";
 
     public static void main(String[] args) {
 
@@ -153,14 +180,46 @@ public class App {
             SimpleRequest req = gson.fromJson(request.body(), SimpleRequest.class);
             String sk = req.sessionKey;
             String em = req.uEmail;
+            String fs = req.fileData;
+            String lk = req.mLink;
+            String fileid = null;
             if (sk.equals(session.get(em))){
                 // ensure status 200 OK, with a MIME type of JSON
                 // NB: even on error, we return 200, but with a JSON object that
                 //     describes the error.
                 response.status(200);
                 response.type("application/json");
+                if (fs != null) {
+                    byte[] decoder = Base64.getDecoder().decode(fs);
+                    InputStream is = new BufferedInputStream(new ByteArrayInputStream(decoder));
+                    String mimeType = URLConnection.guessContentTypeFromStream(is);
+                    String extension = mimeType.split("/")[1];
+                    String filename = fileEnding++ + "." + extension;
+                    String path = "cache/" + filename;
+                    java.io.File file = new java.io.File(path);
+                    try (FileOutputStream fos = new FileOutputStream(file);) {
+                        fos.write(decoder);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    // Build a new authorized API client service.
+                    final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
+                    Drive service = new Drive.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
+                        .setApplicationName(APPLICATION_NAME)
+                        .build();
+
+                    File fileMetadata = new File();
+                    fileMetadata.setName(filename);
+                    FileContent mediaContent = new FileContent(mimeType, file);
+                    File result = service.files().create(fileMetadata, mediaContent)
+                        .setFields("id")
+                        .execute();
+                    fileid = result.getId();
+                    file.delete();
+                }
                 // NB: createEntry checks for null title and message
-                int newId = db.createEntry(req.uid, req.mTitle, req.mMessage);
+                int newId = db.createEntry(req.uid, req.mTitle, req.mMessage, fileid, lk);
                 if (newId == -1) {
                     return gson.toJson(new StructuredResponse("error", "error performing insertion", null));
                 } else {
@@ -626,4 +685,30 @@ public class App {
         }
         return defaultVal;
     }
+
+    /**
+     * Creates an authorized Credential object.
+     * @param HTTP_TRANSPORT The network HTTP Transport.
+     * @return An authorized Credential object.
+     * @throws IOException If the credentials.json file cannot be found.
+     */
+    static Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT) throws IOException {
+        // Load client secrets.
+        InputStream in = App.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
+        if (in == null) {
+            throw new FileNotFoundException("Resource not found: " + CREDENTIALS_FILE_PATH);
+        }
+        GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
+
+        // Build flow and trigger user authorization request.
+        GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
+                HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, SCOPES)
+                .setDataStoreFactory(new FileDataStoreFactory(new java.io.File(TOKENS_DIRECTORY_PATH)))
+                .setAccessType("offline")
+                .build();
+        LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();
+        return new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
+    }
+
+
 }
