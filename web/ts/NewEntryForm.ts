@@ -75,7 +75,7 @@ class NewEntryForm {
         let link = "" + $("#" + NewEntryForm.NAME + "-link").val();
 
         var myReader:FileReader = new FileReader();
-        let att = "" + myReader.readAsDataURL($("#" + NewEntryForm.NAME + "-attachment").val());
+        let att = myReader.readAsDataURL($("#" + NewEntryForm.NAME + "-attachment").files[0]);
 
         if (title === "" || msg === "") {
             window.alert("Error: title or message is not valid");
