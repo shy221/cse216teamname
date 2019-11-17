@@ -42,6 +42,8 @@ class NewEntryForm {
     private static hide() {
         $("#" + NewEntryForm.NAME + "-title").val("");
         $("#" + NewEntryForm.NAME + "-message").val("");
+        // $("#" + NewEntryForm.NAME + "-link").val("");
+        $("#" + NewEntryForm.NAME + "-attachment").val("");
         $("#" + NewEntryForm.NAME).modal("hide");
     }
 
@@ -54,6 +56,8 @@ class NewEntryForm {
     public static show() {
         $("#" + NewEntryForm.NAME + "-title").val("");
         $("#" + NewEntryForm.NAME + "-message").val("");
+        $("#" + NewEntryForm.NAME + "-link").val("");
+        $("#" + NewEntryForm.NAME + "-attachment").val("");
         $("#" + NewEntryForm.NAME).modal("show");
     }
 
@@ -68,18 +72,24 @@ class NewEntryForm {
         // that neither is empty
         let title = "" + $("#" + NewEntryForm.NAME + "-title").val();
         let msg = "" + $("#" + NewEntryForm.NAME + "-message").val();
+        let link = "" + $("#" + NewEntryForm.NAME + "-link").val();
+
+        var myReader:FileReader = new FileReader();
+        let att = "" + myReader.readAsDataURL($("#" + NewEntryForm.NAME + "-attachment").val());
+
         if (title === "" || msg === "") {
             window.alert("Error: title or message is not valid");
             return;
         }
         NewEntryForm.hide();
+
         // set up an AJAX post.  When the server replies, the result will go to
         // onSubmitResponse
         $.ajax({
             type: "POST",
             url: "/messages",
             dataType: "json",
-            data: JSON.stringify({ mTitle: title, mMessage: msg ,uid: uid, uEmail: uemail, sessionKey: ukey }),
+            data: JSON.stringify({ mTitle: title, mMessage: msg, mLink: link, fileData: att, uid: uid, uEmail: uemail, sessionKey: ukey }),
             success: NewEntryForm.onSubmitResponse
         });
     }

@@ -74,6 +74,7 @@ $(document).ready(function () {
     UserProfile.refresh();
     ShowComments.refresh();
     EditUserProfile.refresh();
+    /*
     var google : string = "https://accounts.google.com/o/oauth2/v2/auth?redirect_uri=https%3A%2F%2Farcane-refuge-67249.herokuapp.com&response_type=code&client_id=689219964832-6m703l22ir6jh9ra1m1lhrgg12bv7olt.apps.googleusercontent.com&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email&include_granted_scopes=true";
     
     var home : string = "https://arcane-refuge-67249.herokuapp.com/"
@@ -169,5 +170,7 @@ $(document).ready(function () {
             //window.location.replace(google);
         });
       });
+      */
+
     $("#editElement").hide();
 });

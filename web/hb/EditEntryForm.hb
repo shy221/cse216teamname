@@ -9,6 +9,10 @@
                 <input class="form-control" type="text" id="EditEntryForm-title" />
                 <label for="EditEntryForm-message">Event Detail</label>
                 <textarea class="form-control" id="EditEntryForm-message"></textarea>
+                <label for="EditEntryForm-link">Link</label>
+                <input class="form-control" type="text" id="EditEntryForm-link" />
+                <label for="EditEntryForm-attachment">Attachment</label>
+                <input class="form-control" type="file" accept=".pdf" id="EditEntryForm-attachment" />
                 <label for="EditEntryForm-created">Time Created</label>
                 <span id="EditEntryForm-created"></span>
                 <input type="hidden" id="EditEntryForm-editId" />

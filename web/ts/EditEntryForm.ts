@@ -42,6 +42,8 @@ class EditEntryForm {
     private static hide() {
         $("#" + EditEntryForm.NAME + "-title").val("");
         $("#" + EditEntryForm.NAME + "-message").val("");
+        $("#" + EditEntryForm.NAME + "-link").val("");
+        $("#" + EditEntryForm.NAME + "-attachment").val("");
         $("#" + EditEntryForm.NAME + "-editId").val("");
         $("#" + EditEntryForm.NAME + "-created").text("");
         $("#" + EditEntryForm.NAME).modal("hide");
@@ -57,6 +59,8 @@ class EditEntryForm {
         $("#" + EditEntryForm.NAME + "-title").val(data.mData.mTitle);
         console.log(data.mData.mTitle);
         $("#" + EditEntryForm.NAME + "-message").val(data.mData.mContent);
+        $("#" + EditEntryForm.NAME + "-link").val(data.mData.mLink);
+        $("#" + EditEntryForm.NAME + "-attachment").val("");
         $("#" + EditEntryForm.NAME + "-editId").val(data.mData.mId);
         $("#" + EditEntryForm.NAME + "-created").text(data.mData.mCreated);
         $("#" + EditEntryForm.NAME).modal("show");
@@ -73,6 +77,11 @@ class EditEntryForm {
         // that neither is empty
         let title = "" + $("#" + EditEntryForm.NAME + "-title").val();
         let msg = "" + $("#" + EditEntryForm.NAME + "-message").val();
+        let link = "" + $("#" + EditEntryForm.NAME + "-link").val();
+
+        var myReader:FileReader = new FileReader();
+        let att = "" + myReader.readAsDataURL($("#" + EditEntryForm.NAME + "-attachment").val());
+
         let id = "" + $("#" + EditEntryForm.NAME + "-editId").val();
         if (title === "" || msg === "") {
             window.alert("Error: title or message is not valid");
@@ -85,7 +94,7 @@ class EditEntryForm {
             type: "PUT",
             url: "/messages/" + id,
             dataType: "json",
-            data: JSON.stringify({ mTitle: title, mMessage: msg, uEmail: uemail, sessionKey: ukey}),
+            data: JSON.stringify({ mTitle: title, mMessage: msg, mLink: link, fileData: att, uEmail: uemail, sessionKey: ukey}),
             success: EditEntryForm.onSubmitResponse
         });
     }
