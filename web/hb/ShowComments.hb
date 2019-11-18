@@ -10,7 +10,9 @@
                         {{#each mData}}
                         <tr>
                             <td>{{this.cText}}</td>
+                            <td><a href="{{this.cLink}}">{{this.cLink}}</a></td>
                             <td><button class="ShowComments-user" data-value="{{this.uId}}">{{this.cUsername}}</button></td>
+                            <td><iframe src="data:application/pdf;base64,{{this.cFileData}}"></iframe></td>
                         </tr>
                         {{/each}}
                     </tbody>

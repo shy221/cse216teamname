@@ -78,9 +78,10 @@ class EditEntryForm {
         let title = "" + $("#" + EditEntryForm.NAME + "-title").val();
         let msg = "" + $("#" + EditEntryForm.NAME + "-message").val();
         let link = "" + $("#" + EditEntryForm.NAME + "-link").val();
+        let file = $("#" + EditEntryForm.NAME + "-attachment").prop('files')[0];
 
         var myReader:FileReader = new FileReader();
-        let att = "" + myReader.readAsDataURL($("#" + EditEntryForm.NAME + "-attachment").val());
+        let att = "" + myReader.readAsBinaryString(file);
 
         let id = "" + $("#" + EditEntryForm.NAME + "-editId").val();
         if (title === "" || msg === "") {
@@ -94,7 +95,7 @@ class EditEntryForm {
             type: "PUT",
             url: "/messages/" + id,
             dataType: "json",
-            data: JSON.stringify({ mTitle: title, mMessage: msg, mLink: link, fileData: att, uEmail: uemail, sessionKey: ukey}),
+            data: JSON.stringify({ mTitle: title, mMessage: msg, mLink: link, fileData: btoa(att), mime: "application/pdf", uEmail: uemail, sessionKey: ukey}),
             success: EditEntryForm.onSubmitResponse
         });
     }

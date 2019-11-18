@@ -12,7 +12,7 @@
                 <label for="NewEntryForm-link">Link</label>
                 <input class="form-control" type="text" id="NewEntryForm-link" />
                 <label for="NewEntryForm-attachment">Attachment</label>
-                <input class="form-control" type="file" accept=".pdf" id="NewEntryForm-attachment" />
+                <input class="form-control-file" type="file" accept=".pdf" id="NewEntryForm-attachment" />
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" id="NewEntryForm-OK">OK</button>
