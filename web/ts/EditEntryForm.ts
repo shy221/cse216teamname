@@ -81,7 +81,7 @@ class EditEntryForm {
         let file = $("#" + EditEntryForm.NAME + "-attachment").prop('files')[0];
 
         var myReader:FileReader = new FileReader();
-        let att = myReader.readAsDataURL(file);
+        let att = "" + myReader.readAsDataURL(file);
 
         let id = "" + $("#" + EditEntryForm.NAME + "-editId").val();
         if (title === "" || msg === "") {

@@ -189,7 +189,7 @@ class ShowDetail {
         let file = $("#" + ShowDetail.NAME + "-postcomments-attachment").prop('files')[0];
 
         var myReader:FileReader = new FileReader();
-        let att = myReader.readAsDataURL(file);
+        let att = "" + myReader.readAsDataURL(file);
 
         if (text === "") {
             window.alert("Error: comment is not valid");

@@ -86,7 +86,7 @@ class NewEntryForm {
         console.log(file);
 
         var myReader:FileReader = new FileReader();
-        let att = myReader.readAsDataURL(file);
+        let att = "" + myReader.readAsDataURL(file);
 
         // set up an AJAX post.  When the server replies, the result will go to
         // onSubmitResponse
