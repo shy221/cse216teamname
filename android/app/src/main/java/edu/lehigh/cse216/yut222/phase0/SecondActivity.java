@@ -108,12 +108,24 @@ public class SecondActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent i = new Intent();
                 if (!etTitle.getText().toString().equals("")&& !etContent.getText().toString().equals("") ) {
-                    java.io.File file = new java.io.File (image);
+                    File file = new File (image);
                     //byte[] fileContent = FileUtils.readFileToByteArray(file)); version too new
                     //String encodedString = java.util.Base64.getEncoder().encodeToString(fileContent);
-                    byte [] fileContent = loadFile(file);
-                    int flags = Base64.NO_WRAP | Base64.URL_SAFE;
-                    String encodedString = Base64.encodeToString(fileContent, flags);
+                    String encodedString = "";
+                    try {
+                        byte[] fileContent = new byte[(int) file.length() + 100];
+                        @SuppressWarnings("resource")
+                        int length = new FileInputStream(file).read(fileContent);
+                        encodedString = Base64.encodeToString(fileContent, 0, length, Base64.DEFAULT);
+                        //int flags = Base64.NO_WRAP | Base64.URL_SAFE;
+                        //byte[] a = Base64.encode(fileContent, Base64.DEFAULT);
+                        //Log.e("byte", "byte" + a);
+                        //String encodedString = new String(a);
+                        //String encodedString = Base64.encodeToString(fileContent, flags);
+                        Log.e("encoded String", "encoded String" + encodedString);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                     i.putExtra("title", etTitle.getText().toString());
                     i.putExtra("content", etContent.getText().toString());
                     setResult(Activity.RESULT_OK, i);
@@ -201,7 +213,9 @@ public class SecondActivity extends AppCompatActivity {
                     return;
                 }
             android.net.Uri imageUri = data.getData();
+            Log.e("image uri", "uri" + imageUri);
             image = getRealPathFromUri(imageUri);
+            Log.e("image string", "uri" + image);
         }
 
     }
@@ -277,7 +291,7 @@ public class SecondActivity extends AppCompatActivity {
         map.put("mMessage", c);
         map.put("fileData", e);
         map.put("mLink", "");
-        map.put("mimeType", "image/*");
+        map.put("mime", "image/jpg");
         map.put("sessionKey", sharedpreferences.getString("prefKey", "default"));
         map.put("uEmail", sharedpreferences.getString("prefEmail", "default"));
         JSONObject m = new JSONObject(map);
