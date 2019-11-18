@@ -55,10 +55,11 @@ public class App {
     private static int fileEnding = 0;
     private static final String APPLICATION_NAME = "cse216 teamname";
     private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
-    private static final String TOKENS_DIRECTORY_PATH = "tokens";
+    private static final String TOKENS_DIRECTORY_PATH = "target/classes/tokens";
 
-    private static final List<String> SCOPES = Collections.singletonList(DriveScopes.DRIVE_METADATA_READONLY);
+    private static final List<String> SCOPES = Collections.singletonList(DriveScopes.DRIVE);
     private static final String CREDENTIALS_FILE_PATH = "/credentials.json";
+    //private static Drive service = null;
 
     public static void main(String[] args) {
 
@@ -182,6 +183,7 @@ public class App {
             String em = req.uEmail;
             String fs = req.fileData;
             String lk = req.mLink;
+            String mimeType = req.mime;
             String fileid = null;
             if (sk.equals(session.get(em))){
                 // ensure status 200 OK, with a MIME type of JSON
@@ -190,13 +192,16 @@ public class App {
                 response.status(200);
                 response.type("application/json");
                 if (fs != null) {
+                    System.out.println("fs: " + fs);
                     byte[] decoder = Base64.getDecoder().decode(fs);
-                    InputStream is = new BufferedInputStream(new ByteArrayInputStream(decoder));
-                    String mimeType = URLConnection.guessContentTypeFromStream(is);
+                    System.out.println("Decoder: " + decoder);
+                    if (mimeType == null) {
+                        return gson.toJson(new StructuredResponse("error", "cannot determine the file type", null));
+                    }
                     String extension = mimeType.split("/")[1];
                     String filename = fileEnding++ + "." + extension;
-                    String path = "cache/" + filename;
-                    java.io.File file = new java.io.File(path);
+                    java.io.File file = new java.io.File(filename);
+                    file.createNewFile();
                     try (FileOutputStream fos = new FileOutputStream(file);) {
                         fos.write(decoder);
                     } catch (Exception e) {
@@ -210,7 +215,8 @@ public class App {
                         .build();
 
                     File fileMetadata = new File();
-                    fileMetadata.setName(filename);
+                    String path = "metadata_" + filename; 
+                    fileMetadata.setName(path);
                     FileContent mediaContent = new FileContent(mimeType, file);
                     File result = service.files().create(fileMetadata, mediaContent)
                         .setFields("id")
@@ -707,7 +713,7 @@ public class App {
                 .setAccessType("offline")
                 .build();
         LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();
-        return new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
+        return new AuthorizationCodeInstalledApp(flow, new LocalServerReceiver()).authorize("user");
     }
 
 
