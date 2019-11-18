@@ -95,7 +95,7 @@ class NewEntryForm {
             type: "POST",
             url: "/messages",
             dataType: "json",
-            data: JSON.stringify({ mTitle: title, mMessage: msg, mLink: link, fileData: att, uid: uid, uEmail: uemail, sessionKey: ukey }),
+            data: JSON.stringify({ mTitle: title, mMessage: msg, mLink: link, fileData: att, mime: "application/pdf", uid: uid, uEmail: uemail, sessionKey: ukey }),
             success: NewEntryForm.onSubmitResponse
         });
     }
