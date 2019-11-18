@@ -12,8 +12,7 @@ WEBFOLDERNAME=web
 
 # step 1: make sure we have someplace to put everything.  We will delete the
 #         old folder tree, and then make it from scratch
-rm -rf $TARGETFOLDER
-mkdir $TARGETFOLDER
+rm -rf $TARGETFOLDER/$WEBFOLDERNAME
 mkdir $TARGETFOLDER/$WEBFOLDERNAME
 
 # there are many more steps to be done.  For now, we will just copy an HTML file
