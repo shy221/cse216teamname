@@ -88,6 +88,8 @@ class NewEntryForm {
         var myReader:FileReader = new FileReader();
         let att = "" + myReader.readAsDataURL(file);
 
+        console.log(att);
+
         // set up an AJAX post.  When the server replies, the result will go to
         // onSubmitResponse
         $.ajax({
