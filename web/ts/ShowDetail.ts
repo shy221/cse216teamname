@@ -189,7 +189,7 @@ class ShowDetail {
         let file = $("#" + ShowDetail.NAME + "-postcomments-attachment").prop('files')[0];
 
         var myReader:FileReader = new FileReader();
-        let att = "" + myReader.readAsBinaryString(file);
+        let att = myReader.readAsDataURL(file);
 
         if (text === "") {
             window.alert("Error: comment is not valid");
@@ -199,7 +199,7 @@ class ShowDetail {
             type: "POST",
             url: "/" + mid + "/comments",
             dataType: "json",
-            data: JSON.stringify({ uEmail: uemail, sessionKey: ukey, uid: uid, mid: mid, text: text, mLink: link, mime: "application/pdf", fileData: btoa(att)}),
+            data: JSON.stringify({ uEmail: uemail, sessionKey: ukey, uid: uid, mid: mid, text: text, mLink: link, mime: "application/pdf", fileData: att}),
             success: ShowDetail.refresh
         });
     }
