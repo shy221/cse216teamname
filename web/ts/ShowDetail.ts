@@ -188,20 +188,26 @@ class ShowDetail {
         let link = "" + $("#" + ShowDetail.NAME + "-postcomments-link").val();
         let file = $("#" + ShowDetail.NAME + "-postcomments-attachment").prop('files')[0];
 
-        var myReader:FileReader = new FileReader();
-        let att = "" + myReader.readAsDataURL(file);
-
         if (text === "") {
             window.alert("Error: comment is not valid");
             return;
         }
-        $.ajax({
-            type: "POST",
-            url: "/" + mid + "/comments",
-            dataType: "json",
-            data: JSON.stringify({ uEmail: uemail, sessionKey: ukey, uid: uid, mid: mid, text: text, mLink: link, mime: "application/pdf", fileData: att}),
-            success: ShowDetail.refresh
-        });
+
+        var myReader:FileReader = new FileReader();
+        myReader.onload = function(completionEvent: any) {
+            // wait till reader finished reading
+            var att = btoa(completionEvent.target.result);
+            console.log(att);
+
+            $.ajax({
+                type: "POST",
+                url: "/" + mid + "/comments",
+                dataType: "json",
+                data: JSON.stringify({ uEmail: uemail, sessionKey: ukey, uid: uid, mid: mid, text: text, mLink: link, mime: "application/pdf", fileData: att}),
+                success: ShowDetail.refresh
+            });
+        }
+        myReader.readAsBinaryString(file);
     }
 
 
