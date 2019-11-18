@@ -1,5 +1,8 @@
 package edu.lehigh.cse216.teamname.admin;
 
+
+
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.IOException;
@@ -9,11 +12,13 @@ import java.util.Map;
 
 import com.sendgrid.*;
 
+
 /**
  * App is our basic admin app. For now, it is a demonstration of the six key
  * operations on a database: connect, insert, update, query, delete, disconnect
  */
 public class App {
+    
 
     /**
      * Print the menu for our program
@@ -74,6 +79,7 @@ public class App {
         System.out.println("  [C] tblComment");
         System.out.println("  [L] tblLike");
         System.out.println("  [D] tblDislike");
+        System.out.println("  [F] tblFile");
         System.out.println("  [q] Quit to main menu");
         System.out.println("  [?] Help (this message)");
     }
@@ -87,7 +93,7 @@ public class App {
      */
     static char promptTables(BufferedReader in) {
         // The valid actions:
-        String actions = "MUCLDq?";
+        String actions = "MUCLDFq?";
 
         // We repeat until a valid single-character option is selected
         while (true) {
@@ -116,6 +122,7 @@ public class App {
         System.out.println("  [M] tblData");
         System.out.println("  [U] tblUser");
         System.out.println("  [C] tblComment");
+        System.out.println("  [F] tblFile");
         System.out.println("  [q] Quit to main menu");
         System.out.println("  [?] Help (this message)");
     }
@@ -129,7 +136,7 @@ public class App {
      */
     static char promptTablesLite(BufferedReader in) {
         // The valid actions:
-        String actions = "MUCq?";
+        String actions = "MUCFq?";
 
         // We repeat until a valid single-character option is selected
         while (true) {
@@ -372,6 +379,8 @@ public class App {
                         db.createLike();
                     } else if (action == 'D') {
                         db.createDislike();
+                    } else if (action == 'F'){
+                        db.createFile();
                     } else if (action == 'q') {
                         break;
                     }
@@ -392,7 +401,10 @@ public class App {
                         db.dropLike();
                     } else if (action == 'D') {
                         db.dropDislike();
-                    } else if (action == 'q') {
+                    } else if (action == 'F'){
+                        db.dropFile();
+                    }
+                     else if (action == 'q') {
                         break;
                     }
                 }
@@ -443,6 +455,8 @@ public class App {
                             System.out.println("  --> " + res.mlikes);
                             System.out.println("  --> " + res.mdislikes);
                             System.out.println("  --> " + res.mDate);
+                            System.out.println("  --> " + res.mLink);
+                            System.out.println("  --> " + res.field);
                         }
 
                     } else if (action == 'U') {
@@ -456,6 +470,7 @@ public class App {
 //                            System.out.println("  --> " + res.uSalt);
 //                            System.out.println("  --> " + res.uPassword);
                             System.out.println("  --> " + res.uIntro);
+                            System.out.println("  --> " + res.uQuota);
                         }
 
                     } else if (action == 'C') {
@@ -468,6 +483,8 @@ public class App {
                             System.out.println("  [" + res.uId + "] ");
                             System.out.println("  [" + res.mId + "] ");
                             System.out.println("  --> " + res.cText);
+                            System.out.println("  --> " + res.field);
+                            System.out.println("  --> " + res.cLink);
                         }
                     } else if (action == 'q') {
                         break;
@@ -513,6 +530,18 @@ public class App {
                             System.out.println("  [" + rd.mId + "] ");
                             System.out.println("  --> " + rd.cText);
                         }
+                    } else if (action == 'F') {
+                        
+                        DriveQuickstart serviceDrive = new DriveQuickstart();
+                        //ArrayList<Database.RowData> res = db.selectAllFromData();
+                        /*if (res == null)
+                            continue;*/
+                        System.out.println("  Current tblFile Contents");
+                        System.out.println("  -------------------------");
+                        //serviceDrive.listDrive();
+                        /*for (Database.RowData rd : res) {
+                            System.out.println("  [" + rd.mId + "] " + rd.mSubject);
+                        }*/
                     } else if (action == 'q') {
                         break;
                     }
