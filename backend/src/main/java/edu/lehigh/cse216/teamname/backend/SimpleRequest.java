@@ -31,4 +31,6 @@ public class SimpleRequest {
     public String fileData;
 
     public String mLink;
+
+    public String mime;
 }
