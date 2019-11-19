@@ -199,7 +199,7 @@ class ShowDetail {
             var myReader:FileReader = new FileReader();
             myReader.onload = function(completionEvent: any) {
                 // wait till reader finished reading
-                var att = btoa(completionEvent.target.result);
+                var att = completionEvent.target.result;
                 console.log(att);
 
                 $.ajax({
@@ -210,7 +210,7 @@ class ShowDetail {
                     success: ShowDetail.refresh
                 });
             }
-            myReader.readAsBinaryString(file);
+            myReader.readAsDataURL(file);
         } else {
             // post without attachment
             $.ajax({
