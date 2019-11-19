@@ -56,6 +56,7 @@ public class SecondActivity extends AppCompatActivity {
     String currentPhotoPath;
 
     static final int REQUEST_IMAGE_CAPTURE = 1;
+    static final int REQUEST_TAKE_PHOTO = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -199,28 +200,34 @@ public class SecondActivity extends AppCompatActivity {
     */
 
 
-    public void onActivityResult(int requestCode, int resultCode, Intent data){
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
+            image = currentPhotoPath;
+            Log.e("requestCode", "REQUEST_TAKE_PHOTO");
+        }
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             Bundle extras = data.getExtras();
             Bitmap imageBitmap = (Bitmap) extras.get("data");
             imageView.setImageBitmap(imageBitmap);
-        } else {
-            super.onActivityResult(requestCode, resultCode, data);
-            // Result code is RESULT_OK only if the user selects an Image
-            if (resultCode == RESULT_OK && requestCode == 0)
-                if (data == null) {
-                    Toast.makeText(this, "Unable to choose image", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-            android.net.Uri imageUri = data.getData();
-            Log.e("image uri", "uri" + imageUri);
-            image = getRealPathFromUri(imageUri);
-            Log.e("image string", "uri" + image);
+            dispatchTakePictureIntent();
+            Log.e("requestCode", "REQUEST_IMAGE_CAPTURE");
+        }
+        //super.onActivityResult(requestCode, resultCode, data);
+        // Result code is RESULT_OK only if the user selects an Image
+        if (resultCode == RESULT_OK && requestCode == 0) {
+            if (data == null) {
+                Toast.makeText(this, "Unable to choose image", Toast.LENGTH_SHORT).show();
+                return;
+            }
+        Uri imageUri = data.getData();
+        Log.e("image uri", "uri" + imageUri);
+        image = getRealPathFromUri(imageUri);
+        Log.e("image string", "uri" + image);
         }
 
     }
 
-    private String getRealPathFromUri (android.net.Uri uri){
+    private String getRealPathFromUri (Uri uri){
         String[] projection = {MediaStore.Images.Media.DATA};
         androidx.loader.content.CursorLoader loader = new androidx.loader.content.CursorLoader (getApplicationContext(), uri, projection, null, null, null);
         android.database.Cursor cursor = loader.loadInBackground();
@@ -249,6 +256,7 @@ public class SecondActivity extends AppCompatActivity {
             File photoFile = null;
             try {
                 photoFile = createImageFile();
+                galleryAddPic();
             } catch (IOException ex) {
                 // Error occurred while creating the File
                 Log.e("CreateImageFile() wrong", "No idea how to fix");
@@ -256,12 +264,20 @@ public class SecondActivity extends AppCompatActivity {
             // Continue only if the File was successfully created
             if (photoFile != null) {
                 Uri photoURI = FileProvider.getUriForFile(this,
-                        "com.example.android.fileprovider",
+                        "edu.lehigh.cse216.yut222.phase0.provider",
                         photoFile);
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+                startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
             }
         }
+    }
+
+    private void galleryAddPic() {
+        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+        File f = new File(currentPhotoPath);
+        Uri contentUri = Uri.fromFile(f);
+        mediaScanIntent.setData(contentUri);
+        this.sendBroadcast(mediaScanIntent);
     }
 
     private File createImageFile() throws IOException {
