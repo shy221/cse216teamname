@@ -101,9 +101,9 @@
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
             android:layout_alignParentBottom="true"
-            android:layout_marginEnd="2dp"
-            android:layout_marginRight="2dp"
-            android:layout_marginBottom="262dp"
+            android:layout_marginEnd="1dp"
+            android:layout_marginRight="1dp"
+            android:layout_marginBottom="219dp"
             android:text="like" />
 
         <Button
@@ -115,7 +115,7 @@
             android:layout_alignParentBottom="true"
             android:layout_marginEnd="-1dp"
             android:layout_marginRight="-1dp"
-            android:layout_marginBottom="203dp"
+            android:layout_marginBottom="163dp"
             android:text="comment" />
 
         <Button
@@ -140,7 +140,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="250dp"
-            android:layout_marginTop="50dp"
             app:srcCompat="@drawable/common_google_signin_btn_icon_light_normal_background" />
 
 
