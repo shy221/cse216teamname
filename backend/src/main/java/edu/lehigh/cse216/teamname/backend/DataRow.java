@@ -52,6 +52,8 @@ public class DataRow {
 
     public String mLink;
 
+    public String mime;
+
 
     /**
      * Create a new DataRow with the provided id and title/content, and a 
@@ -65,7 +67,7 @@ public class DataRow {
      *
      * @param content The content string for this row of data
      */
-    DataRow(int mid, int uid, String username, String title, String content, int likes, int dislikes, Date date, String fileid, String link) {
+    DataRow(int mid, int uid, String username, String title, String content, int likes, int dislikes, Date date, String fileid, String link, String mimeType) {
         mId = mid;
         uId = uid;
         cUsername = username;
@@ -76,6 +78,7 @@ public class DataRow {
         mCreated = new Date();
         fileId = fileid;
         mLink = link;
+        mime = mimeType;
     }
 
     DataRow(int mid, String title) {

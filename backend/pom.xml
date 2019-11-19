@@ -54,6 +54,16 @@
       <version>v3-rev110-1.23.0</version>
     </dependency>
 
+    <!--
+      Memcachier
+    -->
+
+    <dependency>
+      <groupId>com.googlecode.xmemcached</groupId>
+      <artifactId>xmemcached</artifactId>
+      <version>2.4.3</version>
+    </dependency>
+
 
 
 

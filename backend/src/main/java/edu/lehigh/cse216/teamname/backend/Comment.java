@@ -30,6 +30,12 @@ public class Comment {
      */
     public String cText;
 
+    public String cFileData;
+
+    public String cLink;
+
+    public String mime;
+
 
 
 
@@ -47,12 +53,15 @@ public class Comment {
      *
      * @param text The content string for this row of data
      */
-    Comment(int cid, int uid, int mid, String username, String text) {
+    Comment(int cid, int uid, int mid, String username, String text, String fileid, String link, String mimeType) {
         cId = cid;
         uId = uid;
         mId = mid;
         cUsername = username;
         cText = text;
+        cFileData = fileid;
+        cLink = link;
+        mime = mimeType;
 //        sessionKey = SessionKey;
     }
 

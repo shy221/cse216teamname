@@ -112,12 +112,12 @@ public class Database {
             // Standard CRUD operations
             //tblData
             db.mDeleteOne = db.mConnection.prepareStatement("DELETE FROM tblData WHERE mid = ?");
-            db.mInsertOne = db.mConnection.prepareStatement("INSERT INTO tblData VALUES (default, ?, ?, ?, ?, ?, ?)");
+            db.mInsertOne = db.mConnection.prepareStatement("INSERT INTO tblData VALUES (default, ?, ?, ?, ?, ?, ?, ?)");
             db.mSelectAll = db.mConnection.prepareStatement("SELECT mid, subject FROM tblData");
             db.mSelectAllByUser = db.mConnection.prepareStatement("SELECT mid, subject FROM tblData Where uid = ?");
             db.mSelectOne = db.mConnection.prepareStatement(
                     "SELECT row.*, (SELECT COUNT(*) FROM tblLike WHERE tblLike.mid = row.mid) AS likes, (SELECT COUNT(*) FROM tblDislike WHERE tblDislike.mid = row.mid) AS dislikes FROM (SELECT * from tblData NATURAL JOIN tblUser) AS row WHERE row.mid = ?");
-            db.mUpdateOne = db.mConnection.prepareStatement("UPDATE tblData SET subject = ?, message = ?, fileId = ?, mLink = ? WHERE mid = ?");
+            db.mUpdateOne = db.mConnection.prepareStatement("UPDATE tblData SET subject = ?, message = ?, fileId = ?, mLink = ?, mime = ? WHERE mid = ?");
             db.mClearLikes = db.mConnection.prepareStatement("DELETE FROM tblLike WHERE mid = ?");
             db.mClearDislikes = db.mConnection.prepareStatement("DELETE FROM tblDislike WHERE mid = ?");
             db.mClearComments = db.mConnection.prepareStatement("DELETE FROM tblComment WHERE mid = ?");
@@ -139,8 +139,8 @@ public class Database {
             
             //tblComments
             //add get all comments for specific message
-            db.cSelectAll = db.mConnection.prepareStatement("SELECT cid, uid, username, text FROM tblComment NATURAL JOIN tblUser where mid = ?");
-            db.cInsertOne = db.mConnection.prepareStatement("INSERT INTO tblComment VALUES (default, ?, ?, ?, ?, ?)");
+            db.cSelectAll = db.mConnection.prepareStatement("SELECT cid, uid, username, text, fileId, mLink, mime FROM tblComment NATURAL JOIN tblUser where mid = ?");
+            db.cInsertOne = db.mConnection.prepareStatement("INSERT INTO tblComment VALUES (default, ?, ?, ?, ?, ?, ?)");
         } catch (SQLException e) {
             System.err.println("Error creating prepared statement");
             e.printStackTrace();
@@ -180,7 +180,7 @@ public class Database {
      * @return The Id of the new row, or -1 if no row was created
      */
     //detail: title, content, likes, dislikes, comment.userid, comments.text
-    public int createEntry(int uid, String subject, String message, String fileid, String mLink) {
+    public int createEntry(int uid, String subject, String message, String fileid, String mLink, String mime) {
         if (subject == null || message == null)
             return -1;
         int id = mCount++;
@@ -193,6 +193,7 @@ public class Database {
             mInsertOne.setTimestamp(4, ts);
             mInsertOne.setString(5, fileid);
             mInsertOne.setString(6, mLink);
+            mInsertOne.setString(7, mime);
             mInsertOne.execute();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -209,7 +210,7 @@ public class Database {
      * @return The Id of the new row, or -1 if no row was created
      */
     //detail: title, content, likes, dislikes, comment.userid, comments.text
-    public int createComment(int uid, int mid, String text, String fileid, String mLink) {
+    public int createComment(int uid, int mid, String text, String fileid, String mLink, String mime) {
         if (uid <= 0 || mid <= 0 ||text == null)
             return -1;
         try {
@@ -218,6 +219,7 @@ public class Database {
             cInsertOne.setString(3, text);
             cInsertOne.setString(4, fileid);
             cInsertOne.setString(5, mLink);
+            cInsertOne.setString(6, mime);
             cInsertOne.execute();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -243,7 +245,7 @@ public class Database {
                 //detail: title, content, likes, dislikes, comment.userid, comments.text
                 //res = new DataRow(rs.getInt("id"), rs.getString("subject"), rs.getString("message"), rs.getInt("likes"), rs.getDate("date"));
 //                res = new DataRow(rs.getInt("id"), rs.getString("subject"), rs.getString("message"), rs.getInt("likes"), rs.getInt("dislikes"), rs.getDate("date"), comments);
-                res = new DataRow(rs.getInt("mid"), rs.getInt("uid"), rs.getString("username"), rs.getString("subject"), rs.getString("message"), rs.getInt("likes"), rs.getInt("dislikes"), rs.getDate("date"), rs.getString("fileId"), rs.getString("mLink"));
+                res = new DataRow(rs.getInt("mid"), rs.getInt("uid"), rs.getString("username"), rs.getString("subject"), rs.getString("message"), rs.getInt("likes"), rs.getInt("dislikes"), rs.getDate("date"), rs.getString("fileId"), rs.getString("mLink"), rs.getString("mime"));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -264,7 +266,7 @@ public class Database {
             cSelectAll.setInt(1, mId);
             ResultSet rs = cSelectAll.executeQuery();
             while (rs.next()) {
-                res.add(new Comment(rs.getInt("cid"), rs.getInt("uid"), mId, rs.getString("username"), rs.getString("text")));
+                res.add(new Comment(rs.getInt("cid"), rs.getInt("uid"), mId, rs.getString("username"), rs.getString("text"), rs.getString("fileId"), rs.getString("mLink"), rs.getString("mime")));
             }
             rs.close();
             return res;
@@ -326,13 +328,14 @@ public class Database {
      * @param message The new message for the row
      * @return a copy of the data in the row, if exists, or null otherwise
      */
-    public DataRow updateOne(int mid, String title, String message, String fileid, String link) {
+    public DataRow updateOne(int mid, String title, String message, String fileid, String link, String mime) {
         try {
             mUpdateOne.setString(1, title);
             mUpdateOne.setString(2, message);
             mUpdateOne.setString(3, fileid);
             mUpdateOne.setString(4, link);
-            mUpdateOne.setInt(5, mid);
+            mUpdateOne.setString(5, mime);
+            mUpdateOne.setInt(6, mid);
             mUpdateOne.execute();
             return readOne(mid);
         } catch (SQLException e) {

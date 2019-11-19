@@ -4,6 +4,9 @@ import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
+import java.lang.InterruptedException;
+import java.net.InetSocketAddress;
+import java.util.concurrent.TimeoutException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -42,6 +45,16 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
+
+//for memcachier
+import net.rubyeye.xmemcached.MemcachedClient;
+import net.rubyeye.xmemcached.MemcachedClientBuilder;
+import net.rubyeye.xmemcached.XMemcachedClientBuilder;
+import net.rubyeye.xmemcached.auth.AuthInfo;
+import net.rubyeye.xmemcached.command.BinaryCommandFactory;
+import net.rubyeye.xmemcached.exception.MemcachedException;
+import net.rubyeye.xmemcached.utils.AddrUtil;
+
 // Import Google's JSON library
 import com.google.gson.Gson;
 
@@ -62,6 +75,8 @@ public class App {
     private static final List<String> SCOPES = Collections.singletonList(DriveScopes.DRIVE);
     private static final String CREDENTIALS_FILE_PATH = "/credentials.json";
     //private static Drive service = null;
+
+    private static MemcachedClient mc = null;
 
     public static void main(String[] args) {
 
@@ -97,6 +112,31 @@ public class App {
             Spark.staticFiles.externalLocation(static_location_override);
         }
 
+        List<InetSocketAddress> servers = AddrUtil.getAddresses(System.getenv("MEMCACHIER_SERVERS").replace(",", " "));
+        AuthInfo authInfo = AuthInfo.plain(System.getenv("MEMCACHIER_USERNAME"), System.getenv("MEMCACHIER_PASSWORD"));
+
+        MemcachedClientBuilder builder = new XMemcachedClientBuilder(servers);
+
+        // Configure SASL auth for each server
+        for (InetSocketAddress server : servers) {
+            builder.addAuthInfo(server, authInfo);
+        }
+
+        // Use binary protocol
+        builder.setCommandFactory(new BinaryCommandFactory());
+        // Connection timeout in milliseconds (default: )
+        builder.setConnectTimeout(1000);
+        // Reconnect to servers (default: true)
+        builder.setEnableHealSession(true);
+        // Delay until reconnect attempt in milliseconds (default: 2000)
+        builder.setHealSessionInterval(2000);
+
+        try {
+            mc = builder.build();
+        } catch (IOException ioe) {
+            System.err.println("Couldn't create a connection to MemCachier: " + ioe.getMessage());
+        }
+
         // Set up a route for serving the main page
         Spark.get("/", (req, res) -> {
             res.redirect("/index.html");
@@ -126,6 +166,17 @@ public class App {
             SimpleRequest req = gson.fromJson(request.body(), SimpleRequest.class);
             String sk = req.sessionKey;
             String em = req.uEmail;
+            try {
+                mc.set("foo", 0, "bar");
+                String val = mc.get("foo");
+                System.out.println(val);
+            } catch (TimeoutException te) {
+                System.err.println("Timeout during set or get: " + te.getMessage());
+            } catch (InterruptedException ie) {
+                System.err.println("Interrupt during set or get: " + ie.getMessage());
+            } catch (MemcachedException me) {
+                System.err.println("Memcached error during get or set: " + me.getMessage());
+            }
             if (sk.equals(session.get(em))){
                 return gson.toJson(new StructuredResponse("ok", null, db.readAll()));
             }
@@ -196,7 +247,7 @@ public class App {
                 response.type("application/json");
                 if (fs != null) {
                     System.out.println("fs: " + fs);
-                    byte[] decoder = Base64.getDecoder().decode(fs);
+                    byte[] decoder = Base64.getMimeDecoder().decode(fs);
                     System.out.println("Decoder: " + decoder);
                     if (mimeType == null) {
                         return gson.toJson(new StructuredResponse("error", "cannot determine the file type", null));
@@ -207,7 +258,7 @@ public class App {
                     }
                 }
                 // NB: createEntry checks for null title and message
-                int newId = db.createEntry(req.uid, req.mTitle, req.mMessage, fileid, lk);
+                int newId = db.createEntry(req.uid, req.mTitle, req.mMessage, fileid, lk, mimeType);
                 if (newId == -1) {
                     return gson.toJson(new StructuredResponse("error", "error performing insertion", null));
                 } else {
@@ -247,7 +298,7 @@ public class App {
                 response.type("application/json");
                 if (fs != null) {
                     System.out.println("fs: " + fs);
-                    byte[] decoder = Base64.getDecoder().decode(fs);
+                    byte[] decoder = Base64.getMimeDecoder().decode(fs);
                     System.out.println("Decoder: " + decoder);
                     if (mimeType == null) {
                         return gson.toJson(new StructuredResponse("error", "cannot determine the file type", null));
@@ -258,7 +309,7 @@ public class App {
                     }
                 }
                 //used to be updateOne(idx, req.mTitle, req.mMessage)
-                DataRow result = db.updateOne(idx, req.mTitle, req.mMessage, fileid, lk);
+                DataRow result = db.updateOne(idx, req.mTitle, req.mMessage, fileid, lk, mimeType);
                 if (result == null) {
                     return gson.toJson(new StructuredResponse("error", "unable to update message " + idx, null));
                 } else {
@@ -600,6 +651,9 @@ public class App {
                 if (data == null) {
                     return gson.toJson(new StructuredResponse("error", mid + " not found", null));
                 } else {
+                    for (int i = 0; i < data.size(); i++) {
+                        data.get(i).cFileData = downloadFileFromDrive(data.get(i).cFileData);
+                    }
                     return gson.toJson(new StructuredResponse("ok", null, data));
                 }
             }
@@ -635,7 +689,7 @@ public class App {
                 response.type("application/json");
                 if (fs != null) {
                     System.out.println("fs: " + fs);
-                    byte[] decoder = Base64.getDecoder().decode(fs);
+                    byte[] decoder = Base64.getMimeDecoder().decode(fs);
                     System.out.println("Decoder: " + decoder);
                     if (mimeType == null) {
                         return gson.toJson(new StructuredResponse("error", "cannot determine the file type", null));
@@ -646,7 +700,7 @@ public class App {
                     }
                 }
                 // NB: createEntry checks for null title and message
-                int newId = db.createComment(req.uid, req.mid, req.text, fileid, lk);
+                int newId = db.createComment(req.uid, req.mid, req.text, fileid, lk, mimeType);
                 if (newId == -1) {
                     return gson.toJson(new StructuredResponse("error", "error performing insertion", null));
                 } else {
