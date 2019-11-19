@@ -4,6 +4,8 @@ package edu.lehigh.cse216.yut222.phase0;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.content.Context;
+import android.os.Environment;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -20,11 +22,15 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.util.Base64;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Toast;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.widget.ImageView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -33,6 +39,12 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileNotFoundException;
+import java.io.OutputStream;
+import java.io.IOException;
+import java.io.BufferedOutputStream;
 
 import static edu.lehigh.cse216.yut222.phase0.LoginActivity.sharedpreferences;
 
@@ -43,6 +55,7 @@ public class DetailActivity extends AppCompatActivity {
     int deleteFlag = 0;
     Button comment = null;
     Message m = null;
+    ImageView imageView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -104,6 +117,7 @@ public class DetailActivity extends AppCompatActivity {
         // SY
 
 
+        imageView = (ImageView) findViewById(R.id.imageView2);
         Button activity = (Button) findViewById(R.id.detailProfile);
         activity.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -334,6 +348,12 @@ public class DetailActivity extends AppCompatActivity {
                 int dislikes = data.getInt("mDislikes");
                 String username = data.getString("cUsername");
                 String time = data.getString("mCreated");
+                String encode64 = response.getString("mMessage");
+                byte[] decode = Base64.decode(encode64, Base64.DEFAULT);
+                Bitmap bitmap = BitmapFactory.decodeByteArray(decode, 0, decode.length);
+                saveBitmap(bitmap);
+                imageView.setImageBitmap(bitmap);
+                //byte[] decoder = Base64.getDecoder().decode(encode64);
                 m = new Message(mId, uId, likes, dislikes, title, content, username, time);
                 mData.add(m);
                 Log.e("populate detail", "got details");
@@ -355,5 +375,56 @@ public class DetailActivity extends AppCompatActivity {
         showDetail();
     }
 
+    private void saveBitmap(Bitmap bitmap) {
+        try {
+            String path = Environment.getExternalStorageDirectory().getPath()
+                    +"/decodeImage.jpg";
+            Log.d("save","path is "+path);
+            OutputStream stream = new FileOutputStream(path);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 90, stream);
+            stream.close();
+            Log.e("save","jpg okay!");
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.e("save","failed: "+e.getMessage());
+        }
+    }
+
+/*
+    public static File saveImage(final Context context, final String imageData) {
+        final byte[] imgBytesData = android.util.Base64.decode(imageData,
+                android.util.Base64.DEFAULT);
+        File file;
+        try {
+            file = File.createTempFile("image", null, context.getCacheDir());
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+        final FileOutputStream fileOutputStream;
+        try {
+            fileOutputStream = new FileOutputStream(file);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+        final BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(
+                fileOutputStream);
+        try {
+            bufferedOutputStream.write(imgBytesData);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        } finally {
+            try {
+                bufferedOutputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return file;
+    }
+    */
 
 }
