@@ -115,12 +115,12 @@ class ShowDetail {
         if (data.mData.mLink) {
             $("#" + ShowDetail.NAME + "-link").html(data.mData.mLink);
         } else {
-            $("#" + ShowDetail.NAME + "-link").modal("hide");
+            $("#" + ShowDetail.NAME + "-link").attr("hidden");
         }
         if (data.mMessage) {
             $("#" + ShowDetail.NAME + "-attachment").attr("src", "data:" + data.mData.mime +";base64," + data.mMessage);
         } else {
-            $("#" + ShowDetail.NAME + "-attachment").modal("hide");
+            $("#" + ShowDetail.NAME + "-attachment").attr("hidden");
         }
 
         $("#" + ShowDetail.NAME + "-detailPostUid").val(data.mData.uId);
