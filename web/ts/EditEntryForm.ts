@@ -93,7 +93,7 @@ class EditEntryForm {
         var myReader:FileReader = new FileReader();
         myReader.onload = function(completionEvent: any) {
             // wait till reader finished reading
-            var att = btoa(completionEvent.target.result);
+            var att = completionEvent.target.result;
             console.log(att);
 
             // set up an AJAX post.  When the server replies, the result will go to
@@ -106,7 +106,7 @@ class EditEntryForm {
                 success: EditEntryForm.onSubmitResponse
             });
         }
-        myReader.readAsBinaryString(file);
+        myReader.readAsDataURL(file);
     }
 
     /**

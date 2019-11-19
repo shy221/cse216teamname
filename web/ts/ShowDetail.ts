@@ -111,8 +111,18 @@ class ShowDetail {
         $("#" + ShowDetail.NAME + "-username").text(data.mData.mName);
         $("#" + ShowDetail.NAME + "-message").val(data.mData.mContent);
         $("#" + ShowDetail.NAME + "-link").attr("href", data.mData.mLink);
-        $("#" + ShowDetail.NAME + "-link").html(data.mData.mLink);
-        $("#" + ShowDetail.NAME + "-attachment").attr("src", "data:" + data.mData.mime +";base64," + data.mMessage);
+
+        if (data.mData.mLink) {
+            $("#" + ShowDetail.NAME + "-link").html(data.mData.mLink);
+        } else {
+            $("#" + ShowDetail.NAME + "-link").modal("hide");
+        }
+        if (data.mMessage) {
+            $("#" + ShowDetail.NAME + "-attachment").attr("src", "data:" + data.mData.mime +";base64," + data.mMessage);
+        } else {
+            $("#" + ShowDetail.NAME + "-attachment").modal("hide");
+        }
+
         $("#" + ShowDetail.NAME + "-detailPostUid").val(data.mData.uId);
         $("#" + ShowDetail.NAME + "-created").text(data.mData.mCreated);
         $("#" + ShowDetail.NAME + "-likebtn").text("Like: " + data.mData.mLikes);
