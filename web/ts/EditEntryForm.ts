@@ -80,24 +80,33 @@ class EditEntryForm {
         let link = "" + $("#" + EditEntryForm.NAME + "-link").val();
         let file = $("#" + EditEntryForm.NAME + "-attachment").prop('files')[0];
 
-        var myReader:FileReader = new FileReader();
-        let att = "" + myReader.readAsDataURL(file);
-
         let id = "" + $("#" + EditEntryForm.NAME + "-editId").val();
         if (title === "" || msg === "") {
             window.alert("Error: title or message is not valid");
             return;
         }
         EditEntryForm.hide();
-        // set up an AJAX post.  When the server replies, the result will go to
-        // onSubmitResponse
-        $.ajax({
-            type: "PUT",
-            url: "/messages/" + id,
-            dataType: "json",
-            data: JSON.stringify({ mTitle: title, mMessage: msg, mLink: link, fileData: att, mime: "application/pdf", uEmail: uemail, sessionKey: ukey}),
-            success: EditEntryForm.onSubmitResponse
-        });
+
+        console.log(link);
+        console.log(file);
+
+        var myReader:FileReader = new FileReader();
+        myReader.onload = function(completionEvent: any) {
+            // wait till reader finished reading
+            var att = btoa(completionEvent.target.result);
+            console.log(att);
+
+            // set up an AJAX post.  When the server replies, the result will go to
+            // onSubmitResponse
+            $.ajax({
+                type: "PUT",
+                url: "/messages/" + id,
+                dataType: "json",
+                data: JSON.stringify({ mTitle: title, mMessage: msg, mLink: link, fileData: att, mime: "application/pdf", uEmail: uemail, sessionKey: ukey}),
+                success: EditEntryForm.onSubmitResponse
+            });
+        }
+        myReader.readAsBinaryString(file);
     }
 
     /**

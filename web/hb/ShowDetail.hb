@@ -3,7 +3,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3 class="modal-title" id="ShowDetail-title"></h3>
-                <button type="button" class="btn btn-default" id="ShowDetail-closebtn" style="float: right; position: relative">X</button>
+                <button type="button" class="btn btn-default" id="ShowDetail-closebtn" style="float: right; position: relative; top: -35px">X</button>
             </div>
             <div class="modal-body">
                 <div class="user-face">
