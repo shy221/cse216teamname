@@ -348,11 +348,13 @@ public class DetailActivity extends AppCompatActivity {
                 int dislikes = data.getInt("mDislikes");
                 String username = data.getString("cUsername");
                 String time = data.getString("mCreated");
-                String encode64 = response.getString("mMessage");
-                byte[] decode = Base64.decode(encode64, Base64.DEFAULT);
-                Bitmap bitmap = BitmapFactory.decodeByteArray(decode, 0, decode.length);
-                saveBitmap(bitmap);
-                imageView.setImageBitmap(bitmap);
+                if (!response.isNull("mMessage")) {
+                    String encode64 = response.getString("mMessage");
+                    byte[] decode = Base64.decode(encode64, Base64.DEFAULT);
+                    Bitmap bitmap = BitmapFactory.decodeByteArray(decode, 0, decode.length);
+                    saveBitmap(bitmap);
+                    imageView.setImageBitmap(bitmap);
+                }
                 //byte[] decoder = Base64.getDecoder().decode(encode64);
                 m = new Message(mId, uId, likes, dislikes, title, content, username, time);
                 mData.add(m);
