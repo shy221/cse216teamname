@@ -6,6 +6,11 @@ package edu.lehigh.cse216.teamname.admin;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.IOException;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.security.GeneralSecurityException;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -341,7 +346,9 @@ public class App {
      * 
      * @param argv Command-line options. Ignored by this program.
      */
-    public static void main(String[] argv) {
+    public static void main(String[] argv) throws IOException, GeneralSecurityException{
+        
+        DriveQuickstart serviceDrive = new DriveQuickstart();
         // get the Postgres configuration from the environment
         Map<String, String> env = System.getenv();
         String db_url = env.get("DATABASE_URL");
@@ -456,7 +463,7 @@ public class App {
                             System.out.println("  --> " + res.mdislikes);
                             System.out.println("  --> " + res.mDate);
                             System.out.println("  --> " + res.mLink);
-                            System.out.println("  --> " + res.field);
+                            System.out.println("  --> " + res.fileId);
                         }
 
                     } else if (action == 'U') {
@@ -483,7 +490,7 @@ public class App {
                             System.out.println("  [" + res.uId + "] ");
                             System.out.println("  [" + res.mId + "] ");
                             System.out.println("  --> " + res.cText);
-                            System.out.println("  --> " + res.field);
+                            System.out.println("  --> " + res.fileId);
                             System.out.println("  --> " + res.cLink);
                         }
                     } else if (action == 'q') {
@@ -532,12 +539,17 @@ public class App {
                         }
                     } else if (action == 'F') {
                         
-                        DriveQuickstart serviceDrive = new DriveQuickstart();
-                        //ArrayList<Database.RowData> res = db.selectAllFromData();
-                        /*if (res == null)
-                            continue;*/
+                        ArrayList<Database.RowDrive> res = db.selectAllFromFile();
+                        if (res == null)
+                            continue;
                         System.out.println("  Current tblFile Contents");
                         System.out.println("  -------------------------");
+                        for (Database.RowDrive rd : res) {
+                            System.out.println("  [" + rd.fId + "] ");
+                            System.out.println("  [" + rd.fName + "] ");
+                            //System.out.println("  [" + rd.mId + "] ");
+                            //System.out.println("  --> " + rd.cText);
+                        }
                         //serviceDrive.listDrive();
                         /*for (Database.RowData rd : res) {
                             System.out.println("  [" + rd.mId + "] " + rd.mSubject);
@@ -651,9 +663,29 @@ public class App {
                         }
                         int res = db.insertRowToDislike(uid, mid);
                         System.out.println(res + " rows added");
+                    }else if (action == 'F') {
+                        int dSize = serviceDrive.getDrivesize();
+                        System.out.println("size is "+serviceDrive.getDrivesize());
+
+                        //int mid = getInt(in, "Enter the id of message");
+                        //int uid = getInt(in, "Enter the your user id");
+                        for(int i = 0; i < dSize; i++){
+                            
+                            String fid = serviceDrive.getFid(i);
+                            System.out.println(fid);
+                            String name = serviceDrive.getName(i);
+                            //nt uid = serviceDrive.getUid();
+                            System.out.println(name);
+                            //System.out.println("owner is " + serviceDrive.getOwner(i));
+                            //String activity = serviceDrive.getActivity();
+                            //int size = serviceDrive.getSize();
+                            int res = db.insertRowToFile(fid, name, 0, "default");
+                            System.out.println(res + " rows added");
+                        }   
                     } else if (action == 'q') {
                         break;
                     }
+                
                 }
 
             } else if (action == '~') {
