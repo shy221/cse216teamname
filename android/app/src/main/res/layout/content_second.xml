@@ -23,26 +23,69 @@
             android:id="@+id/buttonCancel"
             android:layout_width="191dp"
             android:layout_height="50dp"
-            android:text="Cancel"
-            tools:layout_editor_absoluteY="371dp"
-            tools:layout_editor_absoluteX="0dp"
             android:layout_alignTop="@+id/buttonOk"
-            android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:layout_marginStart="-4dp"
+            android:layout_marginLeft="-4dp"
+            android:layout_marginTop="3dp"
+            android:layout_marginEnd="4dp"
+            android:layout_marginRight="4dp"
+            android:layout_toStartOf="@+id/buttonOk"
             android:layout_toLeftOf="@+id/buttonOk"
-            android:layout_toStartOf="@+id/buttonOk" />
+            android:text="Cancel"
+            tools:layout_editor_absoluteX="0dp"
+            tools:layout_editor_absoluteY="371dp" />
 
         <Button
             android:id="@+id/buttonOk"
             android:layout_width="191dp"
             android:layout_height="50dp"
-            android:text="OK"
-            tools:layout_editor_absoluteY="371dp"
-            tools:layout_editor_absoluteX="191dp"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
-            android:layout_marginBottom="162dp" />
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginEnd="-1dp"
+            android:layout_marginRight="-1dp"
+            android:layout_marginBottom="76dp"
+            android:text="OK"
+            tools:layout_editor_absoluteX="191dp"
+            tools:layout_editor_absoluteY="371dp" />
+
+        <Button
+            android:id="@+id/buttonGoGallery"
+            android:layout_width="213dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="0dp"
+            android:layout_marginLeft="0dp"
+            android:layout_marginEnd="198dp"
+            android:layout_marginRight="198dp"
+            android:layout_marginBottom="132dp"
+            android:text="GO GALLERY"
+            tools:layout_editor_absoluteX="191dp"
+            tools:layout_editor_absoluteY="371dp" />
+
+        <Button
+            android:id="@+id/buttonTakePicture"
+            android:layout_width="197dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="212dp"
+            android:layout_marginLeft="212dp"
+            android:layout_marginEnd="2dp"
+            android:layout_marginRight="2dp"
+            android:layout_marginBottom="134dp"
+            android:text="TAKE PICTURE"
+            tools:layout_editor_absoluteX="191dp"
+            tools:layout_editor_absoluteY="371dp" />
 
         <EditText
             android:id="@+id/editText"
@@ -75,6 +118,21 @@
             android:text=""
             tools:layout_editor_absoluteX="0dp"
             tools:layout_editor_absoluteY="62dp" />
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="150dp"
+            android:layout_marginTop="240dp"
+            android:layout_marginRight="150dp"
+            android:layout_marginBottom="240dp"
+            android:maxWidth="150dp"
+            android:maxHeight="150dp"
+            android:minWidth="100dp"
+            android:minHeight="100dp"
+            app:srcCompat="@drawable/common_google_signin_btn_icon_dark_normal_background" />
+
     </RelativeLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

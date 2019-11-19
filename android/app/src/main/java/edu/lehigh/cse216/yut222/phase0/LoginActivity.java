@@ -107,7 +107,7 @@ public class LoginActivity  extends AppCompatActivity{
     }
 
     private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
-        String token = "faketoken";
+        String token = null;
         try {
             Log.w(TAG, "Task = " + completedTask);
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);

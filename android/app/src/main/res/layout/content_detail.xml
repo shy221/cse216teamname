@@ -96,35 +96,52 @@
 
         <Button
             android:id="@+id/like"
-            android:text="like"
             android:layout_width="191dp"
             android:layout_height="50dp"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
-            android:layout_marginBottom="333dp"
-         />
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginEnd="2dp"
+            android:layout_marginRight="2dp"
+            android:layout_marginBottom="262dp"
+            android:text="like" />
+
         <Button
             android:id="@+id/comment"
-            android:text="comment"
             android:layout_width="191dp"
             android:layout_height="50dp"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
-            android:layout_marginBottom="270dp"
-            />
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginEnd="-1dp"
+            android:layout_marginRight="-1dp"
+            android:layout_marginBottom="203dp"
+            android:text="comment" />
+
         <Button
             android:id="@+id/detailProfile"
             android:layout_width="191dp"
             android:layout_height="50dp"
-            android:text="Profile"
-
             android:layout_alignTop="@+id/comment"
-            android:layout_alignParentLeft="true"
+
             android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:layout_marginStart="-4dp"
+            android:layout_marginLeft="-4dp"
+            android:layout_marginTop="0dp"
+            android:layout_marginEnd="4dp"
+            android:layout_marginRight="4dp"
+            android:layout_toStartOf="@+id/comment"
             android:layout_toLeftOf="@+id/comment"
-            android:layout_toStartOf="@+id/comment" />
+            android:text="Profile" />
+
+        <ImageView
+            android:id="@+id/imageView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="250dp"
+            android:layout_marginTop="50dp"
+            app:srcCompat="@drawable/common_google_signin_btn_icon_light_normal_background" />
 
 
     </RelativeLayout>
