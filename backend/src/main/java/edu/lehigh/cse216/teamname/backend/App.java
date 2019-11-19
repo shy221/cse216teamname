@@ -166,18 +166,17 @@ public class App {
             SimpleRequest req = gson.fromJson(request.body(), SimpleRequest.class);
             String sk = req.sessionKey;
             String em = req.uEmail;
+            String key = "";
             try {
-                mc.set("foo", 0, "bar");
-                String val = mc.get("foo");
-                System.out.println(val);
+                key = mc.get(em);
             } catch (TimeoutException te) {
-                System.err.println("Timeout during set or get: " + te.getMessage());
+                return gson.toJson(new StructuredResponse("error", "Timeout during set or get: " + te.getMessage(), null));
             } catch (InterruptedException ie) {
-                System.err.println("Interrupt during set or get: " + ie.getMessage());
+                return gson.toJson(new StructuredResponse("error", "Interrupt during set or get: " + ie.getMessage(), null));
             } catch (MemcachedException me) {
-                System.err.println("Memcached error during get or set: " + me.getMessage());
+                return gson.toJson(new StructuredResponse("error", "Memcached error during get or set: " + me.getMessage(), null));
             }
-            if (sk.equals(session.get(em))){
+            if (sk.equals(key)){
                 return gson.toJson(new StructuredResponse("ok", null, db.readAll()));
             }
             return gson.toJson(new StructuredResponse("error", "session key not correct..", null));
@@ -206,7 +205,17 @@ public class App {
             String em = req.uEmail;
 //            System.out.println(em);
 //            System.out.println(sk);
-            if (sk.equals(session.get(em))){
+            String key = "";
+            try {
+                key = mc.get(em);
+            } catch (TimeoutException te) {
+                return gson.toJson(new StructuredResponse("error", "Timeout during set or get: " + te.getMessage(), null));
+            } catch (InterruptedException ie) {
+                return gson.toJson(new StructuredResponse("error", "Interrupt during set or get: " + ie.getMessage(), null));
+            } catch (MemcachedException me) {
+                return gson.toJson(new StructuredResponse("error", "Memcached error during get or set: " + me.getMessage(), null));
+            }
+            if (sk.equals(key)){
                 if (data == null) {
                     return gson.toJson(new StructuredResponse("error", mid + " not found", null));
                 } else {
@@ -239,7 +248,17 @@ public class App {
             String lk = req.mLink;
             String mimeType = req.mime;
             String fileid = null;
-            if (sk.equals(session.get(em))){
+            String key = "";
+            try {
+                key = mc.get(em);
+            } catch (TimeoutException te) {
+                return gson.toJson(new StructuredResponse("error", "Timeout during set or get: " + te.getMessage(), null));
+            } catch (InterruptedException ie) {
+                return gson.toJson(new StructuredResponse("error", "Interrupt during set or get: " + ie.getMessage(), null));
+            } catch (MemcachedException me) {
+                return gson.toJson(new StructuredResponse("error", "Memcached error during get or set: " + me.getMessage(), null));
+            }
+            if (sk.equals(key)){
                 // ensure status 200 OK, with a MIME type of JSON
                 // NB: even on error, we return 200, but with a JSON object that
                 //     describes the error.
@@ -292,7 +311,17 @@ public class App {
             String lk = req.mLink;
             String mimeType = req.mime;
             String fileid = null;
-            if (sk.equals(session.get(em))){
+            String key = "";
+            try {
+                key = mc.get(em);
+            } catch (TimeoutException te) {
+                return gson.toJson(new StructuredResponse("error", "Timeout during set or get: " + te.getMessage(), null));
+            } catch (InterruptedException ie) {
+                return gson.toJson(new StructuredResponse("error", "Interrupt during set or get: " + ie.getMessage(), null));
+            } catch (MemcachedException me) {
+                return gson.toJson(new StructuredResponse("error", "Memcached error during get or set: " + me.getMessage(), null));
+            }
+            if (sk.equals(key)){
                 // ensure status 200 OK, with a MIME of JSON
                 response.status(200);
                 response.type("application/json");
@@ -335,7 +364,17 @@ public class App {
             String sk = req.sessionKey;
             String em = req.uEmail;
             int uid = req.uid;
-            if (sk.equals(session.get(em))){
+            String key = "";
+            try {
+                key = mc.get(em);
+            } catch (TimeoutException te) {
+                return gson.toJson(new StructuredResponse("error", "Timeout during set or get: " + te.getMessage(), null));
+            } catch (InterruptedException ie) {
+                return gson.toJson(new StructuredResponse("error", "Interrupt during set or get: " + ie.getMessage(), null));
+            } catch (MemcachedException me) {
+                return gson.toJson(new StructuredResponse("error", "Memcached error during get or set: " + me.getMessage(), null));
+            }
+            if (sk.equals(key)){
                 // ensure status 200 OK, with a MIME of JSON
                 response.status(200);
                 response.type("application/json");
@@ -365,7 +404,17 @@ public class App {
             String sk = req.sessionKey;
             String em = req.uEmail;
             int uid = req.uid;
-            if (sk.equals(session.get(em))){
+            String key = "";
+            try {
+                key = mc.get(em);
+            } catch (TimeoutException te) {
+                return gson.toJson(new StructuredResponse("error", "Timeout during set or get: " + te.getMessage(), null));
+            } catch (InterruptedException ie) {
+                return gson.toJson(new StructuredResponse("error", "Interrupt during set or get: " + ie.getMessage(), null));
+            } catch (MemcachedException me) {
+                return gson.toJson(new StructuredResponse("error", "Memcached error during get or set: " + me.getMessage(), null));
+            }
+            if (sk.equals(key)){
                 // ensure status 200 OK, with a MIME of JSON
                 response.status(200);
                 response.type("application/json");
@@ -395,7 +444,17 @@ public class App {
             String sk = req.sessionKey;
             String em = req.uEmail;
             int uid = req.uid;
-            if (sk.equals(session.get(em))){
+            String key = "";
+            try {
+                key = mc.get(em);
+            } catch (TimeoutException te) {
+                return gson.toJson(new StructuredResponse("error", "Timeout during set or get: " + te.getMessage(), null));
+            } catch (InterruptedException ie) {
+                return gson.toJson(new StructuredResponse("error", "Interrupt during set or get: " + ie.getMessage(), null));
+            } catch (MemcachedException me) {
+                return gson.toJson(new StructuredResponse("error", "Memcached error during get or set: " + me.getMessage(), null));
+            }
+            if (sk.equals(key)){
                 // ensure status 200 OK, with a MIME of JSON
                 response.status(200);
                 response.type("application/json");
@@ -426,7 +485,17 @@ public class App {
             String sk = req.sessionKey;
             String em = req.uEmail;
             int uid = req.uid;
-            if (sk.equals(session.get(em))){
+            String key = "";
+            try {
+                key = mc.get(em);
+            } catch (TimeoutException te) {
+                return gson.toJson(new StructuredResponse("error", "Timeout during set or get: " + te.getMessage(), null));
+            } catch (InterruptedException ie) {
+                return gson.toJson(new StructuredResponse("error", "Interrupt during set or get: " + ie.getMessage(), null));
+            } catch (MemcachedException me) {
+                return gson.toJson(new StructuredResponse("error", "Memcached error during get or set: " + me.getMessage(), null));
+            }
+            if (sk.equals(key)){
                 // ensure status 200 OK, with a MIME of JSON
                 response.status(200);
                 response.type("application/json");
@@ -448,7 +517,17 @@ public class App {
             DataRow data = db.readOne(idx);
             String sk = req.sessionKey;
             String em = req.uEmail;
-            if (sk.equals(session.get(em))){
+            String key = "";
+            try {
+                key = mc.get(em);
+            } catch (TimeoutException te) {
+                return gson.toJson(new StructuredResponse("error", "Timeout during set or get: " + te.getMessage(), null));
+            } catch (InterruptedException ie) {
+                return gson.toJson(new StructuredResponse("error", "Interrupt during set or get: " + ie.getMessage(), null));
+            } catch (MemcachedException me) {
+                return gson.toJson(new StructuredResponse("error", "Memcached error during get or set: " + me.getMessage(), null));
+            }
+            if (sk.equals(key)){
                 // ensure status 200 OK, with a MIME type of JSON
                 response.status(200);
                 response.type("application/json");
@@ -525,7 +604,15 @@ public class App {
                     return gson.toJson(new StructuredResponse("error", "failed to add user", addResult));
             }
             String sessionKey = Base64.getEncoder().encodeToString(secretKey.getEncoded());
-            session.put(email, sessionKey);
+            try {
+                mc.set(email, 0, sessionKey);
+            } catch (TimeoutException te) {
+                return gson.toJson(new StructuredResponse("error", "Timeout during set or get: " + te.getMessage(), null));
+            } catch (InterruptedException ie) {
+                return gson.toJson(new StructuredResponse("error", "Interrupt during set or get: " + ie.getMessage(), null));
+            } catch (MemcachedException me) {
+                return gson.toJson(new StructuredResponse("error", "Memcached error during get or set: " + me.getMessage(), null));
+            }
             DataRowUserProfile userInfo = new DataRowUserProfile(db.matchUsr(email).uId,db.matchUsr(email).uSername, db.matchUsr(email).uEmail, db.matchUsr(email).uIntro, sessionKey);
             
 
@@ -536,12 +623,32 @@ public class App {
             SimpleRequest req = gson.fromJson(request.body(), SimpleRequest.class);
             String sk = req.sessionKey;
             String em = req.uEmail;
-            if (sk.equals(session.get(em))) {
+            String key = "";
+            try {
+                key = mc.get(em);
+            } catch (TimeoutException te) {
+                return gson.toJson(new StructuredResponse("error", "Timeout during set or get: " + te.getMessage(), null));
+            } catch (InterruptedException ie) {
+                return gson.toJson(new StructuredResponse("error", "Interrupt during set or get: " + ie.getMessage(), null));
+            } catch (MemcachedException me) {
+                return gson.toJson(new StructuredResponse("error", "Memcached error during get or set: " + me.getMessage(), null));
+            }
+            if (sk.equals(key)){
                 // ensure status 200 OK, witha MIME type of JSON
                 response.status(200);
                 response.type("application/json");
                 // remove the session key of current user
-                session.remove(em);
+                try {
+                    if (!mc.delete(em)) {
+                        return gson.toJson(new StructuredResponse("error", "delete fail", null));
+                    }
+                } catch (TimeoutException te) {
+                    return gson.toJson(new StructuredResponse("error", "Timeout during set or get: " + te.getMessage(), null));
+                } catch (InterruptedException ie) {
+                    return gson.toJson(new StructuredResponse("error", "Interrupt during set or get: " + ie.getMessage(), null));
+                } catch (MemcachedException me) {
+                    return gson.toJson(new StructuredResponse("error", "Memcached error during get or set: " + me.getMessage(), null));
+                }
                 return gson.toJson(new StructuredResponse("ok", "Logout success!", null));
             }
             return gson.toJson(new StructuredResponse("error", "session key not correct..", null));
@@ -558,7 +665,17 @@ public class App {
             UserProfileRequest req = gson.fromJson(request.body(), UserProfileRequest.class);
             String sk = req.sessionKey;
             String em = req.uEmail;
-            if (sk.equals(session.get(em))){
+            String key = "";
+            try {
+                key = mc.get(em);
+            } catch (TimeoutException te) {
+                return gson.toJson(new StructuredResponse("error", "Timeout during set or get: " + te.getMessage(), null));
+            } catch (InterruptedException ie) {
+                return gson.toJson(new StructuredResponse("error", "Interrupt during set or get: " + ie.getMessage(), null));
+            } catch (MemcachedException me) {
+                return gson.toJson(new StructuredResponse("error", "Memcached error during get or set: " + me.getMessage(), null));
+            }
+            if (sk.equals(key)){
                 // ensure status 200 OK, with a MIME type of JSON
                 response.status(200);
                 response.type("application/json");
@@ -583,7 +700,17 @@ public class App {
             UserProfileRequest req = gson.fromJson(request.body(), UserProfileRequest.class);
             String sk = req.sessionKey;
             String em = req.uEmail;
-            if (sk.equals(session.get(em))){
+            String key = "";
+            try {
+                key = mc.get(em);
+            } catch (TimeoutException te) {
+                return gson.toJson(new StructuredResponse("error", "Timeout during set or get: " + te.getMessage(), null));
+            } catch (InterruptedException ie) {
+                return gson.toJson(new StructuredResponse("error", "Interrupt during set or get: " + ie.getMessage(), null));
+            } catch (MemcachedException me) {
+                return gson.toJson(new StructuredResponse("error", "Memcached error during get or set: " + me.getMessage(), null));
+            }
+            if (sk.equals(key)){
                 // ensure status 200 OK, with a MIME type of JSON
                 response.status(200);
                 response.type("application/json");
@@ -608,7 +735,17 @@ public class App {
             UserProfileRequest req = gson.fromJson(request.body(), UserProfileRequest.class);
             String sk = req.sessionKey;
             String em = req.uEmail;
-            if (sk.equals(session.get(em))){
+            String key = "";
+            try {
+                key = mc.get(em);
+            } catch (TimeoutException te) {
+                return gson.toJson(new StructuredResponse("error", "Timeout during set or get: " + te.getMessage(), null));
+            } catch (InterruptedException ie) {
+                return gson.toJson(new StructuredResponse("error", "Interrupt during set or get: " + ie.getMessage(), null));
+            } catch (MemcachedException me) {
+                return gson.toJson(new StructuredResponse("error", "Memcached error during get or set: " + me.getMessage(), null));
+            }
+            if (sk.equals(key)){
                 // ensure status 200 OK, with a MIME of JSON
                 response.status(200);
                 response.type("application/json");
@@ -643,7 +780,17 @@ public class App {
             CommentRequest req = gson.fromJson(request.body(), CommentRequest.class);
             String sk = req.sessionKey;
             String em = req.uEmail;
-            if (sk.equals(session.get(em))){
+            String key = "";
+            try {
+                key = mc.get(em);
+            } catch (TimeoutException te) {
+                return gson.toJson(new StructuredResponse("error", "Timeout during set or get: " + te.getMessage(), null));
+            } catch (InterruptedException ie) {
+                return gson.toJson(new StructuredResponse("error", "Interrupt during set or get: " + ie.getMessage(), null));
+            } catch (MemcachedException me) {
+                return gson.toJson(new StructuredResponse("error", "Memcached error during get or set: " + me.getMessage(), null));
+            }
+            if (sk.equals(key)){
                 // ensure status 200 OK, with a MIME type of JSON
                 response.status(200);
                 response.type("application/json");
@@ -681,7 +828,17 @@ public class App {
             String lk = req.mLink;
             String mimeType = req.mime;
             String fileid = null;
-            if (sk.equals(session.get(em))){
+            String key = "";
+            try {
+                key = mc.get(em);
+            } catch (TimeoutException te) {
+                return gson.toJson(new StructuredResponse("error", "Timeout during set or get: " + te.getMessage(), null));
+            } catch (InterruptedException ie) {
+                return gson.toJson(new StructuredResponse("error", "Interrupt during set or get: " + ie.getMessage(), null));
+            } catch (MemcachedException me) {
+                return gson.toJson(new StructuredResponse("error", "Memcached error during get or set: " + me.getMessage(), null));
+            }
+            if (sk.equals(key)){
                 // ensure status 200 OK, with a MIME type of JSON
                 // NB: even on error, we return 200, but with a JSON object that
                 //     describes the error.
@@ -793,6 +950,9 @@ public class App {
     }
 
     static String downloadFileFromDrive(String fileId) {
+        if (fileId == null) {
+            return null;
+        }
         try {
             Drive service = getService();
             OutputStream outputStream = new ByteArrayOutputStream();
