@@ -111,16 +111,12 @@ class ShowDetail {
         $("#" + ShowDetail.NAME + "-username").text(data.mData.mName);
         $("#" + ShowDetail.NAME + "-message").val(data.mData.mContent);
         $("#" + ShowDetail.NAME + "-link").attr("href", data.mData.mLink);
+        $("#" + ShowDetail.NAME + "-link").html(data.mData.mLink);
 
-        if (data.mData.mLink) {
-            $("#" + ShowDetail.NAME + "-link").html(data.mData.mLink);
-        } else {
-            $("#" + ShowDetail.NAME + "-link").attr("hidden");
-        }
         if (data.mMessage) {
             $("#" + ShowDetail.NAME + "-attachment").attr("src", "data:" + data.mData.mime +";base64," + data.mMessage);
         } else {
-            $("#" + ShowDetail.NAME + "-attachment").attr("hidden");
+            $("#" + ShowDetail.NAME + "-attachment").attr("src", "");
         }
 
         $("#" + ShowDetail.NAME + "-detailPostUid").val(data.mData.uId);
@@ -221,7 +217,7 @@ class ShowDetail {
                 type: "POST",
                 url: "/" + mid + "/comments",
                 dataType: "json",
-                data: JSON.stringify({ uEmail: uemail, sessionKey: ukey, uid: uid, mid: mid, text: text, mLink: link, mime: null, fileData: null}),
+                data: JSON.stringify({ uEmail: uemail, sessionKey: ukey, uid: uid, mid: mid, text: text, mLink: link}),
                 success: ShowDetail.refresh
             });
         }

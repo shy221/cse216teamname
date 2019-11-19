@@ -114,7 +114,7 @@ class EditEntryForm {
                 type: "PUT",
                 url: "/messages/" + id,
                 dataType: "json",
-                data: JSON.stringify({ mTitle: title, mMessage: msg, mLink: link, fileData: null, mime: null, uEmail: uemail, sessionKey: ukey}),
+                data: JSON.stringify({ mTitle: title, mMessage: msg, mLink: link, uEmail: uemail, sessionKey: ukey}),
                 success: EditEntryForm.onSubmitResponse
             });
         }

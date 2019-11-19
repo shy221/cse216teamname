@@ -20,7 +20,7 @@
                 <br>
                 <label for="ShowDetail-attachment">Attachment</label>
                 <br>
-                <iframe class="embed-responsive-item" width="100%" id="ShowDetail-attachment"></iframe>
+                <iframe class="embed-responsive-item" width="100%" id="ShowDetail-attachment" alt="No attachment available"></iframe>
                 <br>
                 <label for="ShowDetail-created">Event created</label>
                 <span id="ShowDetail-created"></span>
