@@ -90,34 +90,23 @@ class EditEntryForm {
         console.log(link);
         console.log(file);
 
-        if (file) {
-            var myReader:FileReader = new FileReader();
-            myReader.onload = function(completionEvent: any) {
-                // wait till reader finished reading
-                var att = completionEvent.target.result;
-                console.log(att);
+        var myReader:FileReader = new FileReader();
+        myReader.onload = function(completionEvent: any) {
+            // wait till reader finished reading
+            var att = completionEvent.target.result;
+            console.log(att);
 
-                // set up an AJAX post.  When the server replies, the result will go to
-                // onSubmitResponse
-                $.ajax({
-                    type: "PUT",
-                    url: "/messages/" + id,
-                    dataType: "json",
-                    data: JSON.stringify({ mTitle: title, mMessage: msg, mLink: link, fileData: att, mime: "application/pdf", uEmail: uemail, sessionKey: ukey}),
-                    success: EditEntryForm.onSubmitResponse
-                });
-            }
-            myReader.readAsDataURL(file);
-        } else {
-            // post without attachment
+            // set up an AJAX post.  When the server replies, the result will go to
+            // onSubmitResponse
             $.ajax({
                 type: "PUT",
                 url: "/messages/" + id,
                 dataType: "json",
-                data: JSON.stringify({ mTitle: title, mMessage: msg, mLink: link, fileData: null, mime: null, uEmail: uemail, sessionKey: ukey}),
+                data: JSON.stringify({ mTitle: title, mMessage: msg, mLink: link, fileData: att, mime: "application/pdf", uEmail: uemail, sessionKey: ukey}),
                 success: EditEntryForm.onSubmitResponse
             });
         }
+        myReader.readAsDataURL(file);
     }
 
     /**

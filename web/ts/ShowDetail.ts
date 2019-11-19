@@ -199,32 +199,21 @@ class ShowDetail {
             return;
         }
 
-        if (file) {
-            var myReader:FileReader = new FileReader();
-            myReader.onload = function(completionEvent: any) {
-                // wait till reader finished reading
-                var att = btoa(completionEvent.target.result);
-                console.log(att);
+        var myReader:FileReader = new FileReader();
+        myReader.onload = function(completionEvent: any) {
+            // wait till reader finished reading
+            var att = btoa(completionEvent.target.result);
+            console.log(att);
 
-                $.ajax({
-                    type: "POST",
-                    url: "/" + mid + "/comments",
-                    dataType: "json",
-                    data: JSON.stringify({ uEmail: uemail, sessionKey: ukey, uid: uid, mid: mid, text: text, mLink: link, mime: "application/pdf", fileData: att}),
-                    success: ShowDetail.refresh
-                });
-            }
-            myReader.readAsBinaryString(file);
-        } else {
-            // post without attachment
             $.ajax({
                 type: "POST",
                 url: "/" + mid + "/comments",
                 dataType: "json",
-                data: JSON.stringify({ uEmail: uemail, sessionKey: ukey, uid: uid, mid: mid, text: text, mLink: link, mime: null, fileData: null}),
+                data: JSON.stringify({ uEmail: uemail, sessionKey: ukey, uid: uid, mid: mid, text: text, mLink: link, mime: "application/pdf", fileData: att}),
                 success: ShowDetail.refresh
             });
         }
+        myReader.readAsBinaryString(file);
     }
 
 
