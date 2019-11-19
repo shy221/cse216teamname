@@ -88,7 +88,6 @@ public class App {
         // NB: Gson is thread-safe.  See 
         // https://stackoverflow.com/questions/10380835/is-it-ok-to-use-gson-instance-as-a-static-field-in-a-model-bean-reuse
         final Gson gson = new Gson();
-        HashMap<String, String> session = new HashMap<String, String>();
 
         // Get the port on which to listen for requests
         Spark.port(getIntFromEnv("PORT", 4567));
@@ -219,7 +218,12 @@ public class App {
                 if (data == null) {
                     return gson.toJson(new StructuredResponse("error", mid + " not found", null));
                 } else {
-                    String encoded = downloadFileFromDrive(data.fileId);                  
+                    String encoded;
+                    if (downloadFileFromDrive(data.fileId)) {
+                        encoded = mc.get(data.fileId);
+                    } else {
+                        encoded = null;
+                    }
                     return gson.toJson(new StructuredResponse("ok", encoded, data));
                 }
             }
@@ -799,7 +803,12 @@ public class App {
                     return gson.toJson(new StructuredResponse("error", mid + " not found", null));
                 } else {
                     for (int i = 0; i < data.size(); i++) {
-                        data.get(i).cFileData = downloadFileFromDrive(data.get(i).cFileData);
+                        String fileId = data.get(i).cFileData;
+                        if (downloadFileFromDrive(fileId)) {
+                            data.get(i).cFileData = mc.get(fileId);
+                        } else {
+                            data.get(i).cFileData = null;
+                        }
                     }
                     return gson.toJson(new StructuredResponse("ok", null, data));
                 }
@@ -949,18 +958,19 @@ public class App {
         }
     }
 
-    static String downloadFileFromDrive(String fileId) {
+    static boolean downloadFileFromDrive(String fileId) {
         if (fileId == null) {
-            return null;
+            return false;
         }
         try {
             Drive service = getService();
             OutputStream outputStream = new ByteArrayOutputStream();
             service.files().get(fileId).executeMediaAndDownloadTo(outputStream);
-            return Base64.getEncoder().encodeToString(((ByteArrayOutputStream) outputStream).toByteArray());
+            mc.set(fileId, 0, Base64.getEncoder().encodeToString(((ByteArrayOutputStream) outputStream).toByteArray()));
+            return true;
         } catch (Exception e) {
             e.printStackTrace();
-            return null;
+            return false;
         }
     }
 
