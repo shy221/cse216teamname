@@ -2,10 +2,12 @@ package edu.lehigh.cse216.teamname.backend;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.InputStreamReader;
 import java.net.URLConnection;
 import java.security.SecureRandom;
@@ -157,7 +159,8 @@ public class App {
                 if (data == null) {
                     return gson.toJson(new StructuredResponse("error", mid + " not found", null));
                 } else {
-                    return gson.toJson(new StructuredResponse("ok", null, data));
+                    String encoded = downloadFileFromDrive(data.fileId);                  
+                    return gson.toJson(new StructuredResponse("ok", encoded, data));
                 }
             }
             return gson.toJson(new StructuredResponse("error", "session key not correct..", null));
@@ -198,31 +201,10 @@ public class App {
                     if (mimeType == null) {
                         return gson.toJson(new StructuredResponse("error", "cannot determine the file type", null));
                     }
-                    String extension = mimeType.split("/")[1];
-                    String filename = fileEnding++ + "." + extension;
-                    java.io.File file = new java.io.File(filename);
-                    file.createNewFile();
-                    try (FileOutputStream fos = new FileOutputStream(file);) {
-                        fos.write(decoder);
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                    fileid = uploadFileToDrive(mimeType, decoder);
+                    if (fileid == null) {
+                        return gson.toJson(new StructuredResponse("error", "error performing uploading", null));
                     }
-
-                    // Build a new authorized API client service.
-                    final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-                    Drive service = new Drive.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
-                        .setApplicationName(APPLICATION_NAME)
-                        .build();
-
-                    File fileMetadata = new File();
-                    String path = "metadata_" + filename; 
-                    fileMetadata.setName(path);
-                    FileContent mediaContent = new FileContent(mimeType, file);
-                    File result = service.files().create(fileMetadata, mediaContent)
-                        .setFields("id")
-                        .execute();
-                    fileid = result.getId();
-                    file.delete();
                 }
                 // NB: createEntry checks for null title and message
                 int newId = db.createEntry(req.uid, req.mTitle, req.mMessage, fileid, lk);
@@ -252,17 +234,35 @@ public class App {
             // a status 500
             int idx = Integer.parseInt(request.params("id"));
             SimpleRequest req = gson.fromJson(request.body(), SimpleRequest.class);
+            DataRow data = db.readOne(idx);
             String sk = req.sessionKey;
             String em = req.uEmail;
+            String fs = req.fileData;
+            String lk = req.mLink;
+            String mimeType = req.mime;
+            String fileid = null;
             if (sk.equals(session.get(em))){
                 // ensure status 200 OK, with a MIME of JSON
                 response.status(200);
                 response.type("application/json");
+                if (fs != null) {
+                    System.out.println("fs: " + fs);
+                    byte[] decoder = Base64.getDecoder().decode(fs);
+                    System.out.println("Decoder: " + decoder);
+                    if (mimeType == null) {
+                        return gson.toJson(new StructuredResponse("error", "cannot determine the file type", null));
+                    }
+                    fileid = uploadFileToDrive(mimeType, decoder);
+                    if (fileid == null) {
+                        return gson.toJson(new StructuredResponse("error", "error performing uploading", null));
+                    }
+                }
                 //used to be updateOne(idx, req.mTitle, req.mMessage)
-                DataRow result = db.updateOne(idx, req.mTitle, req.mMessage);
+                DataRow result = db.updateOne(idx, req.mTitle, req.mMessage, fileid, lk);
                 if (result == null) {
                     return gson.toJson(new StructuredResponse("error", "unable to update message " + idx, null));
                 } else {
+                    deleteFileFromDrive(data.fileId);
                     return gson.toJson(new StructuredResponse("ok", null, result));
                 }
             }
@@ -394,6 +394,7 @@ public class App {
             // If we can't get an ID, Spark will sned a status 500
             int idx = Integer.parseInt(request.params("mid"));
             SimpleRequest req = gson.fromJson(request.body(), SimpleRequest.class);
+            DataRow data = db.readOne(idx);
             String sk = req.sessionKey;
             String em = req.uEmail;
             if (sk.equals(session.get(em))){
@@ -406,6 +407,7 @@ public class App {
                 if (!result) {
                     return gson.toJson(new StructuredResponse("error", "unable to delete row " + idx, null));
                 } else {
+                    deleteFileFromDrive(data.fileId);
                     return gson.toJson(new StructuredResponse("ok", null, null));
                 }
             }
@@ -621,14 +623,30 @@ public class App {
             CommentRequest req = gson.fromJson(request.body(), CommentRequest.class);
             String sk = req.sessionKey;
             String em = req.uEmail;
+            String fs = req.fileData;
+            String lk = req.mLink;
+            String mimeType = req.mime;
+            String fileid = null;
             if (sk.equals(session.get(em))){
                 // ensure status 200 OK, with a MIME type of JSON
                 // NB: even on error, we return 200, but with a JSON object that
                 //     describes the error.
                 response.status(200);
                 response.type("application/json");
+                if (fs != null) {
+                    System.out.println("fs: " + fs);
+                    byte[] decoder = Base64.getDecoder().decode(fs);
+                    System.out.println("Decoder: " + decoder);
+                    if (mimeType == null) {
+                        return gson.toJson(new StructuredResponse("error", "cannot determine the file type", null));
+                    }
+                    fileid = uploadFileToDrive(mimeType, decoder);
+                    if (fileid == null) {
+                        return gson.toJson(new StructuredResponse("error", "error performing uploading", null));
+                    }
+                }
                 // NB: createEntry checks for null title and message
-                int newId = db.createComment(req.uid, req.mid, req.text);
+                int newId = db.createComment(req.uid, req.mid, req.text, fileid, lk);
                 if (newId == -1) {
                     return gson.toJson(new StructuredResponse("error", "error performing insertion", null));
                 } else {
@@ -690,6 +708,73 @@ public class App {
             return Integer.parseInt(processBuilder.environment().get(envar));
         }
         return defaultVal;
+    }
+
+
+    static String uploadFileToDrive(String mimeType, byte[] decoder) {
+        try {
+            String extension = mimeType.split("/")[1];
+            String filename = fileEnding++ + "." + extension;
+            java.io.File file = new java.io.File(filename);
+            file.createNewFile();
+            try (FileOutputStream fos = new FileOutputStream(file);) {
+                fos.write(decoder);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            Drive service = getService();
+
+            File fileMetadata = new File();
+            String path = "metadata_" + filename;
+            fileMetadata.setName(path);
+            FileContent mediaContent = new FileContent(mimeType, file);
+            File result = service.files().create(fileMetadata, mediaContent).setFields("id").execute();
+            file.delete();
+            return result.getId();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    static String downloadFileFromDrive(String fileId) {
+        try {
+            Drive service = getService();
+            OutputStream outputStream = new ByteArrayOutputStream();
+            service.files().get(fileId).executeMediaAndDownloadTo(outputStream);
+            return Base64.getEncoder().encodeToString(((ByteArrayOutputStream) outputStream).toByteArray());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * Permanently delete a file, skipping the trash.
+     *
+     * @param service Drive API service instance.
+     * @param fileId ID of the file to delete.
+     */
+    private static void deleteFileFromDrive(String fileId) {
+        try {
+            getService().files().delete(fileId).execute();
+        } catch (IOException e) {
+            System.out.println("An error occurred in delete: " + e);
+        }
+    }
+
+
+    static Drive getService() {
+        try {
+            // Build a new authorized API client service.
+            final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
+            return new Drive.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
+                    .setApplicationName(APPLICATION_NAME).build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     /**
