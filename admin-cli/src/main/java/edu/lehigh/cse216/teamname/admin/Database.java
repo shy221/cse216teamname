@@ -16,6 +16,8 @@ import java.util.Date;
 import javax.crypto.*;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 
+import sun.awt.image.ImageWatched.Link;
+
 public class Database {
     /**
      * The connection to the database. When there is no connection, it should be
@@ -233,6 +235,34 @@ public class Database {
      */
     private PreparedStatement dClearOne;
 
+    
+    /**
+     * A prepared statement for getting all data in the user table
+     */
+    private PreparedStatement fSelectAll;
+
+    /**
+     * A prepared statement for getting one row from the user table
+     */
+    private PreparedStatement fSelectOne;
+
+    /**
+     * A prepared statement for deleting a row from the user table
+     */
+    private PreparedStatement fDeleteOne;
+
+    
+
+    /**
+     * A prepared statement for creating the table in our user table
+     */
+    private PreparedStatement fCreateTable;
+
+    /**
+     * A prepared statement for dropping the table in our user table
+     */
+    private PreparedStatement fDropTable;
+
     /**
      * RowData is like a struct in C: we use it to hold data, and we allow direct
      * access to its fields. In the context of this Database, RowData represents the
@@ -277,10 +307,14 @@ public class Database {
          */
         Timestamp mDate;
 
+        String mLink;
+
+        String field;
+
         /**
          * Construct a RowData object by providing values for its fields
          */
-        public RowData(int mid, int uid, String username, String subject, String message, int likes, int dislikes, Timestamp date) {
+        public RowData(int mid, int uid, String username, String subject, String message, int likes, int dislikes, Timestamp date, String field, String link) {
             mId = mid;
             uId = uid;
             userName = username;
@@ -289,6 +323,9 @@ public class Database {
             mlikes = likes;
             mdislikes = dislikes;
             mDate = date;
+            mLink = link;
+            field = field;
+
         }
 
         /**
@@ -303,6 +340,8 @@ public class Database {
             mlikes = 0;
             mdislikes = 0;
             mDate = null;
+            mLink = null;
+            field = null;
         }
     }
 
@@ -341,17 +380,20 @@ public class Database {
          * The message stored in this row
          */
         String uIntro;
+        
+        int uQuota;
 
         /**
          * Construct a RowData object by providing values for its fields
          */
-        public RowUser(int uid, String name, String email, String intro) {
+        public RowUser(int uid, String name, String email, String intro, int quota) {
             uId = uid;
             username = name;
             uEmail = email;
 //            uSalt = salt;
 //            uPassword = password;
             uIntro = intro;
+            uQuota = quota;
         }
 
         /**
@@ -394,17 +436,64 @@ public class Database {
          * The count of likes
          */
         String cText;
+        
+        String field;
+
+        String cLink;
 
         /**
          * Construct a RowData object by providing values for its fields
          */
-        public RowComment(int cid, int uid, int mid, String text) {
+        public RowComment(int cid, int uid, int mid, String text, String field, String link) {
             cId = cid;
             uId = uid;
             mId = mid;
             cText = text;
+            field = field;
+            cLink = link;
         }
     }
+
+    /**
+     * RowData is like a struct in C: we use it to hold data, and we allow direct
+     * access to its fields. In the context of this Database, RowData represents the
+     * data we'd see in a row.
+     * 
+     * We make RowData a static class of Database because we don't really want to
+     * encourage users to think of RowData as being anything other than an abstract
+     * representation of a row of the database. RowData and the Database are tightly
+     * coupled: if one changes, the other should too.
+     */
+    public static class RowDrive {
+        /**
+         * The ID of this row of the database
+         */
+        int fId;
+        /**
+         * The subject stored in this row
+         */
+        int uId;
+        /**
+         * The message stored in this row
+         */
+        String fActivity;
+        /**
+         * The count of likes
+         */
+        int fSize;
+
+        /**
+         * Construct a RowData object by providing values for its fields
+         */
+        public RowDrive(int fid, int uid, String activity, int size) {
+            fId = fid;
+            uId = uid;
+            fActivity = activity;
+            fSize = size;
+        }
+    }
+
+ 
 
     /**
      * The Database constructor is private: we only create Database objects through
@@ -462,7 +551,7 @@ public class Database {
             db.uCreateTable = db.mConnection
                     .prepareStatement("CREATE TABLE tblUser (uid SERIAL PRIMARY KEY, username VARCHAR(50) "
                             + "NOT NULL, email VARCHAR(500) NOT NULL "
-                            + ", intro VARCHAR(500) NOT NULL)");
+                            + ", intro VARCHAR(500) NOT NULL, quota INTEGER)");
             db.uDropTable = db.mConnection.prepareStatement("DROP TABLE tblUser");
 
             // Standard CRUD operations
@@ -529,6 +618,13 @@ public class Database {
             db.dCreateView = db.mConnection.prepareStatement(
                     "CREATE VIEW numOfDislikes AS SELECT mid, COUNT(*) AS dislikes FROM tblDislike GROUP BY mid;");
             db.dDropView = db.mConnection.prepareStatement("DROP VIEW numOfDislikes;");
+
+            db.fCreateTable = db.mConnection.prepareStatement("CREATE TABLE tblFile (fid SERIAL PRIMARY KEY, uid INTEGER, activity VARCHAR(500) NOT NULL,"
+                                                        + "size INTEGER;");
+            db.fSelectAll = db.mConnection.prepareStatement("SELECT * from tblFile");
+            db.fSelectOne = db.mConnection.prepareStatement("SELECT * from tblUser WHERE fid = ?");
+            db.fDropTable = db.mConnection.prepareStatement("DROP TABLE tblFile");
+            
 
         } catch (SQLException e) {
             System.err.println("Error creating prepared statement");
@@ -712,7 +808,7 @@ public class Database {
             cSelectAll.setInt(1, mid);
             ResultSet rs = cSelectAll.executeQuery();
             while (rs.next()) {
-                res.add(new RowComment(rs.getInt("cid"), rs.getInt("uid"), rs.getInt("mid"), rs.getString("text")));
+                res.add(new RowComment(rs.getInt("cid"), rs.getInt("uid"), rs.getInt("mid"), rs.getString("text"), rs.getString("field"), rs.getString("cLink")));
             }
             
             rs.close();
@@ -737,7 +833,7 @@ public class Database {
             ResultSet rs = mSelectOne.executeQuery();
             if (rs.next()) {
                 res = new RowData(rs.getInt("mid"), rs.getInt("uid"), rs.getString("username"), rs.getString("subject"), rs.getString("message"), rs.getInt("likes"),
-                    rs.getInt("dislikes"), rs.getTimestamp("date"));
+                    rs.getInt("dislikes"), rs.getTimestamp("date"), rs.getString("mLink"), rs.getString("field"));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -759,7 +855,7 @@ public class Database {
             ResultSet rs = uSelectOne.executeQuery();
             if (rs.next()) {
                 res = new RowUser(rs.getInt("uid"), rs.getString("username"), rs.getString("email"),
-                         rs.getString("intro"));
+                         rs.getString("intro"), rs.getInt("uQuota"));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -780,7 +876,7 @@ public class Database {
             cSelectOne.setInt(1, cid);
             ResultSet rs = cSelectOne.executeQuery();
             if (rs.next()) {
-                res = new RowComment(rs.getInt(cid), rs.getInt("uid"), rs.getInt("mId"), rs.getString("text"));
+                res = new RowComment(rs.getInt(cid), rs.getInt("uid"), rs.getInt("mId"), rs.getString("text"), rs.getString("field"), rs.getString("cLink"));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -1078,6 +1174,17 @@ public class Database {
     }
 
     /**
+     * Create tblFile. If it already exists, this will print an error
+     */
+    void createFile() {
+        try {
+            fCreateTable.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
      * Remove tblData from the database. If it does not exist, this will print an
      * error.
      */
@@ -1132,6 +1239,18 @@ public class Database {
     void dropDislike() {
         try {
             dDropTable.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Remove tblData from the database. If it does not exist, this will print an
+     * error.
+     */
+    void dropFile() {
+        try {
+            fDropTable.execute();
         } catch (SQLException e) {
             e.printStackTrace();
         }
