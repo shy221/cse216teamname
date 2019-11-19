@@ -111,16 +111,11 @@ class ShowDetail {
         $("#" + ShowDetail.NAME + "-username").text(data.mData.mName);
         $("#" + ShowDetail.NAME + "-message").val(data.mData.mContent);
         $("#" + ShowDetail.NAME + "-link").attr("href", data.mData.mLink);
-
-        if (data.mData.mLink) {
-            $("#" + ShowDetail.NAME + "-link").html(data.mData.mLink);
-        } else {
-            $("#" + ShowDetail.NAME + "-link").modal("hide");
-        }
+        $("#" + ShowDetail.NAME + "-link").html(data.mData.mLink);
         if (data.mMessage) {
             $("#" + ShowDetail.NAME + "-attachment").attr("src", "data:" + data.mData.mime +";base64," + data.mMessage);
         } else {
-            $("#" + ShowDetail.NAME + "-attachment").modal("hide");
+            $("#" + ShowDetail.NAME + "-attachment").attr("src", "");
         }
 
         $("#" + ShowDetail.NAME + "-detailPostUid").val(data.mData.uId);
@@ -199,21 +194,32 @@ class ShowDetail {
             return;
         }
 
-        var myReader:FileReader = new FileReader();
-        myReader.onload = function(completionEvent: any) {
-            // wait till reader finished reading
-            var att = btoa(completionEvent.target.result);
-            console.log(att);
+        if (file) {
+            var myReader:FileReader = new FileReader();
+            myReader.onload = function(completionEvent: any) {
+                // wait till reader finished reading
+                var att = btoa(completionEvent.target.result);
+                console.log(att);
 
+                $.ajax({
+                    type: "POST",
+                    url: "/" + mid + "/comments",
+                    dataType: "json",
+                    data: JSON.stringify({ uEmail: uemail, sessionKey: ukey, uid: uid, mid: mid, text: text, mLink: link, mime: "application/pdf", fileData: att}),
+                    success: ShowDetail.refresh
+                });
+            }
+            myReader.readAsBinaryString(file);
+        } else {
+            // post without file
             $.ajax({
                 type: "POST",
                 url: "/" + mid + "/comments",
                 dataType: "json",
-                data: JSON.stringify({ uEmail: uemail, sessionKey: ukey, uid: uid, mid: mid, text: text, mLink: link, mime: "application/pdf", fileData: att}),
+                data: JSON.stringify({ uEmail: uemail, sessionKey: ukey, uid: uid, mid: mid, text: text, mLink: link}),
                 success: ShowDetail.refresh
             });
         }
-        myReader.readAsBinaryString(file);
     }
 
 
