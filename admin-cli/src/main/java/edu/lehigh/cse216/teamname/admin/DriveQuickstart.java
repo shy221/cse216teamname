@@ -27,12 +27,15 @@ public class DriveQuickstart {
     private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
     private static final String TOKENS_DIRECTORY_PATH = "tokens";
 
+    // Print the names and IDs for up to 10 files.
+
     /**
      * Global instance of the scopes required by this quickstart.
      * If modifying these scopes, delete your previously saved tokens/ folder.
      */
     private static final List<String> SCOPES = Collections.singletonList(DriveScopes.DRIVE_METADATA_READONLY);
     private static final String CREDENTIALS_FILE_PATH = "/credentials.json";
+    //src/main/java/edu/lehigh/cse216/teamname/admin
 
     /**
      * Creates an authorized Credential object.
@@ -40,7 +43,8 @@ public class DriveQuickstart {
      * @return An authorized Credential object.
      * @throws IOException If the credentials.json file cannot be found.
      */
-    private static Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT) throws IOException {
+    //
+    private static Credential getCredentials (final NetHttpTransport HTTP_TRANSPORT)throws IOException {
         // Load client secrets.
         InputStream in = DriveQuickstart.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
         if (in == null) {
@@ -57,27 +61,104 @@ public class DriveQuickstart {
         LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();
         return new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
     }
-
-    public static void listDrive(String... args) throws IOException, GeneralSecurityException {
+//throws IOException,GeneralSecurityException throws GeneralSecurityException
+    public static void listDrive(String... args)throws IOException,GeneralSecurityException{
+        // Build a new authorized API client service.
+            final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
+            Drive service = new Drive.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
+                    .setApplicationName(APPLICATION_NAME)
+                    .build();
+    
+            FileList result = service.files().list()
+            .setPageSize(10)
+            .setFields("nextPageToken, files(id, name)")
+            .execute();
+            List<File> files = result.getFiles();
+            // Print the names and IDs for up to 10 files.
+            if (files == null || files.isEmpty()) {
+                System.out.println("No files found.");
+            } else {
+                System.out.println("Files:");
+                for (File file : files) {
+                    System.out.printf("%s (%s)\n", file.getName(), file.getId());
+                }
+            }
+        
+    }
+    public static String getFid(int i)throws IOException,GeneralSecurityException{
         // Build a new authorized API client service.
         final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
         Drive service = new Drive.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
                 .setApplicationName(APPLICATION_NAME)
                 .build();
-
-        // Print the names and IDs for up to 10 files.
         FileList result = service.files().list()
-                .setPageSize(10)
-                .setFields("nextPageToken, files(id, name)")
-                .execute();
-        List<File> files = result.getFiles();
-        if (files == null || files.isEmpty()) {
-            System.out.println("No files found.");
-        } else {
-            System.out.println("Files:");
-            for (File file : files) {
-                System.out.printf("%s (%s)\n", file.getName(), file.getId());
+            .setPageSize(10)
+            .setFields("nextPageToken, files(id, name)")
+            .execute();
+            List<File> files = result.getFiles();
+            // Print the names and IDs for up to 10 files.
+            if (files == null || files.isEmpty()) {
+                System.out.println("No files found.");
+                return null; 
+            } else {
+                return files.get(i).getId();
             }
-        }
+    }
+    public static String getName(int i)throws IOException,GeneralSecurityException{
+        // Build a new authorized API client service.
+        final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
+        Drive service = new Drive.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
+                .setApplicationName(APPLICATION_NAME)
+                .build();
+        FileList result = service.files().list()
+            .setPageSize(10)
+            .setFields("nextPageToken, files(id, name)")
+            .execute();
+            List<File> files = result.getFiles();
+            // Print the names and IDs for up to 10 files.
+            if (files == null || files.isEmpty()) {
+                System.out.println("No files found.");
+                return null; 
+            } else {
+                return files.get(i).getName();
+            }
+    }
+    /*public static String getOwner(int i)throws IOException,GeneralSecurityException{
+        // Build a new authorized API client service.
+        final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
+        Drive service = new Drive.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
+                .setApplicationName(APPLICATION_NAME)
+                .build();
+        FileList result = service.files().list()
+            .setPageSize(10)
+            .setFields("nextPageToken, files(id, name, owners)")
+            .execute();
+            List<File> files = result.getFiles();
+            // Print the names and IDs for up to 10 files.
+            if (files == null || files.isEmpty()) {
+                System.out.println("No files found.");
+                return null; 
+            } else {
+                return files.get(i).getOwner[].displayName();
+            }
+    }*/
+    public static int getDrivesize()throws IOException,GeneralSecurityException{
+        final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
+        Drive service = new Drive.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
+                .setApplicationName(APPLICATION_NAME)
+                .build();
+        FileList result = service.files().list()
+            .setPageSize(10)
+            .setFields("nextPageToken, files(id, name)")
+            .execute();
+            List<File> files = result.getFiles();
+            // Print the names and IDs for up to 10 files.
+            /*if (files == null || files.isEmpty()) {
+                System.out.println("No files found.");
+                return null; 
+            } else {
+                return files.get(i).getName();
+            }*/
+            return files.size();
     }
 }

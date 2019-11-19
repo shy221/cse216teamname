@@ -262,6 +262,8 @@ public class Database {
      * A prepared statement for dropping the table in our user table
      */
     private PreparedStatement fDropTable;
+;
+    private PreparedStatement fInsertOne;
 
     /**
      * RowData is like a struct in C: we use it to hold data, and we allow direct
@@ -309,12 +311,13 @@ public class Database {
 
         String mLink;
 
-        String field;
+        String fileId;
+
 
         /**
          * Construct a RowData object by providing values for its fields
          */
-        public RowData(int mid, int uid, String username, String subject, String message, int likes, int dislikes, Timestamp date, String field, String link) {
+        public RowData(int mid, int uid, String username, String subject, String message, int likes, int dislikes, Timestamp date, String fileId, String link) {
             mId = mid;
             uId = uid;
             userName = username;
@@ -324,7 +327,7 @@ public class Database {
             mdislikes = dislikes;
             mDate = date;
             mLink = link;
-            field = field;
+            fileId = fileId;
 
         }
 
@@ -341,7 +344,7 @@ public class Database {
             mdislikes = 0;
             mDate = null;
             mLink = null;
-            field = null;
+            fileId = null;
         }
     }
 
@@ -437,19 +440,19 @@ public class Database {
          */
         String cText;
         
-        String field;
+        String fileId;
 
         String cLink;
 
         /**
          * Construct a RowData object by providing values for its fields
          */
-        public RowComment(int cid, int uid, int mid, String text, String field, String link) {
+        public RowComment(int cid, int uid, int mid, String text, String fileId, String link) {
             cId = cid;
             uId = uid;
             mId = mid;
             cText = text;
-            field = field;
+            fileId = fileId;
             cLink = link;
         }
     }
@@ -468,7 +471,7 @@ public class Database {
         /**
          * The ID of this row of the database
          */
-        int fId;
+        String fId;
         /**
          * The subject stored in this row
          */
@@ -478,6 +481,10 @@ public class Database {
          */
         String fActivity;
         /**
+         * The message stored in this row
+         */
+        String fName;
+        /**
          * The count of likes
          */
         int fSize;
@@ -485,11 +492,19 @@ public class Database {
         /**
          * Construct a RowData object by providing values for its fields
          */
-        public RowDrive(int fid, int uid, String activity, int size) {
+        public RowDrive(String fid, String name, int uid, String activity, int size) {
             fId = fid;
             uId = uid;
+            fName = name;
             fActivity = activity;
             fSize = size;
+        }
+        public RowDrive(String fid, String name) {
+            fId = fid;
+            uId = 0;
+            fName = name;
+            fActivity = "default";
+            fSize = 0;
         }
     }
 
@@ -568,7 +583,7 @@ public class Database {
             // creation/deletion, so multiple executions will cause an exception
             db.mCreateTable = db.mConnection
                     .prepareStatement("CREATE TABLE tblData (mid SERIAL PRIMARY KEY, uid INTEGER, subject VARCHAR(50) "
-                            + "NOT NULL, message VARCHAR(500) NOT NULL, date TIMESTAMP(6), FOREIGN KEY(uid) REFERENCES tblUser)");
+                            + "NOT NULL, message VARCHAR(500) NOT NULL, date TIMESTAMP(6), fileId VARCHAR(50), mLink VARCHAR(50), mime VARCHAR(50), FOREIGN KEY(uid) REFERENCES tblUser)");
             db.mDropTable = db.mConnection.prepareStatement("DROP TABLE tblData");
 
             // Standard CRUD operations
@@ -591,7 +606,7 @@ public class Database {
             // Prepared statement for comment table
             db.cCreateTable = db.mConnection
                     .prepareStatement("CREATE TABLE tblComment (cid SERIAL PRIMARY KEY, uid INTEGER "
-                            + "NOT NULL, mid INTEGER NOT NULL, text VARCHAR(500) NOT NULL, "
+                            + "NOT NULL, mid INTEGER NOT NULL, text VARCHAR(500) NOT NULL, fileId VARCHAR(50), mLink VARCHAR(50), mime VARCHAR(50),"
                             + "FOREIGN KEY(uid) REFERENCES tblUser, FOREIGN KEY(mid) REFERENCES tblData)");
             db.cDropTable = db.mConnection.prepareStatement("DROP TABLE tblComment");
 
@@ -619,11 +634,13 @@ public class Database {
                     "CREATE VIEW numOfDislikes AS SELECT mid, COUNT(*) AS dislikes FROM tblDislike GROUP BY mid;");
             db.dDropView = db.mConnection.prepareStatement("DROP VIEW numOfDislikes;");
 
-            db.fCreateTable = db.mConnection.prepareStatement("CREATE TABLE tblFile (fid SERIAL PRIMARY KEY, uid INTEGER, activity VARCHAR(500) NOT NULL,"
-                                                        + "size INTEGER;");
+            db.fCreateTable = db.mConnection.prepareStatement("CREATE TABLE tblFile (fid VARCHAR(50) PRIMARY KEY, name VARCHAR(50), uid INTEGER, activity VARCHAR(500) NOT NULL,"
+                                                        + "size INTEGER)");
             db.fSelectAll = db.mConnection.prepareStatement("SELECT * from tblFile");
-            db.fSelectOne = db.mConnection.prepareStatement("SELECT * from tblUser WHERE fid = ?");
+            db.fSelectOne = db.mConnection.prepareStatement("SELECT * from tblFile WHERE fid = ?");
             db.fDropTable = db.mConnection.prepareStatement("DROP TABLE tblFile");
+            db.fInsertOne = db.mConnection.prepareStatement("INSERT INTO tblFile VALUES(?, ?, ?, ?)");
+            db.fSelectAll = db.mConnection.prepareStatement("SELECT fid, name FROM tblFile");
             
 
         } catch (SQLException e) {
@@ -756,6 +773,24 @@ public class Database {
         }
         return count;
     }
+    
+    int insertRowToFile(String fid, String name, int uid, String activity){
+        int count = 0;
+        try {
+            fInsertOne.setString(1, fid);
+            fInsertOne.setString(2, name);
+//            uInsertOne.setString(3, salt);
+//            uInsertOne.setString(4, hash);
+            fInsertOne.setInt(3, uid);
+            fInsertOne.setString(4, activity);
+            //fInsertOne.setInt(5, size);
+
+            count += fInsertOne.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return count;
+    }
 
     /**
      * Query the database for a list of all subjects and their IDs
@@ -811,6 +846,26 @@ public class Database {
                 res.add(new RowComment(rs.getInt("cid"), rs.getInt("uid"), rs.getInt("mid"), rs.getString("text"), rs.getString("field"), rs.getString("cLink")));
             }
             
+            rs.close();
+            return res;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * Query the database for a list of all subjects and their IDs
+     * 
+     * @return All rows, as an ArrayList
+     */
+    ArrayList<RowDrive> selectAllFromFile() {
+        ArrayList<RowDrive> res = new ArrayList<RowDrive>();
+        try {
+            ResultSet rs = fSelectAll.executeQuery();
+            while (rs.next()) {
+                res.add(new RowDrive(rs.getString("fid"), rs.getString("name")));
+            }
             rs.close();
             return res;
         } catch (SQLException e) {
