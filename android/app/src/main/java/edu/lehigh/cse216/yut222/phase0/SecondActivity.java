@@ -236,6 +236,9 @@ public class SecondActivity extends AppCompatActivity {
         Log.e("image uri", "uri" + imageUri);
         image = getRealPathFromUri(imageUri);
         Log.e("image string", "uri" + image);
+            Bitmap myBitmap = BitmapFactory.decodeFile(image);
+            ImageView myImage = (ImageView) findViewById(R.id.imageView);
+            myImage.setImageBitmap(myBitmap);
         }
 
     }
