@@ -352,7 +352,7 @@ public class DetailActivity extends AppCompatActivity {
                     String encode64 = response.getString("mMessage");
                     byte[] decode = Base64.decode(encode64, Base64.DEFAULT);
                     Bitmap bitmap = BitmapFactory.decodeByteArray(decode, 0, decode.length);
-                    saveBitmap(bitmap);
+                    saveBitmap(bitmap, mId);
                     imageView.setImageBitmap(bitmap);
                 }
                 //byte[] decoder = Base64.getDecoder().decode(encode64);
@@ -377,12 +377,14 @@ public class DetailActivity extends AppCompatActivity {
         showDetail();
     }
 
-    private void saveBitmap(Bitmap bitmap) {
+    private void saveBitmap(Bitmap bitmap, int mId) {
         try {
-            String path = Environment.getExternalStorageDirectory().getPath()
-                    +"/decodeImage.jpg";
+            //tried Context.getExternalFilesDir()
+            String path = Environment.getExternalStorageDirectory().getPath() ;
+                   // +"/image" + mId + ".jpg";
             Log.d("save","path is "+path);
-            OutputStream stream = new FileOutputStream(path);
+            File filesave = new File(path +"/image" + mId + ".jpg");
+            OutputStream stream = new FileOutputStream(filesave);
             bitmap.compress(Bitmap.CompressFormat.JPEG, 90, stream);
             stream.close();
             Log.e("save","jpg okay!");

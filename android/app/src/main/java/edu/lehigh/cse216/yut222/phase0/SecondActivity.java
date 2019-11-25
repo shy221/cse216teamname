@@ -29,6 +29,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.widget.ImageView;
 import android.os.Environment;
 
@@ -90,16 +91,21 @@ public class SecondActivity extends AppCompatActivity {
         });
 
         Button bTP = (Button) findViewById(R.id.buttonTakePicture);
-        imageView = (ImageView) findViewById(R.id.imageView);
+        //imageView = (ImageView) findViewById(R.id.imageView);
         if (!hasCamera()) {
             bTP.setEnabled(false);
         }
         bTP.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                dispatchTakePictureIntent();
+                /*
                 Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                if (intent.resolveActivity(getPackageManager()) != null) {
+                    startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
+                }
                 startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
-
+                */
             }
         });
 
@@ -202,14 +208,21 @@ public class SecondActivity extends AppCompatActivity {
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
+            File imgFile = new  File(currentPhotoPath);
+            if(imgFile.exists()){
+                Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+                ImageView myImage = (ImageView) findViewById(R.id.imageView);
+                myImage.setImageBitmap(myBitmap);
+            }
             image = currentPhotoPath;
             Log.e("requestCode", "REQUEST_TAKE_PHOTO");
         }
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             Bundle extras = data.getExtras();
             Bitmap imageBitmap = (Bitmap) extras.get("data");
+            imageView = (ImageView) findViewById(R.id.imageView);
             imageView.setImageBitmap(imageBitmap);
-            dispatchTakePictureIntent();
+            //dispatchTakePictureIntent();
             Log.e("requestCode", "REQUEST_IMAGE_CAPTURE");
         }
         //super.onActivityResult(requestCode, resultCode, data);
@@ -223,6 +236,9 @@ public class SecondActivity extends AppCompatActivity {
         Log.e("image uri", "uri" + imageUri);
         image = getRealPathFromUri(imageUri);
         Log.e("image string", "uri" + image);
+            Bitmap myBitmap = BitmapFactory.decodeFile(image);
+            ImageView myImage = (ImageView) findViewById(R.id.imageView);
+            myImage.setImageBitmap(myBitmap);
         }
 
     }
@@ -278,19 +294,22 @@ public class SecondActivity extends AppCompatActivity {
         Uri contentUri = Uri.fromFile(f);
         mediaScanIntent.setData(contentUri);
         this.sendBroadcast(mediaScanIntent);
+        Log.e(" galleryAddPic()", "called");
     }
 
     private File createImageFile() throws IOException {
         // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
+        //Environment.getExternalStorageDirectory().getPath()
         File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         File image = File.createTempFile(
                 imageFileName,  /* prefix */
                 ".jpg",         /* suffix */
                 storageDir      /* directory */
         );
-
+        Log.e(" createImageFile()", "called");
+        Log.e(" createImageFile()", "dir " + getExternalFilesDir(Environment.DIRECTORY_PICTURES));
         // Save a file: path for use with ACTION_VIEW intents
         currentPhotoPath = image.getAbsolutePath();
         return image;
