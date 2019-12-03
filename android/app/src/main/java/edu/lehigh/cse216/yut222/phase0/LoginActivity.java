@@ -70,14 +70,23 @@ public class LoginActivity  extends AppCompatActivity{
         signInButton.setOnClickListener(new View.OnClickListener() {
 
             @Override
-            public void onClick(View view) {
-                signIn();
-            }
+            public void onClick(View view) { signIn(); }
 
             private void signIn() {
                 Intent signInIntent = mGoogleSignInClient.getSignInIntent();
                 startActivityForResult(signInIntent, RC_SIGN_IN);
             }
+        });
+
+        Button scanBarcode = findViewById(R.id.btnScanBarcode);
+        
+        scanBarcode.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(LoginActivity.this, ScannedBarcodeActivity.class));
+            }
+
         });
 
     }
@@ -179,89 +188,5 @@ public class LoginActivity  extends AppCompatActivity{
 
         // Signed in successfully, show authenticated UI.
     }
-
-    /*private void login(final String e, final String p){
-        //map is hashMap, m is jsonObject
-        //one link to post
-
-        String urlLogin = "https://arcane-refuge-67249.herokuapp.com/login";
-        Map<String, String> map = new HashMap<>();
-        map.put("uEmail", e);
-        map.put("uPassword", p);
-        JSONObject m = new JSONObject(map);
-
-
-
-        //Test Code When Backend's not working
-        /*if (e.equals("123") && p.equals("321")){
-            Context context = LoginActivity.this;
-            sharedpreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-            SharedPreferences.Editor editor = sharedpreferences.edit();
-            editor.putString("prefKey","I made this up");
-            editor.commit();
-            String PrefKey = sharedpreferences.getString("prefKey", "default");
-            Log.e("Login page session key", PrefKey);
-            Intent i = new Intent(LoginActivity.this, WelcomeActivity.class);
-            startActivity(i);
-        }else{
-            Context context = LoginActivity.this;
-            Toast toast = Toast.makeText(context, "WRONG PASSWORD", Toast.LENGTH_LONG);
-            toast.show();
-            Log.e("login", "onResponse mStatus error(password incorrect)");
-        }*/
-        /*JsonObjectRequest postR = new JsonObjectRequest(Request.Method.POST,
-                urlLogin, m, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                try {
-                    String status = response.getString("mStatus");
-                    if (status.equals("ok")) {
-                        //store user profile into a user object
-                        //shared preference
-
-                        JSONObject data = response.getJSONObject("mData");
-                        String uId = data.getString("uId");
-                        String uSername = data.getString("uSername");
-                        String uPassword = data.getString("uPassword");
-                        String uSalt = data.getString("uSalt");
-                        String uKey = data.getString("sessionKey");
-                        String uEmail = data.getString("uEmail");
-                        String uIntro = data.getString("uIntro");
-
-                        Log.e("Login page session key", uKey);
-                        //Context context = LoginActivity.this;
-                        sharedpreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-                        SharedPreferences.Editor editor = sharedpreferences.edit();
-                        editor.putString("prefId",uId);
-                        editor.putString("prefName",uSername);
-                        editor.putString("prefSalt",uSalt);
-                        editor.putString("prefEmail",uEmail);
-                        editor.putString("prefIntro",uIntro);
-                        editor.putString("prefKey",uKey);
-                        editor.commit();
-                        String PrefKey = sharedpreferences.getString("prefKey", "default");
-                        Log.e("Login page session key", PrefKey);
-                        Intent in = new Intent(LoginActivity.this, WelcomeActivity.class);
-                        startActivity(in);
-                    } else {
-                        Context context = LoginActivity.this;
-                        Toast toast = Toast.makeText(context, "WRONG PASSWORD", Toast.LENGTH_LONG);
-                        toast.show();
-                        Log.e("login", "onResponse mStatus error(password incorrect)");
-                    }
-                } catch (final JSONException e) {
-                    Log.e("login", "Error parsing JSON file: onPostResponse/login" );
-                    return;
-                }
-                Log.d("login", "successfully get string response session key");
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.e("login", "Volley error");
-            }
-        });
-        MySingleton.getInstance(this).addToRequestQueue(postR);
-    }*/
 }
 
