@@ -8,6 +8,7 @@
 /// <reference path="ts/ShowComments.ts"/>
 /// <reference path="ts/EditUserProfile.ts"/>
 
+
 // Prevent compiler errors when using jQuery.  "$" will be given a type of 
 // "any", so that we can use it anywhere, and assume it has any fields or
 // methods, without the compiler producing an error.
@@ -25,6 +26,8 @@ var loginState: boolean = false;
 var uid: number;
 var signedin: boolean = false;
 var idToken : string;
+
+
 
 
 var changeProfile = function(googleUser: gapi.auth2.GoogleUser) {

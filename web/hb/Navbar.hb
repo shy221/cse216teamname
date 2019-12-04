@@ -35,7 +35,12 @@
                         Login
                     </a>
                 </li>
-                
+                <li>
+                    <a class="btn btn-link" id="Navbar-showQR">
+                        <span class="glyphicon glyphicon-show-QR"></span><span class="sr-only">Show Trending Posts</span>
+                        <canvas id="canvas"></canvas>
+                    </a>
+                </li>
             </ul>
         </div>
     </div>
