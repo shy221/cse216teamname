@@ -20,26 +20,25 @@ class ShowQR {
      */
     private static init() {
         if (!ShowQR.isInit) {
-
-            $("body").prepend(Handlebars.templates[Navbar.NAME + ".hb"]());
-            $("#"+Navbar.NAME+"-showQR").click(Navbar.login);
+            $("body").prepend(Handlebars.templates[ShowQR.NAME + ".hb"]());
+            // $("#"+Navbar.NAME+"-showQR").click(Navbar.login);
             $("#" + ShowQR.NAME + "-closebtn").click(ShowQR.hide);
             ShowQR.isInit = true;
 
         }
     }
 
-    private static reload() {
-        let id = "" + $("#" + ShowQR.NAME + "-detailId").val();
-        // Issue a GET, and then pass the result to update()
-        $.ajax({
-            type: "GET",
-            url: "/messages/" + id,
-            dataType: "json",
-            data: JSON.stringify({ uEmail: uemail, sessionKey: ukey }),
-            success: ShowQR.init
-        });
-    }
+    // private static reload() {
+    //     let id = "" + $("#" + ShowQR.NAME + "-detailId").val();
+    //     // Issue a GET, and then pass the result to update()
+    //     $.ajax({
+    //         type: "GET",
+    //         url: "/messages/" + id,
+    //         dataType: "json",
+    //         data: JSON.stringify({ uEmail: uemail, sessionKey: ukey }),
+    //         success: ShowQR.init
+    //     });
+    // }
 
     
     /**
@@ -51,17 +50,17 @@ class ShowQR {
         ShowQR.init();
     }
 
-    /**
-     * update() is the private method used by refresh() to update the 
-     * ShowQR
-     */
-    private static update(data: any) {
-        // Remove the data, if it exists
-        //$("#" + ShowQR.NAME).remove();
-        $("body").append(Handlebars.templates[ShowQR.NAME + ".hb"](data));
-        $("#" + ShowQR.NAME + "-userprofilebtn").click(ShowQR.other);
-        $("#" + ShowQR.NAME + "-closebtn").click(ShowQR.hide);
-    }
+    // /**
+    //  * update() is the private method used by refresh() to update the 
+    //  * ShowQR
+    //  */
+    // private static update(data: any) {
+    //     // Remove the data, if it exists
+    //     //$("#" + ShowQR.NAME).remove();
+    //     $("body").append(Handlebars.templates[ShowQR.NAME + ".hb"](data));
+    //     $("#" + ShowQR.NAME + "-userprofilebtn").click(ShowQR.other);
+    //     $("#" + ShowQR.NAME + "-closebtn").click(ShowQR.hide);
+    // }
 
     /**
      * Hide the ShowQR.  Be sure to clear its fields first
@@ -84,21 +83,21 @@ class ShowQR {
     }
 
 
-    private static other() {
-        let uid = "" + $("#" + ShowQR.NAME + "-detailPostUid").val();
-        $.ajax({
-            type: "POST",
-            url: "/" + uid + "/userprofile",
-            dataType: "json",
-            data: JSON.stringify({ uEmail: uemail, sessionKey: ukey }),
-            success: UserProfile.showBasic
-        });
-        $.ajax({
-            type: "POST",
-            url: "/" + uid + "/userposts",
-            dataType: "json",
-            data: JSON.stringify({ uEmail: uemail, sessionKey: ukey }),
-            success: UserProfile.showPosts
-        });
-    }
+    // private static other() {
+    //     let uid = "" + $("#" + ShowQR.NAME + "-detailPostUid").val();
+    //     $.ajax({
+    //         type: "POST",
+    //         url: "/" + uid + "/userprofile",
+    //         dataType: "json",
+    //         data: JSON.stringify({ uEmail: uemail, sessionKey: ukey }),
+    //         success: UserProfile.showBasic
+    //     });
+    //     $.ajax({
+    //         type: "POST",
+    //         url: "/" + uid + "/userposts",
+    //         dataType: "json",
+    //         data: JSON.stringify({ uEmail: uemail, sessionKey: ukey }),
+    //         success: UserProfile.showPosts
+    //     });
+    // }
 } // end class ShowQR

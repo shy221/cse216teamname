@@ -11,6 +11,6 @@
         "jasmine-core": "^3.5.0",
         "jquery": "^3.4.1",
         "qrcode": "^1.4.4",
-        "typescript": "^3.6.4"
+        "typescript": "^3.7.3"
     }
 }

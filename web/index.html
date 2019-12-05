@@ -18,17 +18,18 @@
     <script src="app.js"></script>
     <script src="https://apis.google.com/js/platform.js" async defer></script>
  
-    <script src="/build/qrcode.min.js"></script>
-    <script>
-    QRCode.toCanvas(document.getElementById('canvas'), 'sample text', function (error) {
-        if (error) console.error(error)
-        console.log('success!');
-    })
-    </script> 
-
     <link href="https://fonts.googleapis.com/css?family=Fresca" rel="stylesheet">
     <link rel="stylesheet" href="app.css" />
     <link href="bootstrap.min.css" rel="stylesheet">
+    <script> 
+        var qrdata = document.getElementById("qr-data");
+
+        function generateQR(){
+            var data = qrdata.value;
+
+            alert(data)
+        }
+    </script>
 
 </head>
 
