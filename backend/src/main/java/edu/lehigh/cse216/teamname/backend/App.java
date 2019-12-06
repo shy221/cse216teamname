@@ -46,6 +46,27 @@ import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
 
+//ticketmaster
+/*import com.ticketmaster.api.discovery.DiscoveryApi;
+import com.ticketmaster.api.discovery.operation.SearchEventsOperation;
+import com.ticketmaster.api.discovery.response.PagedResponse;
+import com.ticketmaster.discovery.model.Attraction;
+import com.ticketmaster.discovery.model.Classification;
+import com.ticketmaster.discovery.model.Date;
+import com.ticketmaster.discovery.model.Date.Start;
+import com.ticketmaster.discovery.model.Events;*/
+
+
+import com.ticketmaster.api.Version;
+import com.ticketmaster.api.discovery.operation.ByIdOperation;
+import com.ticketmaster.api.discovery.operation.SearchAttractionsOperation;
+import com.ticketmaster.api.discovery.operation.SearchEventsOperation;
+import com.ticketmaster.api.discovery.operation.SearchVenuesOperation;
+import com.ticketmaster.api.discovery.response.PagedResponse;
+import com.ticketmaster.api.discovery.response.Response;
+import com.ticketmaster.api.discovery.util.Preconditions;
+//import com.ticketmaster.discovery.model.*;
+//import com.ticketmaster.discovery.model.Page.Link;
 //for memcachier
 import net.rubyeye.xmemcached.MemcachedClient;
 import net.rubyeye.xmemcached.MemcachedClientBuilder;
@@ -77,6 +98,7 @@ public class App {
     //private static Drive service = null;
 
     private static MemcachedClient mc = null;
+    private static String tmKey = "gBCoBdLbDr5YuC3Y7z6cfQonKrMEt3wE";
 
     public static void main(String[] args) {
 
@@ -177,6 +199,76 @@ public class App {
             }
             if (sk.equals(key)){
                 return gson.toJson(new StructuredResponse("ok", null, db.readAll()));
+            }
+            return gson.toJson(new StructuredResponse("error", "session key not correct..", null));
+        });
+
+        Spark.post("/suggestion", (request, response) -> {
+            DiscoveryApi req = gson.fromJson(request.body(), DiscoveryApi.class);
+            response.status(200);
+            response.type("application/json");
+            String sk = req.sessionKey;
+            String em = req.uEmail;
+            String postalCode = req.postalCode;
+            String key = "";
+            try{
+                key = mc.get(em);
+            } catch (TimeoutException te) {
+                return gson.toJson(new StructuredResponse("error", "Timeout during set or get: " + te.getMessage(), null));
+            } catch (InterruptedException ie) {
+                return gson.toJson(new StructuredResponse("error", "Interrupt during set or get: " + ie.getMessage(), null));
+            } catch (MemcachedException me){
+                return gson.toJson(new StructuredResponse("error", "Memcached error during get or set: " + me.getMessage(), null));
+            }
+            if (sk.equals(key)){
+                DataRowEvent suggestEvent = new DataRowEvent(0, "xjapan");
+                return gson.toJson(new StructuredResponse("ok", null, suggestEvent));
+            }
+            return gson.toJson(new StructuredResponse("error", "session key not correct..", null));
+        });
+        /*Spark.post("/eventDetail/:eid", (request, response) -> {
+            DiscoveryApi req = gson.fromJson(request.body(), DiscoveryApi.class);
+            response.status(200);
+            response.type("application/json");
+            String sk = req.sessionKey;
+            String em = req.uEmail;
+            String postalCode = req.postalCode;
+            String key = "";
+            try{
+                key = mc.get(em);
+            } catch (TimeoutException te) {
+                return gson.toJson(new StructuredResponse("error", "Timeout during set or get: " + te.getMessage(), null));
+            } catch (InterruptedException ie) {
+                return gson.toJson(new StructuredResponse("error", "Interrupt during set or get: " + ie.getMessage(), null));
+            } catch (MemcachedException me){
+                return gson.toJson(new StructuredResponse("error", "Memcached error during get or set: " + me.getMessage(), null));
+            }
+            if (sk.equals(key)){
+                DataRowEvent suggestEvent = new DataRowEvent(0, "xjapan");
+                return gson.toJson(new StructuredResponse("ok", null, suggestEvent));
+            }
+            //return gson.toJson(new StructuredResponse("ok", null, null));
+        });*/
+
+        Spark.post("/generateQR",(request, response) -> {
+            QRrequest req = gson.fromJson(request.body(), QRrequest.class);
+            response.status(200);
+            response.type("application/json");
+            String sk = req.sessionKey;
+            String em = req.uEmail;
+            String key = "";
+            try{
+                key = mc.get(em);
+            } catch (TimeoutException te) {
+                return gson.toJson(new StructuredResponse("error", "Timeout during set or get: " + te.getMessage(), null));
+            } catch (InterruptedException ie) {
+                return gson.toJson(new StructuredResponse("error", "Interrupt during set or get: " + ie.getMessage(), null));
+            } catch (MemcachedException me){
+                return gson.toJson(new StructuredResponse("error", "Memcached error during get or set: " + me.getMessage(), null));
+            }
+            if (sk.equals(key)){
+                int insert = db.createQR(req.uEmail);//missing timestamp
+                return gson.toJson(new StructuredResponse("ok", "" + insert, null));
             }
             return gson.toJson(new StructuredResponse("error", "session key not correct..", null));
         });
@@ -292,6 +384,8 @@ public class App {
             return gson.toJson(new StructuredResponse("error", "session key not correct..", null));
 
         });
+
+        
 
         /**
          * Modified for phase 2
@@ -561,6 +655,7 @@ public class App {
         // obtain the access token,
         // use the token to access user info 
         // and insert it to our own database.
+
         Spark.post("/login", (request, response) -> {
             // NB: if gson.Json fails, Spark will reply with status 500 Internal
             // Server Error
