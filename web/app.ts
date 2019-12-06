@@ -28,7 +28,7 @@ var loginState: boolean = false;
 var uid: number;
 var signedin: boolean = false;
 var idToken : string;
-
+ 
 
 
 
