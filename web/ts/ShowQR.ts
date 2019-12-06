@@ -79,11 +79,17 @@ class ShowQR {
      */
     
     public static show() {
-        var qrdata = uemail + " " + ukey;
+        var qrdata = uemail + "\n" + ukey;
 
             QRCode.toCanvas(document.getElementById('canvas'), qrdata, function (error: any) {
                 if (error) console.error(error)
-                console.log('success!');
+                    $.ajax({
+                        type: "POST",
+                        url: "/generateQR",
+                        dataType: "json",
+                        data: JSON.stringify({ uId: uid, uEmail: uemail, sessionKey: ukey }),
+                    });
+
               });
     }
 

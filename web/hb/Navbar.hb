@@ -19,7 +19,7 @@
                 <li>
                     <a class="btn btn-link" id="Navbar-add">
                         <span class="glyphicon glyphicon-plus"></span><span class="sr-only">Show Trending Posts</span>
-                        Post a Event
+                        Post an Event
                     </a>
                 </li>
             </ul>
@@ -41,6 +41,7 @@
                         View QR code
                         <canvas id="canvas"></canvas>
                     </a>
+                    <canvas id="canvas"></canvas>
                 </li>
             </ul>
         </div>
