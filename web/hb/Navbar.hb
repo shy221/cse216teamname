@@ -37,6 +37,8 @@
                 </li>
                 <li>
                     <a class="btn btn-link" id="Navbar-showQR">
+                    <span class="glyphicon glyphicon-picture"></span><span class="sr-only">Show Trending Posts</span>
+                        View QR code 
                     </a>
                 </li>
             </ul>

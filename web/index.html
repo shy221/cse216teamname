@@ -21,15 +21,34 @@
     <link href="https://fonts.googleapis.com/css?family=Fresca" rel="stylesheet">
     <link rel="stylesheet" href="app.css" />
     <link href="bootstrap.min.css" rel="stylesheet">
+    <!-- <script src = "qrcode.min.js"></script> 
     <script> 
         var qrdata = document.getElementById("qr-data");
+        var qrcode = new QRCode(document.getElementById('qrcode'));
 
         function generateQR(){
             var data = qrdata.value;
 
-            alert(data)
+            qrcode.makeCode(data);
         }
-    </script>
+    </script> -->
+
+    <canvas id="canvas"></canvas>
+ 
+    <script src="qrcode.min.js"></script>
+    <script>
+    /*
+    function generateQR(){
+        uemail = uemail + "";
+        ukey = ukey + "";
+        var qrdata = uemail + "+" + ukey;
+            QRCode.toCanvas(document.getElementById('canvas'), qrdata, function (error) {
+                if (error) console.error(error)
+                console.log('success!');
+              })
+        }
+        */
+    </script> 
 
 </head>
 

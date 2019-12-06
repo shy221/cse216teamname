@@ -6,6 +6,7 @@
 ///// <reference path="ts/Login.ts"/>
 /// <reference path="ts/UserProfile.ts"/>
 /// <reference path="ts/ShowComments.ts"/>
+/// <reference path="ts/ShowQR.ts"/>
 /// <reference path="ts/EditUserProfile.ts"/>
 
 
@@ -13,6 +14,7 @@
 // "any", so that we can use it anywhere, and assume it has any fields or
 // methods, without the compiler producing an error.
 let $: any;
+let QRCode: any;
 
 // Prevent compiler errors when using Handlebars
 let Handlebars: any;
@@ -64,6 +66,23 @@ var onSubmitResponse = function(data: any) {
       window.alert("Unspecified error");
   }
 }
+
+// var requirejs = require('requirejs');
+
+// requirejs.config({
+//     //Pass the top-level main.js/index.js require
+//     //function to requirejs so that node modules
+//     //are loaded relative to the top-level JS file.
+//     ShowQR: require,
+//     nodeRequire: require
+// });
+
+// requirejs(['foo', 'bar'],
+// function   (foo: any,   bar: any) {
+//     //foo and bar are loaded according to requirejs
+//     //config, but if not found, then node's require
+//     //is used to load the module.
+// });
 
 
 // Run some configuration code when the web page loads

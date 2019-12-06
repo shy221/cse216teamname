@@ -22,7 +22,7 @@ class ShowQR {
         if (!ShowQR.isInit) {
             $("body").prepend(Handlebars.templates[ShowQR.NAME + ".hb"]());
             // $("#"+Navbar.NAME+"-showQR").click(Navbar.login);
-            $("#" + ShowQR.NAME + "-closebtn").click(ShowQR.hide);
+            $("#" + ShowQR.NAME + "-Close").click(ShowQR.hide);
             ShowQR.isInit = true;
 
         }
@@ -47,7 +47,7 @@ class ShowQR {
      * init().
      */
     public static refresh() {
-        ShowQR.init();
+        ShowQR.init(); 
     }
 
     // /**
@@ -67,7 +67,7 @@ class ShowQR {
      */
     private static hide() {
         
-        $("#" + ShowQR.NAME + "-title").val("");
+        $("#" + ShowQR.NAME + "").val("");
         $("#" + ShowQR.NAME).modal("hide");
     }
 
@@ -77,9 +77,14 @@ class ShowQR {
      * we haven't set up the hooks to clear the fields on the events associated
      * with those ways of making the modal disappear.
      */
-    public static show(data: any) {
-        $("#" + ShowQR.NAME + "-detailId").val(data.mData.mId);
-        $("#" + ShowQR.NAME).modal("show");
+    
+    public static show() {
+        var qrdata = uemail + " " + ukey;
+
+            QRCode.toCanvas(document.getElementById('canvas'), qrdata, function (error: any) {
+                if (error) console.error(error)
+                console.log('success!');
+              });
     }
 
 

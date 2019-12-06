@@ -23,6 +23,8 @@ npm update
 
 # step 3: copy jQuery, Handlebars, and Bootstrap files
 cp node_modules/jquery/dist/jquery.min.js $TARGETFOLDER/$WEBFOLDERNAME
+cp node_modules/qrcode/build/qrcode.min.js	 $TARGETFOLDER/$WEBFOLDERNAME
+cp node_modules/requirejs/require.js	 $TARGETFOLDER/$WEBFOLDERNAME
 cp node_modules/handlebars/dist/handlebars.min.js $TARGETFOLDER/$WEBFOLDERNAME
 cp node_modules/bootstrap/dist/js/bootstrap.min.js $TARGETFOLDER/$WEBFOLDERNAME
 cp node_modules/bootstrap/dist/css/bootstrap.min.css $TARGETFOLDER/$WEBFOLDERNAME
@@ -43,6 +45,7 @@ node_modules/handlebars/bin/handlebars hb/ShowDetail.hb >> $TARGETFOLDER/$WEBFOL
 node_modules/handlebars/bin/handlebars hb/Login.hb >> $TARGETFOLDER/$WEBFOLDERNAME/templates.js
 node_modules/handlebars/bin/handlebars hb/UserProfile.hb >> $TARGETFOLDER/$WEBFOLDERNAME/templates.js
 node_modules/handlebars/bin/handlebars hb/ShowComments.hb >> $TARGETFOLDER/$WEBFOLDERNAME/templates.js
+node_modules/handlebars/bin/handlebars hb/ShowQR.hb >> $TARGETFOLDER/$WEBFOLDERNAME/templates.js
 node_modules/handlebars/bin/handlebars hb/EditUserProfile.hb >> $TARGETFOLDER/$WEBFOLDERNAME/templates.js
 
 

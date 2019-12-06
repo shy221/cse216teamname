@@ -9,7 +9,7 @@ class Navbar {
      * Track if the Singleton has been initialized
      */
     private static isInit = false;
-
+ 
     /**
      * The name of the DOM entry associated with Navbar
      */

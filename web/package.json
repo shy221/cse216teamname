@@ -5,12 +5,14 @@
     "dependencies": {
         "@types/gapi": "0.0.39",
         "@types/gapi.auth2": "0.0.50",
+        "@types/node": "^12.12.14",
         "bootstrap": "^3.4.1",
         "gapi": "0.0.3",
         "handlebars": "^4.4.3",
         "jasmine-core": "^3.5.0",
         "jquery": "^3.4.1",
         "qrcode": "^1.4.4",
+        "requirejs": "^2.3.6",
         "typescript": "^3.7.3"
     }
 }
