@@ -70,7 +70,10 @@ public class LoginActivity  extends AppCompatActivity{
         signInButton.setOnClickListener(new View.OnClickListener() {
 
             @Override
-            public void onClick(View view) { signIn(); }
+            public void onClick(View view) {
+                Log.d("OAuth", "Ready to sign in");
+                signIn();
+            }
 
             private void signIn() {
                 Intent signInIntent = mGoogleSignInClient.getSignInIntent();

@@ -128,48 +128,48 @@ public class ScannedBarcodeActivity extends AppCompatActivity {
 
     private void checkUKey() {
         if (intentData.length() != 0) {
-            int uidToUsername = intentData.indexOf("uId:");
-            int usernameToSessionkey = intentData.indexOf(";uSername:");
-            int sessionkeyToUemail = intentData.indexOf(";sessionKey:");
-            int uemailToUintro = intentData.indexOf(";uEmail:");
-            int uintroToEnd = intentData.indexOf(";uIntro:");
-            // all of these fields should exist
-            if (uidToUsername != -1 && usernameToSessionkey != -1 && sessionkeyToUemail != -1 && uemailToUintro != -1 && uintroToEnd != -1) {
+
+            int br1 = intentData.indexOf("\n");
+            int br2 = intentData.lastIndexOf("\n");
+
+            if (br1 != -1 && br2 != -1) {
                 // parse intentData
                 Map<String, String> map = new HashMap<>();
-                map.put("uId", intentData.substring(uidToUsername + 4, usernameToSessionkey));
-                map.put("uSername", intentData.substring(usernameToSessionkey + 10, sessionkeyToUemail));
-                map.put("sessionKey", intentData.substring(sessionkeyToUemail + 12, uemailToUintro));
-                map.put("uEmail", intentData.substring(uemailToUintro + 8, uintroToEnd));
-                map.put("uIntro", intentData.substring(uintroToEnd + 8));
+                map.put("uId", intentData.substring(0, br1));
+                map.put("uEmail", intentData.substring(br1 + 1, br2));
+                map.put("sessionKey", intentData.substring(br2 + 1));
 
-                sharedpreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-                SharedPreferences.Editor editor = sharedpreferences.edit();
-                editor.putString("prefId",map.get("uId"));
-                editor.putString("prefName",map.get("uSername"));
-                editor.putString("prefEmail",map.get("uEmail"));
-                editor.putString("prefIntro",map.get("uIntro"));
-                editor.putString("prefKey",map.get("sessionKey"));
-                editor.commit();
+                Log.d("login", "user info obtained" + map.get("uId") + ", uEmail: " + map.get("uEmail") + ", sessionKey: " + map.get("sessionKey"));
 
-                String tmp = "uId: '" + sharedpreferences.getString("prefId", "default") + "' stored in shared preferences";
-                txtBarcodeValue.setText(tmp);
-
-                JSONObject d = new JSONObject(map);
-                JsonObjectRequest postR = new JsonObjectRequest(Request.Method.POST, "https://arcane-refuge-67249.herokuapp.com/listmessages", d,
+                final JSONObject d = new JSONObject(map);
+                JsonObjectRequest postR = new JsonObjectRequest(Request.Method.POST, "https://arcane-refuge-67249.herokuapp.com/" + map.get("uId") + "/userprofile", d,
                         new Response.Listener<JSONObject>() {
                             @Override
                             public void onResponse(JSONObject response) {
                                 try {
                                     if (response.getString("mStatus").equals("ok")) {
                                         // valid sessionKey, go to welcome activity
+                                        JSONObject data = response.getJSONObject("mData");
+
+                                        sharedpreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                                        SharedPreferences.Editor editor = sharedpreferences.edit();
+                                        editor.putString("prefId", d.getString("uId"));
+                                        editor.putString("prefName", data.getString("uSername"));
+                                        editor.putString("prefEmail",d.getString("uEmail"));
+                                        editor.putString("prefKey",d.getString("sessionKey"));
+                                        editor.putString("prefIntro", data.getString("uIntro"));
+                                        editor.commit();
+
                                         Intent in = new Intent(ScannedBarcodeActivity.this, WelcomeActivity.class);
                                         startActivity(in);
                                     } else {
-                                        Log.e("login", "Invalid session key");
+                                        Log.e("mStatus", response.getString("mStatus"));
+                                        Log.e("mMessage", response.getString("mMessage"));
+                                        Log.e("JSONObject", d.toString());
                                     }
                                 } catch (final JSONException e) {
-                                    Log.e("login", "Error parsing JSON file: onPostResponse/listmessages");
+                                    Log.e("login", "Error parsing JSON file: " + e.getMessage());
+                                    Log.e("response", response.toString());
                                 }
                             }
                         }, new Response.ErrorListener() {
