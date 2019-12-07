@@ -120,14 +120,16 @@ public class LoginActivity  extends AppCompatActivity{
 
     private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
         String token = null;
-        try {
-            Log.w(TAG, "Task = " + completedTask);
-            GoogleSignInAccount account = completedTask.getResult(ApiException.class);
-            token = account.getIdToken();
-        } catch (ApiException e) {
-            // The ApiException status code indicates the detailed failure reason.
-            // Please refer to the GoogleSignInStatusCodes class reference for more information.
-            Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
+        while (token == null) {
+            try {
+                Log.w(TAG, "Task = " + completedTask);
+                GoogleSignInAccount account = completedTask.getResult(ApiException.class);
+                token = account.getIdToken();
+            } catch (ApiException e) {
+                // The ApiException status code indicates the detailed failure reason.
+                // Please refer to the GoogleSignInStatusCodes class reference for more information.
+                Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
+            }
         }
         updateUI(token);
     }
@@ -137,6 +139,8 @@ public class LoginActivity  extends AppCompatActivity{
         Map<String, String> map = new HashMap<>();
         map.put("id_token", token);
         JSONObject m = new JSONObject(map);
+
+        Log.d("json", m.toString());
 
         JsonObjectRequest postR = new JsonObjectRequest(Request.Method.POST,
                 urlLogin, m, new Response.Listener<JSONObject>() {
