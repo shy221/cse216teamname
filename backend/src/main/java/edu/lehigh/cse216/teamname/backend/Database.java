@@ -144,7 +144,7 @@ public class Database {
             db.cSelectAll = db.mConnection.prepareStatement("SELECT cid, uid, username, text, fileId, mLink, mime FROM tblComment NATURAL JOIN tblUser where mid = ?");
             db.cInsertOne = db.mConnection.prepareStatement("INSERT INTO tblComment VALUES (default, ?, ?, ?, ?, ?, ?)");
 
-            db.qInsertOne = db.mConnection.prepareStatement("INSERT INTO tblQR VALUES (?, ?)");
+            db.qInsertOne = db.mConnection.prepareStatement("INSERT INTO tblQR VALUES (default, ?, ?)");
         } catch (SQLException e) {
             System.err.println("Error creating prepared statement");
             e.printStackTrace();
@@ -213,14 +213,15 @@ public class Database {
      * @return The Id of the new row, or -1 if no row was created
      */
     //detail: title, content, likes, dislikes, comment.userid, comments.text
-    public int createQR(String uEmail) {
-        if (uEmail == null)
+    public int createQR(int uid) {
+        if (uid <= 0)
             return -1;
         try {
+            qInsertOne.setInt(1, uid);
             Date date = new Date();
             Timestamp ts = new Timestamp(date.getTime());
             qInsertOne.setTimestamp(2, ts);
-            qInsertOne.setString(1, uEmail);
+
         } catch (SQLException e) {
             e.printStackTrace();
         }

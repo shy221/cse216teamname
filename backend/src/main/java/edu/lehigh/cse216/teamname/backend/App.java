@@ -267,7 +267,7 @@ public class App {
                 return gson.toJson(new StructuredResponse("error", "Memcached error during get or set: " + me.getMessage(), null));
             }
             if (sk.equals(key)){
-                int insert = db.createQR(req.uEmail);//missing timestamp
+                int insert = db.createQR(req.uid);//generate timestamp in createQR
                 return gson.toJson(new StructuredResponse("ok", "" + insert, null));
             }
             return gson.toJson(new StructuredResponse("error", "session key not correct..", null));
