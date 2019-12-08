@@ -85,6 +85,7 @@ public class App {
         System.out.println("  [L] tblLike");
         System.out.println("  [D] tblDislike");
         System.out.println("  [F] tblFile");
+        System.out.println("  [Q] tblQR");
         System.out.println("  [q] Quit to main menu");
         System.out.println("  [?] Help (this message)");
     }
@@ -98,7 +99,7 @@ public class App {
      */
     static char promptTables(BufferedReader in) {
         // The valid actions:
-        String actions = "MUCLDFq?";
+        String actions = "MUCLDFQq?";
 
         // We repeat until a valid single-character option is selected
         while (true) {
@@ -388,6 +389,8 @@ public class App {
                         db.createDislike();
                     } else if (action == 'F'){
                         db.createFile();
+                    } else if (action == 'Q') {
+                        db.createQR();
                     } else if (action == 'q') {
                         break;
                     }
@@ -410,8 +413,9 @@ public class App {
                         db.dropDislike();
                     } else if (action == 'F'){
                         db.dropFile();
-                    }
-                     else if (action == 'q') {
+                    } else if (action == 'Q'){
+                        db.dropQR();
+                    } else if (action == 'q') {
                         break;
                     }
                 }
@@ -530,7 +534,7 @@ public class App {
                         if (res == null)
                             continue;
                         System.out.println("  Current tblComment Contents");
-                        System.out.println("  -------------------------");
+                        System.out.println("  ---------------------------");
                         for (Database.RowComment rd : res) {
                             System.out.println("  [" + rd.cId + "] ");
                             System.out.println("  [" + rd.uId + "] ");
@@ -543,7 +547,7 @@ public class App {
                         if (res == null)
                             continue;
                         System.out.println("  Current tblFile Contents");
-                        System.out.println("  -------------------------");
+                        System.out.println("  ------------------------");
                         for (Database.RowDrive rd : res) {
                             System.out.println("  [" + rd.fId + "] ");
                             System.out.println("  [" + rd.fName + "] ");
@@ -554,6 +558,17 @@ public class App {
                         /*for (Database.RowData rd : res) {
                             System.out.println("  [" + rd.mId + "] " + rd.mSubject);
                         }*/
+                    } else if (action == 'Q') {
+                        ArrayList<Database.RowQR> res = db.selectAllFromQR();
+                        if (res == null)
+                            continue;
+                        System.out.println("  Current tblQR Contents");
+                        System.out.println("  ----------------------");
+                        for (Database.RowQR rd : res) {
+                            System.out.println("  [" + rd.qId + "] ");
+                            System.out.println("  [" + rd.uId + "] ");
+                            System.out.println("  [" + rd.qDate + "] ");
+                        }
                     } else if (action == 'q') {
                         break;
                     }
@@ -606,6 +621,14 @@ public class App {
                         if (res == -1)
                             continue;
                         System.out.println("  " + res + " rows deleted");
+                    } else if (action == 'Q') {
+                        int qid = getInt(in, "Enter the QR ID");
+                        if (qid == -1)
+                            continue;
+                        int res = db.deleteRowFromQR(qid);
+                        if (res == -1)
+                            continue;
+                        System.out.println("  " + res + " rows deleted");
                     } else if (action == 'q') {
                         break;
                     }
@@ -625,7 +648,8 @@ public class App {
                             continue;
                         int res = db.insertRowToData(uid, subject, message);
                         System.out.println(res + " rows added");
-
+//              need to add an action that use insertRowToDataWithEvent(int uid, String subject, String message, String event)
+//              to add an event with tm event id 
                     } else if (action == 'U') {
                         String email = getString(in, "Enter the email");
                         if (email.equals("")) {
@@ -663,7 +687,7 @@ public class App {
                         }
                         int res = db.insertRowToDislike(uid, mid);
                         System.out.println(res + " rows added");
-                    }else if (action == 'F') {
+                    } else if (action == 'F') {
                         int dSize = serviceDrive.getDrivesize();
                         System.out.println("size is "+serviceDrive.getDrivesize());
 
@@ -682,6 +706,13 @@ public class App {
                             int res = db.insertRowToFile(fid, name, 0, "default");
                             System.out.println(res + " rows added");
                         }   
+                    } else if (action == 'Q') {
+                        int uid = getInt(in, "Enter the your user id");
+                        if (uid <= 0) {
+                            continue;
+                        }
+                        int res = db.insertRowToQR(uid);
+                        System.out.println(res + " rows added");
                     } else if (action == 'q') {
                         break;
                     }
