@@ -13,7 +13,7 @@ package edu.lehigh.cse216.teamname.backend;
     /**
      * The short-lifed access token returned from Google
      */
-    public int uid;
+    public int uId;
     public String uEmail;
     public String sessionKey;
 

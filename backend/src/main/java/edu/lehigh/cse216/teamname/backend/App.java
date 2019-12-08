@@ -256,6 +256,7 @@ public class App {
             response.type("application/json");
             String sk = req.sessionKey;
             String em = req.uEmail;
+            int uid = req.uId;
             String key = "";
             try{
                 key = mc.get(em);
@@ -266,8 +267,11 @@ public class App {
             } catch (MemcachedException me){
                 return gson.toJson(new StructuredResponse("error", "Memcached error during get or set: " + me.getMessage(), null));
             }
+            if (uid <= 0){
+                return gson.toJson(new StructuredResponse("error", "no uid input.", null));
+            }
             if (sk.equals(key)){
-                int insert = db.createQR(req.uid);//generate timestamp in createQR
+                int insert = db.createQR(req.uId);//generate timestamp in createQR
                 return gson.toJson(new StructuredResponse("ok", "" + insert, null));
             }
             return gson.toJson(new StructuredResponse("error", "session key not correct..", null));
