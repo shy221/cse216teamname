@@ -71,8 +71,11 @@ public class LoginActivity  extends AppCompatActivity{
 
             @Override
             public void onClick(View view) {
-                Log.d("OAuth", "Ready to sign in");
-                signIn();
+                switch (view.getId()) {
+                    case R.id.sign_in_button:
+                        signIn();
+                        break;
+                }
             }
 
             private void signIn() {
@@ -119,19 +122,16 @@ public class LoginActivity  extends AppCompatActivity{
     }
 
     private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
-        String token = null;
-        while (token == null) {
-            try {
-                Log.w(TAG, "Task = " + completedTask);
-                GoogleSignInAccount account = completedTask.getResult(ApiException.class);
-                token = account.getIdToken();
-            } catch (ApiException e) {
-                // The ApiException status code indicates the detailed failure reason.
-                // Please refer to the GoogleSignInStatusCodes class reference for more information.
-                Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
-            }
+        try {
+            Log.w(TAG, "Task = " + completedTask);
+            GoogleSignInAccount account = completedTask.getResult(ApiException.class);
+            String token = account.getIdToken();
+            updateUI(token);
+        } catch (ApiException e) {
+            // The ApiException status code indicates the detailed failure reason.
+            // Please refer to the GoogleSignInStatusCodes class reference for more information.
+            Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
         }
-        updateUI(token);
     }
 
     private void updateUI(String token) {
