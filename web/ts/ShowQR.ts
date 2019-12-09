@@ -79,7 +79,7 @@ class ShowQR {
      */
     
     public static show() {
-        var qrdata = uemail + "\n" + ukey;
+        var qrdata = uid + "\n" + uemail + "\n" + ukey;
 
             QRCode.toCanvas(document.getElementById('canvas'), qrdata, function (error: any) {
                 if (error) console.error(error)
