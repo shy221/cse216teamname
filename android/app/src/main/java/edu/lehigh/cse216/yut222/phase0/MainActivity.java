@@ -106,12 +106,13 @@ public class MainActivity extends AppCompatActivity {
         Map<String, String> map = new HashMap<>();
         map.put("uEmail", sharedpreferences.getString("prefEmail","default"));
         map.put("sessionKey", sharedpreferences.getString("prefKey", "default"));
-        JSONObject m = new JSONObject(map);
+        final JSONObject m = new JSONObject(map);
 
         JsonObjectRequest listR = new JsonObjectRequest(Request.Method.POST, urlList, m,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
+                        Log.d("Request", m.toString());
                         populateListFromVolley(response);
                     }
                 }, new Response.ErrorListener() {
