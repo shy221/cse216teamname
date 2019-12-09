@@ -46,6 +46,11 @@ public class Database {
     private PreparedStatement mInsertOne;
 
     /**
+     * A prepared statement for inserting into the database with the tm event ID
+     */
+    // private PreparedStatement mInsertOne2;
+
+    /**
      * A prepared statement for updating a single row in the database
      */
     private PreparedStatement mUpdateOne;
@@ -262,8 +267,22 @@ public class Database {
      * A prepared statement for dropping the table in our user table
      */
     private PreparedStatement fDropTable;
-;
+
     private PreparedStatement fInsertOne;
+
+
+    // Prepared statements for tblQR
+    private PreparedStatement qCreateTable;
+
+    private PreparedStatement qDropTable;
+
+    private PreparedStatement qSelectAll;
+
+    private PreparedStatement qInsertOne;
+
+    private PreparedStatement qDeleteOne;
+
+
 
     /**
      * RowData is like a struct in C: we use it to hold data, and we allow direct
@@ -313,11 +332,15 @@ public class Database {
 
         String fileId;
 
+        int qId;
+
+        Timestamp qDate;
+
 
         /**
          * Construct a RowData object by providing values for its fields
          */
-        public RowData(int mid, int uid, String username, String subject, String message, int likes, int dislikes, Timestamp date, String fileId, String link) {
+        public RowData(int mid, int uid, String username, String subject, String message, int likes, int dislikes, Timestamp date, String fileId, String link, int qid, Timestamp qdate) {
             mId = mid;
             uId = uid;
             userName = username;
@@ -328,6 +351,8 @@ public class Database {
             mDate = date;
             mLink = link;
             fileId = fileId;
+            qId = qid;
+            qDate = qdate;
 
         }
 
@@ -345,6 +370,8 @@ public class Database {
             mDate = null;
             mLink = null;
             fileId = null;
+            qId = 0;
+            qDate = null;
         }
     }
 
@@ -387,7 +414,7 @@ public class Database {
         int uQuota;
 
         /**
-         * Construct a RowData object by providing values for its fields
+         * Construct a RowUser object by providing values for its fields
          */
         public RowUser(int uid, String name, String email, String intro, int quota) {
             uId = uid;
@@ -400,7 +427,7 @@ public class Database {
         }
 
         /**
-         * Construct a RowData object by providing values for its fields
+         * Construct a RowUser object by providing values for its fields
          */
         public RowUser(int uid, String name) {
             uId = uid;
@@ -413,13 +440,13 @@ public class Database {
     }
 
     /**
-     * RowData is like a struct in C: we use it to hold data, and we allow direct
-     * access to its fields. In the context of this Database, RowData represents the
+     * RowComment is like a struct in C: we use it to hold data, and we allow direct
+     * access to its fields. In the context of this Database, RowComment represents the
      * data we'd see in a row.
      * 
-     * We make RowData a static class of Database because we don't really want to
-     * encourage users to think of RowData as being anything other than an abstract
-     * representation of a row of the database. RowData and the Database are tightly
+     * We make RowComment a static class of Database because we don't really want to
+     * encourage users to think of RowComment as being anything other than an abstract
+     * representation of a row of the database. RowComment and the Database are tightly
      * coupled: if one changes, the other should too.
      */
     public static class RowComment {
@@ -445,7 +472,7 @@ public class Database {
         String cLink;
 
         /**
-         * Construct a RowData object by providing values for its fields
+         * Construct a RowComment object by providing values for its fields
          */
         public RowComment(int cid, int uid, int mid, String text, String fileId, String link) {
             cId = cid;
@@ -458,13 +485,13 @@ public class Database {
     }
 
     /**
-     * RowData is like a struct in C: we use it to hold data, and we allow direct
-     * access to its fields. In the context of this Database, RowData represents the
+     * RowDrive is like a struct in C: we use it to hold data, and we allow direct
+     * access to its fields. In the context of this Database, RowDrive represents the
      * data we'd see in a row.
      * 
-     * We make RowData a static class of Database because we don't really want to
-     * encourage users to think of RowData as being anything other than an abstract
-     * representation of a row of the database. RowData and the Database are tightly
+     * We make RowDrive a static class of Database because we don't really want to
+     * encourage users to think of RowDrive as being anything other than an abstract
+     * representation of a row of the database. RowDrive and the Database are tightly
      * coupled: if one changes, the other should too.
      */
     public static class RowDrive {
@@ -490,7 +517,7 @@ public class Database {
         int fSize;
 
         /**
-         * Construct a RowData object by providing values for its fields
+         * Construct a RowDrive object by providing values for its fields
          */
         public RowDrive(String fid, String name, int uid, String activity, int size) {
             fId = fid;
@@ -508,6 +535,22 @@ public class Database {
         }
     }
 
+    public static class RowQR {
+        int qId;
+
+        int uId;
+
+        Timestamp qDate;
+
+        /**
+         * Construct a RowQR object by providing values for its fields
+         */
+        public RowQR (int qid, int uid, Timestamp qdate){
+            qId = qid;
+            uId = uid;
+            qDate = qdate;
+        }
+    }
  
 
     /**
@@ -581,9 +624,12 @@ public class Database {
 
             // Note: no "IF NOT EXISTS" or "IF EXISTS" checks on table
             // creation/deletion, so multiple executions will cause an exception
+
+            // changed table
             db.mCreateTable = db.mConnection
                     .prepareStatement("CREATE TABLE tblData (mid SERIAL PRIMARY KEY, uid INTEGER, subject VARCHAR(50) "
-                            + "NOT NULL, message VARCHAR(500) NOT NULL, date TIMESTAMP(6), fileId VARCHAR(50), mLink VARCHAR(50), mime VARCHAR(50), FOREIGN KEY(uid) REFERENCES tblUser)");
+                            + "NOT NULL, message VARCHAR(500) NOT NULL, date TIMESTAMP(6), fileId VARCHAR(50), mLink VARCHAR(50), mime VARCHAR(50), " 
+                            /*+ "tmEventId VARCHAR(20), " */+ "FOREIGN KEY(uid) REFERENCES tblUser)");
             db.mDropTable = db.mConnection.prepareStatement("DROP TABLE tblData");
 
             // Standard CRUD operations
@@ -591,7 +637,8 @@ public class Database {
             db.mClearLikes = db.mConnection.prepareStatement("DELETE FROM tblLike WHERE mid = ?");
             db.mClearDislikes = db.mConnection.prepareStatement("DELETE FROM tblDislike WHERE mid = ?");
             db.mClearComments = db.mConnection.prepareStatement("DELETE FROM tblComment WHERE mid = ?");
-            db.mInsertOne = db.mConnection.prepareStatement("INSERT INTO tblData VALUES (default, ?, ?, ?, ?)");
+            db.mInsertOne = db.mConnection.prepareStatement("INSERT INTO tblData VALUES (default, ?, ?, ?, ?,)");
+            // db.mInsertOne2 = db.mConnection.prepareStatement("INSERT INTO tblData VALUES (default, ?, ?, ?, ?, ?)"); //the last ? is for tm event code insertion, need to test
             db.mSelectAll = db.mConnection.prepareStatement("SELECT mid, subject FROM tblData");
             db.mSelectOne = db.mConnection.prepareStatement(
                     "SELECT row.*, (SELECT COUNT(*) FROM tblLike WHERE tblLike.mid = row.mid) AS likes, (SELECT COUNT(*) FROM tblDislike WHERE tblDislike.mid = row.mid) AS dislikes FROM (SELECT * from tblData NATURAL JOIN tblUser) AS row WHERE row.mid = ?");
@@ -642,6 +689,12 @@ public class Database {
             db.fInsertOne = db.mConnection.prepareStatement("INSERT INTO tblFile VALUES(?, ?, ?, ?)");
             db.fSelectAll = db.mConnection.prepareStatement("SELECT fid, name FROM tblFile");
             
+            // Prepared statement for tblQR
+            db.qCreateTable = db.mConnection.prepareStatement("CREATE TABLE tblQR (qid SERIAL PRIMARY KEY, uid INTEGER, date TIMESTAMP(6), FOREIGN KEY(uid) REFERENCES tblUser)");
+            db.qDropTable = db.mConnection.prepareStatement("DROP TABLE tblQR");
+            db.qSelectAll = db.mConnection.prepareStatement("SELECT * from tblQR");
+            db.qInsertOne = db.mConnection.prepareStatement("INSERT INTO tblQR VALUES(default, ?, ?)");
+            db.qDeleteOne = db.mConnection.prepareStatement("DELETE FROM tblQR WHERE qid = ?");
 
         } catch (SQLException e) {
             System.err.println("Error creating prepared statement");
@@ -701,6 +754,36 @@ public class Database {
         }
         return count;
     }
+
+    /**
+     * Insert a row into the database
+     * 
+     * @param uid     The id of the post creator
+     * @param subject The subject for this new row
+     * @param message The message body for this new row
+     * @param event   The event ID of the tm event
+     * 
+     * @return The number of rows that were inserted
+     */
+
+    /* since we no longer use ticketmaster api, no need for this method.
+    int insertRowToDataWithEvent(int uid, String subject, String message, String event) {
+        int count = 0;
+        try {
+            mInsertOne2.setInt(1, uid);
+            mInsertOne2.setString(2, subject);
+            mInsertOne2.setString(3, message);
+            Date date = new Date();
+            Timestamp ts = new Timestamp(date.getTime());
+            mInsertOne2.setTimestamp(4, ts);
+            count += mInsertOne.executeUpdate();
+            mInsertOne2.setString(5, event);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return count;
+    }
+    */
 
     /**
      * Insert a row into the database
@@ -792,6 +875,20 @@ public class Database {
         return count;
     }
 
+    int insertRowToQR(int uid){
+        int count = 0;
+        try {
+            qInsertOne.setInt(1, uid);
+            Date date = new Date();
+            Timestamp ts = new Timestamp(date.getTime());
+            qInsertOne.setTimestamp(2, ts);
+            count += qInsertOne.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return count;
+    }
+
     /**
      * Query the database for a list of all subjects and their IDs
      * 
@@ -874,6 +971,21 @@ public class Database {
         }
     }
 
+    ArrayList<RowQR> selectAllFromQR() {
+        ArrayList<RowQR> res = new ArrayList<RowQR>();
+        try {
+            ResultSet rs = qSelectAll.executeQuery();
+            while (rs.next()) {
+                res.add(new RowQR(rs.getInt("qid"), rs.getInt("uid"), rs.getTimestamp("qdate")));
+            }
+            rs.close();
+            return res;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     /**
      * Get all data for a specific row, by ID
      * 
@@ -888,7 +1000,7 @@ public class Database {
             ResultSet rs = mSelectOne.executeQuery();
             if (rs.next()) {
                 res = new RowData(rs.getInt("mid"), rs.getInt("uid"), rs.getString("username"), rs.getString("subject"), rs.getString("message"), rs.getInt("likes"),
-                    rs.getInt("dislikes"), rs.getTimestamp("date"), rs.getString("mLink"), rs.getString("field"));
+                    rs.getInt("dislikes"), rs.getTimestamp("date"), rs.getString("mLink"), rs.getString("field"), rs.getInt("qid"), rs.getTimestamp("qdate"));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -939,6 +1051,7 @@ public class Database {
         return res;
     }
 
+
     /**
      * Delete a row by ID
      * 
@@ -987,6 +1100,17 @@ public class Database {
         try {
             cDeleteOne.setInt(1, cid);
             res = cDeleteOne.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return res;
+    }
+
+    int deleteRowFromQR(int qid) {
+        int res = -1;
+        try {
+            qDeleteOne.setInt(1, qid);
+            res = qDeleteOne.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -1240,6 +1364,17 @@ public class Database {
     }
 
     /**
+     * Create tblQR. If it already exists, this will print an error
+     */
+    void createQR() {
+        try {
+            qCreateTable.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
      * Remove tblData from the database. If it does not exist, this will print an
      * error.
      */
@@ -1306,6 +1441,18 @@ public class Database {
     void dropFile() {
         try {
             fDropTable.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Remove tblQR from the database. If it does not exist, this will print an
+     * error.
+     */
+    void dropQR(){
+        try {
+            qDropTable.execute();
         } catch (SQLException e) {
             e.printStackTrace();
         }
