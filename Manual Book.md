@@ -1,4 +1,4 @@
-# Getting Started#
+# Getting Started
 ## Introduction to The Buzz
 The Buzz is an app where users can post the movie and concert events on it in order to find people with the same interest. This project basically consist of four parts：
 
@@ -6,14 +6,12 @@ The Buzz is an app where users can post the movie and concert events on it in or
 - Backend: the server for The Buzz using the Java Spark web framework and deployed on heroku
 - Web: a TypeScript web front-ends
 - Android: an Android app for The Buzz developed with Android studio
-##
 
 ## Basic Requirements
 - Git: we use Git to track our works
 - Terminal: Mac has good default terminal. For Windows, the default terminal is fine but I recommend Git Bash
 - VS code: I recommend the visual studio code for coding
 - Bitbucket account: you should create an account so that we could share out project with you
-##
 
 ## How to Get Started
 1. Go to the repo on Bitbucket (we will add you to the project)
@@ -25,15 +23,13 @@ The Buzz is an app where users can post the movie and concert events on it in or
 7. After finishing your work, use command `git add` to add the files you want to save.
 8. Then, `git commit` to save your works
 9. Finally, `git push` to save your work on the Bitbucket repo
-##
 
-# Developer Instructions#
+# Developer Instructions
 
 ## Admin
 ### Software Requirements
 - Java JDK: for code compiling
 - Maven: for project constrution and please follow the [https://maven.apache.org/install.html](https://maven.apache.org/install.html) to install the maven
-###
 
 ### App.java
 App.java is the main program of the Admin app. It contains the set up of the Database, interaction with user, and calling the functions in the database.
@@ -85,7 +81,6 @@ Here is the example of how to get user's command in the console:
 	            System.out.println("Invalid Command");
 	        }
 	    }
-####
 
 #### Response
 Here is the example of how we react depends on user input:
@@ -113,8 +108,6 @@ Here is the example of how we react depends on user input:
                         }
 
                     }
-####
-###
 
 ### Database.java
 Database is responsible for the interaction with our heroku database. To do that, we have to write the prepared SQL statements like follow:
@@ -153,19 +146,15 @@ Then, write the functions to set up the values for the question marks and execut
         }
         return count;
     }
-###
+
 
 ### Compiling and Running
 To compile the code, run `mvn package` in the terminal to compile the program and run the tests. Then, run `mvn exec:java` with our database url: `DATABASE_URL=postgres://ptswzskpnbqwdn:ad5fb569055109e8808cf7cda7356dee5f9e428bb64b064fdb0849e85b72b8c8@ec2-107-21-201-238.compute-1.amazonaws.com:5432/d9bk6p14rm5u9e mvn exec:java`
-###
-
-##
 
 ## Backend
 ### Software Requirements
 - Java SDK: code compiling basic
 - Maven: for package and deploy
-###
 
 ### Java Spark Web Framework
 We use Java Spark to map the Routes to the corresponding Spark functions so that when front-ends make a Json call to a specific url, backend can give the response to that request.
@@ -194,7 +183,6 @@ Here is the example of how to respond to the "/listmessages" post request in bac
             }
             return gson.toJson(new StructuredResponse("error", "session key not correct..", null));
         });
-###
 
 ### Google API
 We use Google API in the backend for authentication purpose. Here is how we check the auth token sent from the front-ends with Google OAuth:
@@ -234,13 +222,11 @@ Also, we use Google API for uploading files in the event posts to the Google Dri
             FileContent mediaContent = new FileContent(mimeType, file);
             File result = service.files().create(fileMetadata, mediaContent).setFields("id").execute();
 Check out [https://developers.google.com/drive/api/v3/quickstart/java](https://developers.google.com/drive/api/v3/quickstart/java) for more details
-###
-##
 
 ## Web
 ### Software Requirements
 - NPM: for package management
-###
+
 ### TypeScript
 TypeScript is a superset of JavaScript, which lets us write event-based code acting in response to network traffic and keyboard/mouse events to change the information within the HTML elements. Basically, it is in charge of the functionality of the web page such as setting up the response of button and put the information on the web page.
 
@@ -310,7 +296,6 @@ The following is the example of how to show QR code to the user on website:
 	              });
 	    }
 	} // end class ShowQR
-###
 
 ### Handlebars
 Handlebars is in the hb folder. It is in charge of the layout of our website. It set up the location of the messages, size of button and so on. The following is an example of the QR code modal:
@@ -331,11 +316,9 @@ Handlebars is in the hb folder. It is in charge of the layout of our website. It
 	        </div>
 	    </div>
 	</div>
-###
 
 ### CSS
 CSS is in charge of the styling of the web page, such as the color of the button. We have a css folder but we have not made any CSS format yet. If you want to write any CSS format please put it in css folder.
-###
 
 ### Deploy
 Since the web has to be deployed with the backend together, to deploy the web on our heroku server, first you have to run deploy.sh with `sh deploy.sh` in the terminal. Then, use command `mvn heroku:deploy` in the backend folder to deploy your web on the server.
@@ -368,8 +351,6 @@ If you have add new .hb or .ts files, please add the .hb files to the deploy.sh 
 	/// <reference path="ts/ShowComments.ts"/>
 	/// <reference path="ts/ShowQR.ts"/>
 	/// <reference path="ts/EditUserProfile.ts"/>
-###
-##
 
 
 
@@ -377,19 +358,16 @@ If you have add new .hb or .ts files, please add the .hb files to the deploy.sh 
 ### Software Requirements
 - Android Studio 3.5
 - Disable Hyper-V if you are using Windows system
-###
 
 ### Getting Started
 1. Open the Android Studio
 2. Click "Open an existing project"
 3. Choose the Android folder in cse216_teamname
-###
 
 ### Compiling
 Click the green right arrow button on the top left of the Android Studio to install and run your program.
 
 If you want to run your program on a virtual phone, you can create an emulator in the Android Studio
-###
 
 ### build.gradle
 You need to put all the configurations and depedencies here.
@@ -436,7 +414,6 @@ Here is an example of our build.gradle:
 	    androidTestImplementation 'androidx.test:rules:1.3.0-alpha02'
 	    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
 	}
-###
 
 ### Java Files
 Java Files are use to develop the functionality of the activities.
@@ -469,7 +446,6 @@ Here is an example of our WelcomeActivity.java to set up the function for the bu
 	    }
 	
 	}
-###
 
 ### XML Files
 XML Files are just like HTML. They are used for formatting the interface. Here is an example of how we format our WelcomeActivity page:
@@ -503,7 +479,6 @@ XML Files are just like HTML. They are used for formatting the interface. Here i
 	        android:layout_marginTop="69dp" />
 	
 	</RelativeLayout>
-###
 
 ### Google API
 We use Google API for login purpose. 
@@ -672,6 +647,4 @@ Add the following to the app-level build.gradle:
 	 }
 
 **For more details, here is the link of the tutorial for Android Google Signin: [https://developers.google.com/identity/sign-in/android/sign-in](https://developers.google.com/identity/sign-in/android/sign-in)**
-###
-##
 
