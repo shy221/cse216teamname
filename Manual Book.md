@@ -1,5 +1,5 @@
-#Getting Started#
-##Introduction to The Buzz
+# Getting Started#
+## Introduction to The Buzz
 The Buzz is an app where users can post the movie and concert events on it in order to find people with the same interest. This project basically consist of four parts：
 
 - Admin: a command-line administrative app for management of the tables 
@@ -8,14 +8,14 @@ The Buzz is an app where users can post the movie and concert events on it in or
 - Android: an Android app for The Buzz developed with Android studio
 ##
 
-##Basic Requirements
+## Basic Requirements
 - Git: we use Git to track our works
 - Terminal: Mac has good default terminal. For Windows, the default terminal is fine but I recommend Git Bash
 - VS code: I recommend the visual studio code for coding
 - Bitbucket account: you should create an account so that we could share out project with you
 ##
 
-##How to Get Started
+## How to Get Started
 1. Go to the repo on Bitbucket (we will add you to the project)
 2. Copy the command starts with `git clone`
 3. Create a folder in the local where you want to work on your project
@@ -27,18 +27,18 @@ The Buzz is an app where users can post the movie and concert events on it in or
 9. Finally, `git push` to save your work on the Bitbucket repo
 ##
 
-#Developer Instructions#
+# Developer Instructions#
 
-##Admin
-###Software Requirements
+## Admin
+### Software Requirements
 - Java JDK: for code compiling
 - Maven: for project constrution and please follow the [https://maven.apache.org/install.html](https://maven.apache.org/install.html) to install the maven
 ###
 
-###App.java
+### App.java
 App.java is the main program of the Admin app. It contains the set up of the Database, interaction with user, and calling the functions in the database.
 
-####Command-line Interface
+#### Command-line Interface
 Here is the example of how to get user's command in the console:
 
 		/**
@@ -87,7 +87,7 @@ Here is the example of how to get user's command in the console:
 	    }
 ####
 
-####Response
+#### Response
 Here is the example of how we react depends on user input:
 
 			if (action == '1') {
@@ -116,7 +116,7 @@ Here is the example of how we react depends on user input:
 ####
 ###
 
-###Database.java
+### Database.java
 Database is responsible for the interaction with our heroku database. To do that, we have to write the prepared SQL statements like follow:
 
             db.uCreateTable = db.mConnection
@@ -155,19 +155,19 @@ Then, write the functions to set up the values for the question marks and execut
     }
 ###
 
-###Compiling and Running
+### Compiling and Running
 To compile the code, run `mvn package` in the terminal to compile the program and run the tests. Then, run `mvn exec:java` with our database url: `DATABASE_URL=postgres://ptswzskpnbqwdn:ad5fb569055109e8808cf7cda7356dee5f9e428bb64b064fdb0849e85b72b8c8@ec2-107-21-201-238.compute-1.amazonaws.com:5432/d9bk6p14rm5u9e mvn exec:java`
 ###
 
 ##
 
-##Backend
-###Software Requirements
+## Backend
+### Software Requirements
 - Java SDK: code compiling basic
 - Maven: for package and deploy
 ###
 
-###Java Spark Web Framework
+### Java Spark Web Framework
 We use Java Spark to map the Routes to the corresponding Spark functions so that when front-ends make a Json call to a specific url, backend can give the response to that request.
 
 Here is the example of how to respond to the "/listmessages" post request in backend:
@@ -196,7 +196,7 @@ Here is the example of how to respond to the "/listmessages" post request in bac
         });
 ###
 
-###Google API
+### Google API
 We use Google API in the backend for authentication purpose. Here is how we check the auth token sent from the front-ends with Google OAuth:
 
 			OAuthRequest req = gson.fromJson(request.body(), OAuthRequest.class);
@@ -237,11 +237,11 @@ Check out [https://developers.google.com/drive/api/v3/quickstart/java](https://d
 ###
 ##
 
-##Web
-###Software Requirements
+## Web
+### Software Requirements
 - NPM: for package management
 ###
-###TypeScript
+### TypeScript
 TypeScript is a superset of JavaScript, which lets us write event-based code acting in response to network traffic and keyboard/mouse events to change the information within the HTML elements. Basically, it is in charge of the functionality of the web page such as setting up the response of button and put the information on the web page.
 
 The following is the example of how to show QR code to the user on website:
@@ -312,7 +312,7 @@ The following is the example of how to show QR code to the user on website:
 	} // end class ShowQR
 ###
 
-###Handlebars
+### Handlebars
 Handlebars is in the hb folder. It is in charge of the layout of our website. It set up the location of the messages, size of button and so on. The following is an example of the QR code modal:
 
 	<div id="ShowQR" class="modal fade" role="dialog">
@@ -333,11 +333,11 @@ Handlebars is in the hb folder. It is in charge of the layout of our website. It
 	</div>
 ###
 
-###CSS
+### CSS
 CSS is in charge of the styling of the web page, such as the color of the button. We have a css folder but we have not made any CSS format yet. If you want to write any CSS format please put it in css folder.
 ###
 
-###Deploy
+### Deploy
 Since the web has to be deployed with the backend together, to deploy the web on our heroku server, first you have to run deploy.sh with `sh deploy.sh` in the terminal. Then, use command `mvn heroku:deploy` in the backend folder to deploy your web on the server.
 
 If you have add new .hb or .ts files, please add the .hb files to the deploy.sh and add the .ts files to app.ts  reference when you want to deploy.
@@ -373,25 +373,25 @@ If you have add new .hb or .ts files, please add the .hb files to the deploy.sh 
 
 
 
-##Android
-###Software Requirements
+## Android
+### Software Requirements
 - Android Studio 3.5
 - Disable Hyper-V if you are using Windows system
 ###
 
-###Getting Started
+### Getting Started
 1. Open the Android Studio
 2. Click "Open an existing project"
 3. Choose the Android folder in cse216_teamname
 ###
 
-###Compiling
+### Compiling
 Click the green right arrow button on the top left of the Android Studio to install and run your program.
 
 If you want to run your program on a virtual phone, you can create an emulator in the Android Studio
 ###
 
-###build.gradle
+### build.gradle
 You need to put all the configurations and depedencies here.
 
 Here is an example of our build.gradle:
@@ -438,7 +438,7 @@ Here is an example of our build.gradle:
 	}
 ###
 
-###Java Files
+### Java Files
 Java Files are use to develop the functionality of the activities.
 
 Here is an example of our WelcomeActivity.java to set up the function for the buttons on the page:
@@ -471,7 +471,7 @@ Here is an example of our WelcomeActivity.java to set up the function for the bu
 	}
 ###
 
-###XML Files
+### XML Files
 XML Files are just like HTML. They are used for formatting the interface. Here is an example of how we format our WelcomeActivity page:
 
 	<?xml version="1.0" encoding="utf-8"?>
@@ -505,10 +505,10 @@ XML Files are just like HTML. They are used for formatting the interface. Here i
 	</RelativeLayout>
 ###
 
-###Google API
+### Google API
 We use Google API for login purpose. 
 
-####Integrating with project
+#### Integrating with project
 Add the following to the app-level build.gradle:
 
 	apply plugin: 'com.android.application'
@@ -518,7 +518,7 @@ Add the following to the app-level build.gradle:
 	        implementation 'com.google.android.gms:play-services-auth:17.0.0'
 	    }
 
-####A Quick Start example for Google signin flow
+#### A Quick Start example for Google signin flow
 
 	public class SignInActivity extends AppCompatActivity implements
 	        View.OnClickListener {
@@ -671,7 +671,7 @@ Add the following to the app-level build.gradle:
 	    }
 	 }
 
-****For more details, here is the link of the tutorial for Android Google Signin: [https://developers.google.com/identity/sign-in/android/sign-in](https://developers.google.com/identity/sign-in/android/sign-in)****
+**For more details, here is the link of the tutorial for Android Google Signin: [https://developers.google.com/identity/sign-in/android/sign-in](https://developers.google.com/identity/sign-in/android/sign-in)**
 ###
 ##
 
