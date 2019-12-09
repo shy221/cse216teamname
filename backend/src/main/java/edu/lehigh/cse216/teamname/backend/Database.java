@@ -61,6 +61,8 @@ public class Database {
     private PreparedStatement mSelectOne;
     private PreparedStatement mUpdateOne;
 
+    private PreparedStatement qInsertOne;
+
     /**
      * The Database constructor is private: we only create Database objects
      * through the getDatabase() method.
@@ -141,6 +143,8 @@ public class Database {
             //add get all comments for specific message
             db.cSelectAll = db.mConnection.prepareStatement("SELECT cid, uid, username, text, fileId, mLink, mime FROM tblComment NATURAL JOIN tblUser where mid = ?");
             db.cInsertOne = db.mConnection.prepareStatement("INSERT INTO tblComment VALUES (default, ?, ?, ?, ?, ?, ?)");
+
+            db.qInsertOne = db.mConnection.prepareStatement("INSERT INTO tblQR VALUES (default, ?, ?)");
         } catch (SQLException e) {
             System.err.println("Error creating prepared statement");
             e.printStackTrace();
@@ -199,6 +203,29 @@ public class Database {
             e.printStackTrace();
         }
         return id;
+    }
+
+        /**
+     * Insert a row into the database
+     * 
+     * @param subject The subject for this new row
+     * @param message The message for this new row
+     * @return The Id of the new row, or -1 if no row was created
+     */
+    //detail: title, content, likes, dislikes, comment.userid, comments.text
+    public int createQR(int uid) {
+        if (uid <= 0)
+            return -1;
+        try {
+            qInsertOne.setInt(1, uid);
+            Date date = new Date();
+            Timestamp ts = new Timestamp(date.getTime());
+            qInsertOne.setTimestamp(2, ts);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 1;
     }
 
     /**

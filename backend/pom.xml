@@ -53,6 +53,17 @@
       <artifactId>google-api-services-drive</artifactId>
       <version>v3-rev110-1.23.0</version>
     </dependency>
+    <!-- https://mvnrepository.com/artifact/com.ticketmaster.api/discovery-java -->
+    <dependency>
+      <groupId>com.ticketmaster.api</groupId>
+      <artifactId>discovery-java</artifactId>
+      <version>0.1.8</version>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/com.ticketmaster.api/discovery-model-java -->
+
+
+
+
 
     <!--
       Memcachier
@@ -108,6 +119,7 @@
       <name>EBR External Release Repository</name>
       <url>http:// repository.springsource.com/maven/bundles/external</url>
     </repository>
+    <!-- https://mvnrepository.com/artifact/com.ticketmaster.api/discovery-model-java -->
   </repositories>
 
 
