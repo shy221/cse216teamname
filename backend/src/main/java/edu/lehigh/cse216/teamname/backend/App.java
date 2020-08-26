@@ -339,7 +339,6 @@ public class App {
                 }
             }
             return gson.toJson(new StructuredResponse("error", "session key not correct..", null));
-
         });
 
         /**
